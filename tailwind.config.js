@@ -24,10 +24,11 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['Geist', '"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
-        display: ['"Plus Jakarta Sans"', 'Geist', 'system-ui', 'sans-serif'],
+        sans: ['Outfit', '"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['Outfit', '"Plus Jakarta Sans"', 'sans-serif'],
+        heading: ['"Space Grotesk"', 'Outfit', 'sans-serif'],
         serif: ['"Playfair Display"', 'Georgia', 'serif'],
-        mono: ['"Geist Mono"', '"JetBrains Mono"', 'monospace'],
+        mono: ['"JetBrains Mono"', '"Geist Mono"', 'monospace'],
       }
     },
   },

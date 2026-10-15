@@ -15,6 +15,7 @@ import {
   FileImage,
   Split
 } from 'lucide-react';
+import TornadoLoader from '../common/TornadoLoader';
 
 const SAMPLE_CASES = [
   {
@@ -91,7 +92,7 @@ export default function RealityInversion({ currentCase, onIngestNew }) {
           return prev;
         }
       });
-    }, 600);
+    }, 1100);
   };
 
   // Client-side restoration synthesizer for custom uploaded image
@@ -259,29 +260,20 @@ export default function RealityInversion({ currentCase, onIngestNew }) {
           {/* Main Visual Display */}
           <div 
             ref={sliderContainerRef}
-            className="relative w-full aspect-video sm:h-[430px] rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-200/80 shadow-md select-none group"
+            className="relative w-full aspect-video sm:h-[480px] rounded-2xl overflow-hidden bg-zinc-100 border border-zinc-200/80 shadow-md select-none group flex items-center justify-center"
             onMouseDown={() => { isDraggingSlider.current = true; }}
             onTouchStart={() => { isDraggingSlider.current = true; }}
           >
             {isProcessing ? (
-              /* Live Latent Inversion Simulation Overlay */
-              <div className="absolute inset-0 z-30 bg-zinc-950/90 backdrop-blur-md flex flex-col items-center justify-center text-center p-6 text-white">
-                <div className="relative mb-5">
-                  <div className="w-16 h-16 rounded-full border-2 border-emerald-500/30 border-t-emerald-400 animate-spin" />
-                  <Sparkles className="w-7 h-7 text-emerald-400 absolute inset-0 m-auto animate-pulse" />
-                </div>
-                <span className="text-xs font-mono uppercase tracking-widest text-emerald-400 mb-1">
-                  LATENT INVERSION ENGINE // PASS {processStep + 1} OF 4
-                </span>
-                <h4 className="text-base sm:text-lg font-semibold text-white max-w-md">
-                  {STEPS[processStep]}
-                </h4>
-                <div className="w-64 h-1.5 bg-zinc-800 rounded-full mt-4 overflow-hidden">
-                  <div 
-                    className="h-full bg-emerald-400 transition-all duration-300" 
-                    style={{ width: `${((processStep + 1) / STEPS.length) * 100}%` }}
-                  />
-                </div>
+              /* Live Latent Inversion Simulation Overlay with Top-Down Tornado Vortex */
+              <div className="absolute inset-0 z-30 bg-white/95 backdrop-blur-xl flex items-center justify-center p-6 rounded-2xl">
+                <TornadoLoader
+                  progress={((processStep + 1) / STEPS.length) * 100}
+                  stageLabel={`LATENT INVERSION ENGINE · PASS ${processStep + 1} OF 4`}
+                  stageDetail={STEPS[processStep]}
+                  subText="De-morphing neural face manifolds and isolating authentic unmanipulated photographic ground truth"
+                  size={260}
+                />
               </div>
             ) : viewMode === 'slider' ? (
               /* Split Comparison Slider */
@@ -293,8 +285,8 @@ export default function RealityInversion({ currentCase, onIngestNew }) {
                     alt="AI Predicted Original"
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute top-3 right-3 z-10 px-2.5 py-1 rounded-lg bg-emerald-950/80 backdrop-blur-md border border-emerald-500/40 text-[11px] font-semibold text-emerald-300 flex items-center gap-1.5">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                  <div className="absolute top-3 right-3 z-10 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-emerald-200/80 shadow-sm text-xs font-semibold text-emerald-800 flex items-center gap-1.5 font-sans">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                     <span>AI Predicted Original Ground Truth</span>
                   </div>
                 </div>
@@ -310,7 +302,7 @@ export default function RealityInversion({ currentCase, onIngestNew }) {
                     className="w-full h-full object-cover max-w-none"
                     style={{ width: sliderContainerRef.current ? sliderContainerRef.current.clientWidth : '100%' }}
                   />
-                  <div className="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-lg bg-rose-950/80 backdrop-blur-md border border-rose-500/40 text-[11px] font-semibold text-rose-300 flex items-center gap-1.5">
+                  <div className="absolute top-3 left-3 z-10 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-rose-200/80 shadow-sm text-xs font-semibold text-rose-800 flex items-center gap-1.5 font-sans">
                     <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
                     <span>Morphed AI Specimen</span>
                   </div>
@@ -318,7 +310,7 @@ export default function RealityInversion({ currentCase, onIngestNew }) {
 
                 {/* 3. Draggable Divider Handle */}
                 <div
-                  className="absolute top-0 bottom-0 w-0.5 bg-white shadow-[0_0_15px_rgba(255,255,255,0.8)] cursor-ew-resize z-20 flex items-center justify-center"
+                  className="absolute top-0 bottom-0 w-0.5 bg-zinc-900 shadow-[0_0_12px_rgba(24,24,27,0.35)] cursor-ew-resize z-20 flex items-center justify-center"
                   style={{ left: `${sliderPosition}%` }}
                 >
                   <div className="w-8 h-8 -ml-3.75 rounded-full bg-white border border-zinc-300 shadow-xl flex items-center justify-center text-zinc-900 group-hover:scale-110 transition-transform">
@@ -329,15 +321,15 @@ export default function RealityInversion({ currentCase, onIngestNew }) {
             ) : (
               /* Side-by-Side Dual View */
               <div className="grid grid-cols-2 h-full w-full">
-                <div className="relative border-r border-zinc-800 h-full">
+                <div className="relative border-r border-zinc-200 h-full">
                   <img src={activeMorphed} alt="Morphed" className="w-full h-full object-cover" />
-                  <div className="absolute bottom-3 left-3 px-2 py-0.5 rounded bg-rose-950/80 text-rose-300 text-[10px] font-bold">
+                  <div className="absolute bottom-3 left-3 px-3 py-1 rounded-full bg-white/95 text-rose-800 border border-rose-200/80 text-xs font-bold shadow-sm font-sans">
                     MORPHED SPECIMEN
                   </div>
                 </div>
                 <div className="relative h-full">
                   <img src={activeOriginal} alt="Predicted Original" className="w-full h-full object-cover" />
-                  <div className="absolute bottom-3 right-3 px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-300 text-[10px] font-bold">
+                  <div className="absolute bottom-3 right-3 px-3 py-1 rounded-full bg-white/95 text-emerald-800 border border-emerald-200/80 text-xs font-bold shadow-sm font-sans">
                     PREDICTED ORIGINAL
                   </div>
                 </div>
