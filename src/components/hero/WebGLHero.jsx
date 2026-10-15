@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
+import HalftoneWordmarkFooter from "@/components/ui/halftone-wordmark-footer";
 
 /* ───────────────────────────── GLSL SHADERS ────────────────────────────── */
 const VERT_SHADER = `#version 300 es
@@ -75,32 +76,44 @@ vec2 getCoverUv(vec2 uv, float ia, float sa) {
   return st + 0.5;
 }
 
-/* ── Subtle Digital Screen Micro-Glitch (Restrained, Clean) ── */
+/* ── Slower, Measured Monochromatic Digital Screen Glitch Engine ── */
 vec2 getGlitchDisplacement(vec2 uv, float t) {
   vec2 disp = vec2(0.0);
 
-  // Very subtle, occasional horizontal micro-jitter
-  float microBlock = floor(uv.y * 90.0 + t * 4.0);
-  float microNoise = snoise(vec2(microBlock * 0.25, floor(t * 10.0) * 0.7));
-  if (abs(microNoise) > 0.75) {
-    disp.x += sign(microNoise) * (abs(microNoise) - 0.75) * 0.010;
+  // 1. Measured horizontal slice jumps (calm 7 fps cadence)
+  float sliceBlock = floor(uv.y * 65.0 + t * 5.0);
+  float sliceNoise = snoise(vec2(sliceBlock * 0.35, floor(t * 7.0) * 0.85));
+  if (abs(sliceNoise) > 0.62) {
+    disp.x += sign(sliceNoise) * (abs(sliceNoise) - 0.62) * 0.020;
   }
+
+  // 2. Micro scanline jitter (deliberate 11 fps ticks)
+  float microBlock = floor(uv.y * 160.0 - t * 8.0);
+  float microNoise = snoise(vec2(microBlock * 0.22, floor(t * 11.0) * 0.9));
+  if (abs(microNoise) > 0.68) {
+    disp.x += sign(microNoise) * (abs(microNoise) - 0.68) * 0.012;
+  }
+
+  // 3. Periodic subtle micro vertical twitch
+  float vJitter = step(0.96, fract(sin(floor(t * 8.0) * 45.1) * 43758.5453));
+  disp.y += (vJitter * 0.004 - 0.002);
 
   return disp;
 }
 
-/* ── Monochromatic Matte Grey & White Sampling (Zero Rainbow RGB) ── */
+/* ── Monochromatic Matte Grey & White Sampling (Slower, Clean Analog Texture) ── */
 vec3 sampleGlitchedDest(vec2 uv, vec2 disp, float t) {
   vec2 sampleUv = clamp(uv + disp, 0.001, 0.999);
   vec4 texCol = texture(uDest, sampleUv);
 
-  // Clean monochromatic matte luminance (strictly white and matte grey, no rainbow RGB color)
+  // Strictly monochromatic matte luminance (white, grey, black - NO extra colors)
   float lum = dot(texCol.rgb, vec3(0.299, 0.587, 0.114));
   vec3 monoCol = vec3(lum);
 
-  // Soft subtle scanline modulation (clean, high-end CRT texture without harsh dark bands)
-  float scanline = 0.96 + 0.04 * sin(uv.y * uRes.y * 0.85);
-  return monoCol * scanline;
+  // Slower, smooth scanline drift & calm flicker
+  float scanline = 0.96 + 0.04 * sin(uv.y * uRes.y * 0.90 + t * 2.2);
+  float flicker = 1.0 - 0.025 * step(0.95, fract(sin(floor(t * 8.0) * 12.9898) * 43758.5453));
+  return monoCol * scanline * flicker;
 }
 
 /* ── Cross Sparkle Star with Needle Diffraction Spikes ── */
@@ -138,8 +151,8 @@ vec4 drawCrossStar(vec2 pxCoord, vec2 pos, float reach, float core, float twinkl
 vec4 computeSparklesAndStars(vec2 screenPx, vec2 resPx, float t) {
   vec4 acc = vec4(0.0);
 
-  // 1. Moving cross-stars (recreating the user's transparent element)
-  // Center Hero Cross Star (drifting continuously)
+  // 1. Moving cross-stars
+  // Center Hero Cross Star
   vec2 p1 = vec2(
     resPx.x * (0.50 + 0.10 * sin(t * 0.28) + 0.03 * cos(t * 0.65)),
     resPx.y * (0.48 + 0.07 * cos(t * 0.24) - 0.03 * sin(t * 0.52))
@@ -221,7 +234,7 @@ void main() {
   vec2 aUv = getCoverUv(uv, ia, sa);
   vec2 clampedUv = clamp(aUv, 0.001, 0.999);
 
-  // ── When p >= 0.99: Clean Halftone face with Subtle Micro-Glitch + Moving Sparkles & Stars ──
+  // ── When p >= 0.99: Halftone face with Preloaded Rapid Glitch + Moving Sparkles & Stars ──
   if (p >= 0.99) {
     vec2 glitchDisp = getGlitchDisplacement(clampedUv, t);
     vec3 baseCol = sampleGlitchedDest(clampedUv, glitchDisp, t);
@@ -249,7 +262,7 @@ void main() {
 
   // 3. Radius expansion
   float maxRadius = 2.1;
-  float expansion = smoothstep(0.04, 0.94, p);
+  float expansion = smoothstep(0.02, 0.96, p);
   float currentRadius = expansion * maxRadius;
 
   // 4. Irregular tear boundary
@@ -267,20 +280,18 @@ void main() {
   vec2 destUv = clamp(clampedUv - tearDisplace * 0.5, 0.001, 0.999);
 
   // 6. Outside tear: fresco hands -> dark contour hands
-  float darkMix = smoothstep(0.02, 0.28, p);
+  float darkMix = smoothstep(0.01, 0.20, p);
   vec4 colOutside = mix(texture(uSrc, srcUv), texture(uDark, srcUv), darkMix);
 
-  // 7. Inside tear: silver landscape -> clean halftone face with sparkles
-  float destMix = smoothstep(0.40, 0.82, p);
+  // 7. Inside tear: immediately glitched halftone face with sparkles (preloaded & rapid)
   vec2 innerGlitch = getGlitchDisplacement(destUv, t);
   vec3 glitchedFace = sampleGlitchedDest(destUv, innerGlitch, t);
   vec2 screenPx = vUv * uRes;
   vec4 innerSparkles = computeSparklesAndStars(screenPx, uRes, t);
   vec4 colHalftone = vec4(glitchedFace + innerSparkles.rgb * 0.88, 1.0);
-  vec4 colInside = mix(texture(uFrag, destUv), colHalftone, destMix);
 
-  // 8. Composite inside & outside
-  vec4 col = mix(colOutside, colInside, inside);
+  // 8. Composite inside & outside immediately
+  vec4 col = mix(colOutside, colHalftone, inside);
 
   // 9. Digital debris & sparkles along border (clean silver/white)
   float spk1 = step(0.56, snoise(clampedUv * 150.0 + vec2(t * 3.2, t * 1.6)));
@@ -456,14 +467,13 @@ export default function WebGLHero({ onExplore, onPhaseChange }) {
     }
   }, []);
 
-  /* Trigger cinematic transition */
+  /* Trigger slow, proper, furnished cinematic tear transition */
   const triggerTransition = useCallback(() => {
     const now = performance.now();
     if (now - lastTriggerTsRef.current < 250) return;
     lastTriggerTsRef.current = now;
 
     if (isPlayingRef.current || transitionedRef.current) return;
-
     if (!progRef.current) return;
 
     if (!texturesLoadedRef.current) {
@@ -476,14 +486,12 @@ export default function WebGLHero({ onExplore, onPhaseChange }) {
 
     cancelTweenRef.current = makeTween(
       [
-        // STAGE 2: Initial localized rupture at "YOU" (0.45s)
-        { toValue: 0.15, duration: 0.45, ease: easeInQuad },
-        // STAGE 3 & 4: Dark contour hands & silver emergence (1.10s)
-        { toValue: 0.55, duration: 1.10, ease: easeInOutCubic },
-        // STAGE 5 & 6: Tear fills screen, halftone face reveals (1.20s)
-        { toValue: 0.88, duration: 1.20, ease: easeInOutCubic },
-        // STAGE 7: Final reconstruction & halftone stability (0.75s)
-        { toValue: 1.00, duration: 0.75, ease: easeOutCubic },
+        // Stage 1: Slow, tactile initial rupture at "YOU" (0.85s)
+        { toValue: 0.22, duration: 0.85, ease: easeInQuad },
+        // Stage 2: Rich, furnished tearing expansion unfolding across the page (1.45s)
+        { toValue: 0.75, duration: 1.45, ease: easeInOutCubic },
+        // Stage 3: Gentle, majestic settling as tear finishes (0.90s)
+        { toValue: 1.00, duration: 0.90, ease: easeOutCubic },
       ],
       (v) => {
         progressRef.current = v;
@@ -675,25 +683,28 @@ export default function WebGLHero({ onExplore, onPhaseChange }) {
         }}
       />
 
-      {/* ── Clean, Shorter Caps "TOUCH" Text at the Bottom (Zero Shadow, Crisp Typography) ── */}
+      {/* ── Proper, Highly Readable, Sleek Thin "TOUCH" Text Touching the Bottom ── */}
       {phase === "idle" && (
-        <div className="absolute inset-x-0 bottom-0 z-30 flex flex-col items-center justify-end pointer-events-none select-none pb-4 md:pb-6">
+        <div className="absolute inset-x-0 bottom-0 z-30 flex flex-col items-center justify-end pb-2 sm:pb-3 pointer-events-none select-none overflow-visible">
           <button
             type="button"
             onClick={handleInteraction}
             onPointerDown={handleInteraction}
-            className="font-bold text-white pointer-events-auto cursor-pointer hover:opacity-85 active:scale-98 transition-all duration-150 select-none touch-manipulation"
+            className="text-white pointer-events-auto cursor-pointer select-none touch-manipulation transition-opacity duration-150 hover:opacity-80 active:opacity-60"
             style={{
-              fontSize: "clamp(2rem, 5.5vw, 3.8rem)",
-              fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-              letterSpacing: "0.02em",
-              fontWeight: 700,
+              fontSize: "clamp(2.4rem, 6.8vw, 4.5rem)",
+              fontFamily: "'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif",
+              letterSpacing: "0.04em",
+              fontWeight: 300,
               lineHeight: 1,
               textShadow: "none",
               color: "#FFFFFF",
               background: "transparent",
               border: "none",
               outline: "none",
+              margin: 0,
+              padding: 0,
+              display: "inline-block",
             }}
           >
             TOUCH
@@ -701,38 +712,66 @@ export default function WebGLHero({ onExplore, onPhaseChange }) {
         </div>
       )}
 
+      {/* ── Preloaded Interactive Halftone Dot 'VERATIS' Wordmark (Mounted on start, 0 delay) ── */}
+      <div
+        className={`absolute inset-x-0 bottom-0 z-20 flex flex-col justify-end transition-opacity duration-500 ease-out ${
+          phase === "done" ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+      >
+        <HalftoneWordmarkFooter
+          wordmark="VERATIS"
+          height="clamp(160px, 25vh, 240px)"
+          crop={0.16}
+          dotGap={5}
+          radius={85}
+          grain={0.2}
+          interactive={true}
+          palette={{
+            background: "transparent",
+            ink: "#ffffff",
+            warm: "#d5ed9a",
+          }}
+          columns={[]}
+          label=""
+          meta=""
+          backToTop={false}
+        />
+      </div>
+
       {/* ── Minimalist Scroll Prompt on Completed Halftone Page ── */}
-      {phase === "done" && (
-        <div className="absolute bottom-6 inset-x-0 z-20 flex justify-center pointer-events-none">
-          <button
-            onClick={onExplore}
-            className="group flex flex-col items-center gap-1.5 text-white/45 hover:text-white transition-colors cursor-pointer pointer-events-auto"
-            aria-label="Scroll to explore dashboard"
+      <div
+        className={`absolute bottom-[clamp(170px,27vh,255px)] inset-x-0 z-30 flex justify-center transition-opacity duration-500 ease-out ${
+          phase === "done" ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+      >
+        <button
+          onClick={onExplore}
+          className="group flex flex-col items-center gap-1.5 text-white/60 hover:text-white transition-colors cursor-pointer pointer-events-auto backdrop-blur-xs py-1.5 px-3.5 rounded-full bg-black/25 border border-white/10 shadow-xs"
+          aria-label="Scroll to explore dashboard"
+        >
+          <span className="text-[10px] font-mono tracking-[0.3em] uppercase">Scroll</span>
+          <svg
+            width="16"
+            height="9"
+            viewBox="0 0 18 10"
+            fill="none"
+            className="transition-transform group-hover:translate-y-1"
           >
-            <span className="text-[10px] font-mono tracking-[0.3em] uppercase">Scroll</span>
-            <svg
-              width="18"
-              height="10"
-              viewBox="0 0 18 10"
-              fill="none"
-              className="transition-transform group-hover:translate-y-1"
-            >
-              <path
-                d="M1 1L9 8L17 1"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-            </svg>
-          </button>
-        </div>
-      )}
+            <path
+              d="M1 1L9 8L17 1"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+          </svg>
+        </button>
+      </div>
 
       {/* ── Dev Rewatch / Reset Button ── */}
       {phase === "done" && (
         <button
           onClick={resetTransition}
-          className="absolute bottom-5 right-5 z-20 px-3 py-1.5 rounded-full bg-black/50 border border-white/15 text-white/70 hover:text-white text-[11px] font-mono hover:bg-black/80 transition-all cursor-pointer backdrop-blur-md shadow-lg"
+          className="absolute top-5 right-5 z-30 px-3 py-1.5 rounded-full bg-black/50 border border-white/15 text-white/70 hover:text-white text-[11px] font-mono hover:bg-black/80 transition-all cursor-pointer backdrop-blur-md shadow-lg"
           title="Replay cinematic transition"
         >
           ↺ Rewatch
