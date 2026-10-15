@@ -73,7 +73,28 @@ document.addEventListener('DOMContentLoaded', async () => {
   checkPendingAction();
   initVoiceRecognition();
   checkBackendHealth();
+
+  // Listen for tab switches and updates
+  if (chrome.tabs) {
+    chrome.tabs.onActivated?.addListener(async () => {
+      await refreshActiveTab();
+    });
+    chrome.tabs.onUpdated?.addListener(async (tabId, changeInfo, tab) => {
+      if (tab?.active) {
+        await refreshActiveTab();
+      }
+    });
+  }
 });
+
+function isRestrictedUrl(url) {
+  if (!url) return false;
+  return url.startsWith('chrome://') || 
+         url.startsWith('chrome-extension://') || 
+         url.startsWith('edge://') || 
+         url.startsWith('about:') || 
+         url.includes('chrome.google.com/webstore');
+}
 
 // Load settings from storage
 async function loadSettings() {
@@ -100,8 +121,13 @@ async function refreshActiveTab() {
     const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
     if (tabs && tabs[0]) {
       currentTab = tabs[0];
-      const domain = currentTab.url ? new URL(currentTab.url).hostname : 'Webpage';
-      pageTitleLabel.textContent = `${domain} · ${currentTab.title || 'Active Tab'}`;
+      const isRestricted = isRestrictedUrl(currentTab.url);
+      if (isRestricted) {
+        pageTitleLabel.textContent = 'Chrome System Page (open any website to analyze)';
+      } else {
+        const domain = currentTab.url ? new URL(currentTab.url).hostname : 'Webpage';
+        pageTitleLabel.textContent = `${domain} · ${currentTab.title || 'Active Tab'}`;
+      }
       currentContext.title = currentTab.title || '';
       currentContext.url = currentTab.url || '';
     } else {
@@ -192,6 +218,15 @@ async function extractFromTab(actionType) {
   }
   if (!currentTab || !currentTab.id) {
     addMessage('assistant', '⚠️ Could not access the active tab. Please make sure a normal webpage is open.');
+    return;
+  }
+
+  // Check if current tab is a restricted system page
+  if (isRestrictedUrl(currentTab.url)) {
+    addMessage(
+      'assistant',
+      'ℹ️ Chrome restricts all extensions from reading internal **chrome://** system pages for browser security.\n\n👉 **To test VERATIS Companion:** Switch to any regular public website (like Wikipedia, BBC News, or your local website), highlight some text, and click **"Get Selection"** or choose an action!\n\n*(You can also ask general digital-trust or fact-checking questions directly in the box below.)*'
+    );
     return;
   }
 
@@ -384,12 +419,26 @@ function openSettingsModal() {
    ========================================================================== */
 
 async function triggerAction(actionName) {
-  // If no text is selected or captured yet, try grabbing selection or page first
+  // If user typed something in composer, use that as input
   if (!currentContext.selectedText && !currentContext.pageText) {
-    await extractFromTab('GET_SELECTION');
-    if (!currentContext.selectedText) {
-      await extractFromTab('GET_PAGE_TEXT');
+    if (messageInput.value.trim()) {
+      currentContext.selectedText = messageInput.value.trim();
+      messageInput.value = '';
+    } else if (!isRestrictedUrl(currentTab?.url)) {
+      await extractFromTab('GET_SELECTION');
+      if (!currentContext.selectedText) {
+        await extractFromTab('GET_PAGE_TEXT');
+      }
     }
+  }
+
+  // If still empty on a restricted page, guide the user cleanly
+  if (!currentContext.selectedText && !currentContext.pageText && isRestrictedUrl(currentTab?.url)) {
+    addMessage(
+      'assistant',
+      'ℹ️ You are currently on a Chrome system page (`chrome://`). Please switch to any regular website (like Wikipedia, BBC, or your local site) to analyze page text, or type/paste your text directly in the box below!'
+    );
+    return;
   }
 
   const actionLabels = {

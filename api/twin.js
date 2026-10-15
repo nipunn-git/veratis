@@ -29,13 +29,23 @@ export default async function handler(req, res) {
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
     const { scenarioId, messages = [], userMessage = '' } = body;
 
+    const groqKey = process.env.GROQ_API_KEY;
     const geminiKey = process.env.GEMINI_API_KEY;
     const openaiKey = process.env.OPENAI_API_KEY;
     const anthropicKey = process.env.ANTHROPIC_API_KEY;
 
     let reply = null;
 
-    // 1. Try Gemini if configured
+    // 1. Try GroqCloud (Ultra-fast Llama 3.3 70B)
+    if (groqKey && !reply) {
+      try {
+        reply = await callGroqTwin(groqKey, scenarioId, messages, userMessage);
+      } catch (err) {
+        console.warn('Groq Twin call failed, using next provider:', err.message);
+      }
+    }
+
+    // 2. Try Gemini if configured
     if (geminiKey && !reply) {
       try {
         reply = await callGeminiTwin(geminiKey, scenarioId, messages, userMessage);
@@ -186,4 +196,41 @@ Return JSON: { "text": "response", "suggestedFollowUps": [{ "text": "safe reply"
   const data = await response.json();
   const parsed = JSON.parse(data.choices[0].message.content);
   return { ...parsed, isLiveAI: true };
+}
+
+async function callGroqTwin(apiKey, scenarioId, messages, userMessage) {
+  const prompt = `You are roleplaying a social engineering simulation character for training in a cybersecurity awareness tool.
+Stay in character strictly. Apply realistic scenario pressure, urgency, or authority.
+Return ONLY valid JSON:
+{
+  "text": "Your in-character reply to the user",
+  "suggestedFollowUps": [
+    { "text": "A cautious safe reply the user could send", "type": "safe" },
+    { "text": "A risky compliant reply the user could send", "type": "risky" }
+  ]
+}
+Scenario: ${scenarioId}
+User said: "${userMessage}"`;
+
+  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      response_format: { type: 'json_object' },
+      messages: [
+        { role: 'system', content: prompt },
+        { role: 'user', content: userMessage }
+      ],
+      temperature: 0.3
+    })
+  });
+
+  if (!response.ok) throw new Error(`Groq error: ${response.status}`);
+  const data = await response.json();
+  const parsed = JSON.parse(data.choices[0].message.content);
+  return { ...parsed, isLiveAI: true, provider: 'GroqCloud (Llama 3.3 70B)' };
 }

@@ -40,22 +40,32 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'No text or query provided for analysis.' });
     }
 
+    const groqKey = process.env.GROQ_API_KEY;
     const geminiKey = process.env.GEMINI_API_KEY;
     const openaiKey = process.env.OPENAI_API_KEY;
     const anthropicKey = process.env.ANTHROPIC_API_KEY;
 
     let aiResult = null;
 
-    // 1. Try Gemini
+    // 1. Try GroqCloud (Ultra fast Llama 3.3 70B)
+    if (groqKey && !aiResult) {
+      try {
+        aiResult = await callGroqCompanion(groqKey, action, query, contextContent, pageTitle, pageUrl, history);
+      } catch (err) {
+        console.warn('Groq Companion failed, trying next provider:', err.message);
+      }
+    }
+
+    // 2. Try Gemini
     if (geminiKey && !aiResult) {
       try {
         aiResult = await callGeminiCompanion(geminiKey, action, query, contextContent, pageTitle, pageUrl, history);
       } catch (err) {
-        console.warn('Gemini Companion failed, falling back to smart analyzer:', err.message);
+        console.warn('Gemini Companion failed, trying next provider:', err.message);
       }
     }
 
-    // 2. Try OpenAI
+    // 3. Try OpenAI
     if (openaiKey && !aiResult) {
       try {
         aiResult = await callOpenAICompanion(openaiKey, action, query, contextContent, pageTitle, pageUrl, history);
@@ -243,6 +253,55 @@ Provide a concise, plain-English, helpful analysis in Markdown with bullet point
     action,
     response: textOutput,
     isLiveAI: true,
+    suggestedNext: ['Investigate', 'Challenge This', 'Explain in simple terms']
+  };
+}
+
+/**
+ * GroqCloud Live AI Integration (Ultra-fast Llama 3.3 70B)
+ */
+async function callGroqCompanion(apiKey, action, query, text, title, url, history) {
+  const prompt = `You are VERATIS Companion, an intelligent AI digital-trust and verification assistant running as a browser extension side panel.
+Webpage Title: "${title}"
+URL: "${url}"
+Content/Excerpt:
+"${text.slice(0, 3000)}"
+
+Action Requested: "${action}".
+User query: "${query || action}".
+
+GUIDELINES:
+- Use simple, plain, conversational English with short bullet points.
+- Distinguish warning signs from proven facts.
+- Never claim an item is verified unless real proof exists.
+- Be direct, polite, helpful, and concise.`;
+
+  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages: [
+        { role: 'system', content: 'You are VERATIS Companion. Plain-English digital-trust assistant.' },
+        { role: 'user', content: prompt }
+      ],
+      temperature: 0.3,
+      max_tokens: 1000
+    })
+  });
+
+  if (!response.ok) throw new Error(`Groq status ${response.status}: ${await response.text()}`);
+  const data = await response.json();
+  const textOutput = data.choices?.[0]?.message?.content || 'No response generated.';
+
+  return {
+    action,
+    response: textOutput,
+    isLiveAI: true,
+    provider: 'GroqCloud (Llama 3.3 70B)',
     suggestedNext: ['Investigate', 'Challenge This', 'Explain in simple terms']
   };
 }
