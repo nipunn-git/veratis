@@ -1,12 +1,13 @@
 import React from 'react';
-import { Download, RefreshCw, Upload, ShieldAlert, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Download, RefreshCw, Upload, ShieldAlert, Sparkles, CheckCircle2, Gavel, Bot } from 'lucide-react';
 
 export default function SpecimenDossierWidget({ 
   currentCase, 
   onSwitchCase, 
   onExportDossier, 
   onNewUpload,
-  onPredictOriginal
+  onPredictOriginal,
+  onNavigateTab
 }) {
   if (!currentCase) return null;
 
@@ -53,8 +54,26 @@ export default function SpecimenDossierWidget({
 
           <div className="flex flex-wrap items-center gap-2 pt-2">
             <button
+              onClick={() => onNavigateTab?.('tribunal')}
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-white transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
+              title="Open Truth Tribunal investigation"
+            >
+              <Gavel className="w-3.5 h-3.5 text-zinc-300" />
+              <span>Tribunal</span>
+            </button>
+
+            <button
+              onClick={() => onNavigateTab?.('twin')}
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border border-indigo-200/80 transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
+              title="Launch Digital Twin social engineering simulator"
+            >
+              <Bot className="w-3.5 h-3.5 text-indigo-600" />
+              <span>Digital Twin</span>
+            </button>
+
+            <button
               onClick={onPredictOriginal}
-              className="text-xs font-semibold px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
             >
               <Sparkles className="w-3.5 h-3.5 text-emerald-200" />
               <span>Predict Original</span>
@@ -73,7 +92,7 @@ export default function SpecimenDossierWidget({
               className="text-xs font-medium px-3 py-1.5 rounded-lg bg-zinc-100/80 hover:bg-zinc-200/70 text-zinc-700 transition-colors cursor-pointer flex items-center gap-1.5"
             >
               <Upload className="w-3.5 h-3.5 text-zinc-500" />
-              <span>Ingest media</span>
+              <span>Ingest</span>
             </button>
           </div>
         </div>

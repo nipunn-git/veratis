@@ -11,7 +11,9 @@ import {
   Download, 
   Home, 
   Layers,
-  Sparkles
+  Sparkles,
+  Gavel,
+  Bot
 } from 'lucide-react';
 
 export default function BottomNavbar({
@@ -24,13 +26,15 @@ export default function BottomNavbar({
 }) {
   const tabs = [
     { id: 'overview', label: 'Grid', icon: LayoutGrid, hotkey: '1' },
-    { id: 'reconstruct', label: 'Reconstruct', icon: Sparkles, hotkey: '2' },
-    { id: 'radar', label: 'Radar', icon: Radar, hotkey: '3' },
-    { id: 'autopsy', label: 'Autopsy', icon: Search, hotkey: '4' },
-    { id: 'timeline', label: 'Timeline', icon: Clock, hotkey: '5' },
-    { id: 'gravity', label: 'Gravity', icon: GitFork, hotkey: '6' },
-    { id: 'hypotheses', label: 'Hypotheses', icon: Scale, hotkey: '7' },
-    { id: 'uncertainty', label: 'Uncertainty', icon: HelpCircle, hotkey: '8' },
+    { id: 'tribunal', label: 'Tribunal', icon: Gavel, hotkey: '2' },
+    { id: 'twin', label: 'Digital Twin', icon: Bot, hotkey: '3' },
+    { id: 'reconstruct', label: 'Reconstruct', icon: Sparkles, hotkey: '4' },
+    { id: 'radar', label: 'Radar', icon: Radar, hotkey: '5' },
+    { id: 'autopsy', label: 'Autopsy', icon: Search, hotkey: '6' },
+    { id: 'timeline', label: 'Timeline', icon: Clock, hotkey: '7' },
+    { id: 'gravity', label: 'Gravity', icon: GitFork, hotkey: '8' },
+    { id: 'hypotheses', label: 'Hypotheses', icon: Scale, hotkey: '9' },
+    { id: 'uncertainty', label: 'Uncertainty', icon: HelpCircle, hotkey: '0' },
   ];
 
   // Keyboard shortcuts
