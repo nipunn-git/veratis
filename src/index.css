@@ -4,15 +4,15 @@
 
 @layer base {
   :root {
-    --souma-bg: #141e17;
+    --souma-bg: #000000;
     --souma-bone: #f5f4ef;
-    --souma-nav: #243427;
-    --souma-accent: #d5ed9a;
-    --souma-dark-text: #111b14;
+    --souma-nav: #141414;
+    --souma-accent: #ffffff;
+    --souma-dark-text: #050505;
   }
 
   body {
-    background-color: #141e17;
+    background-color: #000000;
     color: #f5f4ef;
     font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     letter-spacing: -0.015em;
@@ -27,14 +27,14 @@
     height: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: #141e17;
+    background: #000000;
   }
   ::-webkit-scrollbar-thumb {
-    background: #2a3b2e;
+    background: #262626;
     border-radius: 9999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #d5ed9a;
+    background: #525252;
   }
 }
 

@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import WebGLHero from './components/hero/WebGLHero';
 import Dashboard from './dashboard';
+import InitialLoader from './components/common/InitialLoader';
 
 export default function App() {
   const [heroPhase, setHeroPhase] = useState('idle'); // 'idle' | 'animating' | 'done'
   const [view, setView] = useState('landing'); // 'landing' | 'transitioning' | 'dashboard'
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const isTransitioningRef = useRef(false);
 
   // 1. Lock scrolling on the main landing screen until touched & animation finishes
@@ -94,7 +96,12 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0e0d0b] text-[#f5f4ef] selection:bg-[#20D9FF] selection:text-[#050B14]">
+    <div className="min-h-screen bg-black text-[#f5f4ef] selection:bg-white selection:text-black">
+      {/* 0. Cinematic Pitch-Black 0-100% Preloader */}
+      {isInitialLoading && (
+        <InitialLoader onComplete={() => setIsInitialLoading(false)} />
+      )}
+
       {/* 1. Hero Section (Shown on landing and during smooth glide into dashboard) */}
       {view !== 'dashboard' && (
         <WebGLHero

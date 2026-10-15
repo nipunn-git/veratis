@@ -695,7 +695,7 @@ export default function WebGLHero({ onExplore, onPhaseChange }) {
 
       {/* ── "REALITY HAS A BLIND SPOT" at the Bottom ── */}
       {phase === "idle" && (
-        <div className="absolute inset-x-0 bottom-0 z-30 flex flex-col items-center justify-end pb-3 sm:pb-4 pointer-events-none select-none overflow-visible px-4">
+        <div className="absolute inset-x-0 bottom-0 z-30 flex flex-col items-center justify-end pb-0.5 sm:pb-1 pointer-events-none select-none overflow-visible px-4">
           <button
             type="button"
             onClick={handleInteraction}
