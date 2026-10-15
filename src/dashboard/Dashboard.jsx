@@ -240,156 +240,66 @@ export default function Dashboard({ onBackToLanding, initialCaseIndex = 0 }) {
           onOpenCaseSelector={() => setCaseModalOpen(true)}
           onOpenUpload={() => setUploadModalOpen(true)}
           onExportDossier={handleExportDossier}
-          onSelectPreset={handleSelectPreset}
         />
 
-        {/* 2. Main Dashboard Content Canvas (Extended Horizontally) */}
-        <main className="max-w-[1780px] w-full mx-auto px-4 sm:px-8 lg:px-12 pt-4 pb-28">
+        {/* 2. Main Dashboard Content Canvas */}
+        <main className="w-full">
           {/* VIEW A: OVERVIEW - The 21st.dev Draggable Widget Grid (6 cards only) */}
           {activeTab === 'overview' && (
-            <DraggableGrid
-              widgets={widgets}
-              onReorderWidgets={handleReorderWidgets}
-              onResetLayout={handleResetLayout}
-              onToggleWidgetVisibility={handleToggleWidgetVisibility}
-              currentCase={currentCase}
-              onSwitchCase={() => setCaseModalOpen(true)}
-              onExportDossier={handleExportDossier}
-              onNewUpload={() => setUploadModalOpen(true)}
-            />
+            <div className="max-w-[1800px] w-full mx-auto px-4 sm:px-8 lg:px-12 pt-5 pb-28">
+              <DraggableGrid
+                widgets={widgets}
+                onReorderWidgets={handleReorderWidgets}
+                onResetLayout={handleResetLayout}
+                onToggleWidgetVisibility={handleToggleWidgetVisibility}
+                currentCase={currentCase}
+                onSwitchCase={() => setCaseModalOpen(true)}
+                onExportDossier={handleExportDossier}
+                onNewUpload={() => setUploadModalOpen(true)}
+              />
+            </div>
           )}
 
-          {/* VIEW B: DECEPTION RADAR (Focused Feature View) */}
-          {activeTab === 'radar' && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between pb-2">
-                <button
-                  onClick={() => setActiveTab('overview')}
-                  className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-zinc-200/80 text-xs sm:text-sm font-medium text-zinc-700 hover:text-zinc-950 hover:bg-white transition-all shadow-2xs cursor-pointer group"
-                >
-                  <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5 text-zinc-400 group-hover:text-zinc-700" />
-                  <span>Back to overview</span>
-                </button>
-                <span className="text-xs sm:text-sm font-medium px-4 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-zinc-200/80 text-zinc-600 shadow-2xs">
-                  Deception Radar
-                </span>
-              </div>
-              <div className="bg-white/80 backdrop-blur-xl border border-zinc-200/60 rounded-3xl p-6 sm:p-10 lg:p-12 shadow-xs">
+          {/* FOCUSED FEATURE VIEWS: Attached edge-to-edge to sides, open top/bottom, without redundant back headers */}
+          {activeTab !== 'overview' && (
+            <div className="w-full bg-white/80 backdrop-blur-xl border-y border-zinc-200/60 border-x-0 py-10 sm:py-14 px-6 sm:px-12 lg:px-20 xl:px-28 2xl:px-36 shadow-xs pb-36">
+              {/* VIEW B: DECEPTION RADAR */}
+              {activeTab === 'radar' && (
                 <DeceptionRadar
                   scores={currentCase.radarScores}
                   analysis={currentCase.radarAnalysis}
                 />
-              </div>
-            </div>
-          )}
+              )}
 
-          {/* VIEW C: EVIDENCE AUTOPSY (Focused Feature View) */}
-          {activeTab === 'autopsy' && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between pb-2">
-                <button
-                  onClick={() => setActiveTab('overview')}
-                  className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-zinc-200/80 text-xs sm:text-sm font-medium text-zinc-700 hover:text-zinc-950 hover:bg-white transition-all shadow-2xs cursor-pointer group"
-                >
-                  <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5 text-zinc-400 group-hover:text-zinc-700" />
-                  <span>Back to overview</span>
-                </button>
-                <span className="text-xs sm:text-sm font-medium px-4 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-zinc-200/80 text-zinc-600 shadow-2xs">
-                  Evidence Autopsy
-                </span>
-              </div>
-              <div className="bg-white/80 backdrop-blur-xl border border-zinc-200/60 rounded-3xl p-6 sm:p-10 lg:p-12 shadow-xs">
+              {/* VIEW C: EVIDENCE AUTOPSY */}
+              {activeTab === 'autopsy' && (
                 <EvidenceAutopsy
                   image={currentCase.image}
                   annotations={currentCase.annotations}
                 />
-              </div>
-            </div>
-          )}
+              )}
 
-          {/* VIEW D: REALITY TIMELINE (Focused Feature View) */}
-          {activeTab === 'timeline' && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between pb-2">
-                <button
-                  onClick={() => setActiveTab('overview')}
-                  className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-zinc-200/80 text-xs sm:text-sm font-medium text-zinc-700 hover:text-zinc-950 hover:bg-white transition-all shadow-2xs cursor-pointer group"
-                >
-                  <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5 text-zinc-400 group-hover:text-zinc-700" />
-                  <span>Back to overview</span>
-                </button>
-                <span className="text-xs sm:text-sm font-medium px-4 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-zinc-200/80 text-zinc-600 shadow-2xs">
-                  Reality Timeline
-                </span>
-              </div>
-              <div className="bg-white/80 backdrop-blur-xl border border-zinc-200/60 rounded-3xl p-6 sm:p-10 lg:p-12 shadow-xs">
+              {/* VIEW D: REALITY TIMELINE */}
+              {activeTab === 'timeline' && (
                 <RealityTimeline timeline={currentCase.timeline} />
-              </div>
-            </div>
-          )}
+              )}
 
-          {/* VIEW E: GRAVITY MAP (Focused Feature View) */}
-          {activeTab === 'gravity' && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between pb-2">
-                <button
-                  onClick={() => setActiveTab('overview')}
-                  className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-zinc-200/80 text-xs sm:text-sm font-medium text-zinc-700 hover:text-zinc-950 hover:bg-white transition-all shadow-2xs cursor-pointer group"
-                >
-                  <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5 text-zinc-400 group-hover:text-zinc-700" />
-                  <span>Back to overview</span>
-                </button>
-                <span className="text-xs sm:text-sm font-medium px-4 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-zinc-200/80 text-zinc-600 shadow-2xs">
-                  Evidence Gravity Map
-                </span>
-              </div>
-              <div className="bg-white/80 backdrop-blur-xl border border-zinc-200/60 rounded-3xl p-6 sm:p-10 lg:p-12 shadow-xs">
+              {/* VIEW E: GRAVITY MAP */}
+              {activeTab === 'gravity' && (
                 <EvidenceGravityMap gravityMap={currentCase.gravityMap} />
-              </div>
-            </div>
-          )}
+              )}
 
-          {/* VIEW F: COMPETING HYPOTHESES (Focused Feature View) */}
-          {activeTab === 'hypotheses' && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between pb-2">
-                <button
-                  onClick={() => setActiveTab('overview')}
-                  className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-zinc-200/80 text-xs sm:text-sm font-medium text-zinc-700 hover:text-zinc-950 hover:bg-white transition-all shadow-2xs cursor-pointer group"
-                >
-                  <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5 text-zinc-400 group-hover:text-zinc-700" />
-                  <span>Back to overview</span>
-                </button>
-                <span className="text-xs sm:text-sm font-medium px-4 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-zinc-200/80 text-zinc-600 shadow-2xs">
-                  Competing Hypotheses
-                </span>
-              </div>
-              <div className="bg-white/80 backdrop-blur-xl border border-zinc-200/60 rounded-3xl p-6 sm:p-10 lg:p-12 shadow-xs">
+              {/* VIEW F: COMPETING HYPOTHESES */}
+              {activeTab === 'hypotheses' && (
                 <CompetingHypotheses
                   hypotheses={currentCase.competingHypotheses}
                 />
-              </div>
-            </div>
-          )}
+              )}
 
-          {/* VIEW G: UNCERTAINTY ENGINE (Focused Feature View) */}
-          {activeTab === 'uncertainty' && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between pb-2">
-                <button
-                  onClick={() => setActiveTab('overview')}
-                  className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-zinc-200/80 text-xs sm:text-sm font-medium text-zinc-700 hover:text-zinc-950 hover:bg-white transition-all shadow-2xs cursor-pointer group"
-                >
-                  <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5 text-zinc-400 group-hover:text-zinc-700" />
-                  <span>Back to overview</span>
-                </button>
-                <span className="text-xs sm:text-sm font-medium px-4 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-zinc-200/80 text-zinc-600 shadow-2xs">
-                  Uncertainty Engine
-                </span>
-              </div>
-              <div className="bg-white/80 backdrop-blur-xl border border-zinc-200/60 rounded-3xl p-6 sm:p-10 lg:p-12 shadow-xs">
+              {/* VIEW G: UNCERTAINTY ENGINE */}
+              {activeTab === 'uncertainty' && (
                 <UncertaintyEngine uncertainty={currentCase.uncertaintyEngine} />
-              </div>
+              )}
             </div>
           )}
         </main>
