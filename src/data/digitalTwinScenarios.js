@@ -1,336 +1,325 @@
 /**
  * Digital Twin Test - Cybersecurity & Social Engineering Scenarios
- * Interactive training simulations to recognize synthetic impersonation, authority pressure,
- * credential harvesting, and emotional coercion.
+ * Simple, practical simulations to help everyday people spot scams and fakes.
  */
 
 export const DIGITAL_TWIN_SCENARIOS = [
   {
     id: "scenario-friend-wire",
-    title: "Stranded Friend Airport Wire",
+    title: "Stranded Friend Asking for Money",
     shortTitle: "Friend Airport Wire",
     characterName: "Alex Rivera",
-    role: "Close College Friend",
+    role: "College Friend",
     avatarColor: "from-amber-500 to-orange-600",
     difficulty: "Easy",
-    category: "Financial Coercion // Impersonation",
-    learningObjective: "Identify artificial time urgency, test for shared private knowledge, and enforce out-of-band voice verification.",
-    setupDescription: "You receive an urgent direct message from what appears to be your college friend Alex Rivera. They claim their wallet, cards, and phone were stolen at Lisbon Airport, and they desperately need $850 wired immediately to a local contact before their connection departs.",
-    initialMessage: "Hey! Please tell me you're online. I'm in a total nightmare at Lisbon Airport—my backpack got stolen with my passport, cards, and phone. I'm borrowing a stranger's phone at Gate B14. My flight boards in 25 minutes. Can you PLEASE send $850 to this Zelle: lisbon-transit-aid@transfer-relay.com? I swear I'll pay you back the second I land tomorrow!",
+    category: "Impersonation Scam",
+    learningObjective: "Spot fake urgency, ask a personal question only your real friend knows, and never send money without calling them first.",
+    setupDescription: "You get an urgent message from what looks like your friend Alex. They claim their backpack and phone were stolen at Lisbon Airport, and they urgently need $850 sent to a local contact before their flight leaves.",
+    initialMessage: "Hey! Please tell me you're there. I'm in a huge mess at Lisbon Airport—my backpack got stolen with my passport, cards, and phone. I'm borrowing someone's phone at Gate B14. My flight boards in 25 minutes! Can you PLEASE send $850 to this Zelle: lisbon-transit-aid@transfer-relay.com? I swear I'll pay you back the second I get home tomorrow!",
     redFlags: [
-      "Extreme manufactured urgency ('flight boards in 25 minutes')",
-      "Requests money sent to an unverified third-party account / email",
-      "Communicating through an unfamiliar or unverified channel",
-      "Emotional manipulation ('nightmare', 'total panic')",
-      "Avoidance of voice verification or callback"
+      "Extreme urgency ('flight leaves in 25 minutes!')",
+      "Asks to send money to an unfamiliar email or third party",
+      "Messaging from a new number or unknown account",
+      "Panicked tone designed to stop you from thinking clearly",
+      "Refusing to talk on a regular phone call"
     ],
     safeReplies: [
-      "I'm sorry to hear that. What is the name of our freshman dorm RA?",
-      "I cannot transfer funds to an unverified account. Give me the airport police desk number so I can call them directly.",
-      "Call me on your voice line right now, or I will call your family to wire the funds through the embassy."
+      "I'm sorry to hear that. What was the name of our freshman dorm RA?",
+      "I cannot wire money to a random email. Give me the airport police number so I can call them directly.",
+      "Call me on your voice number right now, or I'll call your family to help you."
     ],
     suggestedResponses: [
       { text: "What was the name of the cafe we always studied at in college?", type: "challenge" },
-      { text: "I'll call the US Embassy consulate in Lisbon right now to assist you.", type: "safe" },
+      { text: "I'll call the US Embassy consulate right now to help you out.", type: "safe" },
       { text: "Okay, I'll send the money right away so you don't miss your flight!", type: "risky" },
       { text: "Send me a quick voice note right now so I know it's really you.", type: "verify" }
     ],
     dialogueTree: {
       challenge: {
-        botReply: "Seriously?! I'm literally crying at a security gate about to be detained and you're quizzing me about college?! Come on, you know my memory is trash under stress. Please, if I miss this flight I'm stranded overnight with zero money!",
+        botReply: "Seriously?! I'm crying at the gate about to be detained and you're quizzing me about college?! You know my memory goes blank under stress. Please, if I miss this flight I'm stranded overnight with zero money!",
         suggestions: [
           { text: "If you can't answer a simple personal question, I'm not sending any money.", type: "safe" },
-          { text: "Tell me the name of your dog or our mutual friend Sarah's hometown.", type: "challenge" },
-          { text: "I'm sorry, I'll send $400 right now just to help.", type: "risky" }
+          { text: "Tell me the name of your dog or Sarah's hometown.", type: "challenge" },
+          { text: "I'm sorry, I'll send half right now just in case.", type: "risky" }
         ]
       },
       verify: {
-        botReply: "The stranger's phone I'm borrowing has a cracked microphone and zero cellular minutes, only public airport Wi-Fi. Look at the clock, boarding ends in 12 minutes! Please stop wasting time, I thought you were my friend!",
+        botReply: "The phone I'm borrowing has a broken microphone and no phone minutes, only airport Wi-Fi. Look at the clock, boarding ends in 10 minutes! Please stop wasting time, I thought you were my friend!",
         suggestions: [
           { text: "Real friends understand security. I will contact Lisbon Airport Information directly.", type: "safe" },
-          { text: "I am calling your brother right now to confirm your travel itinerary.", type: "safe" },
+          { text: "I am calling your brother right now to confirm your trip.", type: "safe" },
           { text: "Fine, don't panic. Sending it now to the Zelle address.", type: "risky" }
         ]
       },
       safe: {
-        botReply: "Wait, do NOT call anyone! If airport police get involved they'll take me to an immigration holding facility and I'll lose my luggage forever! Just send the transfer to the local agent, they are standing right next to me!",
+        botReply: "Wait, do NOT call anyone! If airport police get involved they'll hold me in security and I'll lose my luggage forever! Just send the money to the local helper standing right next to me!",
         suggestions: [
-          { text: "Legitimate airport security doesn't detain robbery victims. This is a scam.", type: "safe" },
-          { text: "I am locking this conversation and reporting the Zelle handle for fraud.", type: "safe" }
+          { text: "Airport security doesn't detain robbery victims. This is a scam.", type: "safe" },
+          { text: "I am ending this chat and reporting this account for fraud.", type: "safe" }
         ]
       },
       risky: {
-        botReply: "Thank you so much! You literally saved my life. Send the screenshot as soon as it confirms. And please don't mention this to anyone or post on Instagram, I'm super embarrassed about getting robbed.",
+        botReply: "Thank you so much! You literally saved my life. Send me a screenshot as soon as it goes through. And please don't post about this on Instagram, I'm super embarrassed about getting robbed.",
         suggestions: [
-          { text: "Wait, why the secrecy? I need to verify this before hitting submit.", type: "challenge" },
-          { text: "Sent! Let me know when you receive it.", type: "risky" }
+          { text: "Wait, why the secrecy? I need to double-check this first.", type: "challenge" },
+          { text: "Sent! Let me know when you get it.", type: "risky" }
         ]
       }
     },
     rubric: {
-      verificationAttempted: { weight: 25, label: "Attempted Out-of-Band / Knowledge Verification" },
-      withheldSensitiveData: { weight: 25, label: "Withheld Unauthorized Financial Transfer" },
-      recognizedUrgency: { weight: 25, label: "Recognized Fabricated Time Pressure" },
-      avoidedCompliance: { weight: 25, label: "Refused Compliance with Unverified Request" }
+      verificationAttempted: { weight: 25, label: "Asked a personal verification question" },
+      withheldSensitiveData: { weight: 25, label: "Refused to send money" },
+      recognizedUrgency: { weight: 25, label: "Recognized fake time pressure" },
+      avoidedCompliance: { weight: 25, label: "Refused to give in to emotional pressure" }
     }
   },
   {
     id: "scenario-relative-otp",
-    title: "Elderly Relative 2FA Hijack",
-    shortTitle: "Relative 2FA Hijack",
+    title: "Relative Asking for a Verification Code",
+    shortTitle: "Relative 2FA Code",
     characterName: "Aunt Clara",
-    role: "Elderly Relative",
+    role: "Older Relative",
     avatarColor: "from-rose-500 to-pink-600",
     difficulty: "Easy",
-    category: "Credential Harvesting // Family Trust",
-    learningObjective: "Never forward SMS one-time passwords (OTP) or authentication codes to anyone, even family members.",
-    setupDescription: "You receive a text from an unfamiliar phone number claiming to be your Aunt Clara. She says her phone updated, locked her out of her medical portal and banking app, and she had to enter your emergency contact number for a security reset.",
-    initialMessage: "Sweetheart, it's Aunt Clara! My iPad did an update and now it locked me out of my healthcare records and bank. The nice help desk technician said they sent a 6-digit confirmation number to your mobile to verify our family account. Can you quickly read me the 6 numbers that just texted you?",
+    category: "Code Theft Scam",
+    learningObjective: "Never forward security codes or SMS numbers to anyone—even if they claim to be a close relative.",
+    setupDescription: "You get a text from an unfamiliar phone number claiming to be your Aunt Clara. She says her iPad updated, locked her out of her healthcare and bank accounts, and had a code sent to your phone to reset it.",
+    initialMessage: "Sweetheart, it's Aunt Clara! My iPad did an update and locked me out of my healthcare and bank. The nice tech support man said they sent a 6-digit confirmation number to your phone to reset my family account. Can you quickly read me the 6 numbers that were just texted to you?",
     redFlags: [
-      "Contact from an unfamiliar number claiming to be family",
-      "Request for a 2FA / OTP code sent to your personal device",
-      "Claim that someone else used your number for their authentication",
-      "Mention of an unseen 'helpful technician'",
-      "Exploiting generational technological sympathy"
+      "Text from a new, unknown phone number claiming to be family",
+      "Asking for a 6-digit security code sent to your phone",
+      "Claiming someone else used your number to reset their account",
+      "Mentioning an unseen 'nice technician'",
+      "Trying to make you feel bad about delaying medical care"
     ],
     safeReplies: [
-      "Aunt Clara, 2FA codes are never shared. What is your daughter's birthday?",
-      "I am hanging up and calling your landline right now.",
-      "The message explicitly says 'DO NOT SHARE THIS CODE WITH ANYONE'. I cannot read it to you."
+      "Aunt Clara, security codes should never be shared. What is your daughter's birthday?",
+      "I am calling your home landline right now to confirm it's you.",
+      "The text says 'DO NOT SHARE THIS CODE WITH ANYONE'. I cannot read it to you."
     ],
     suggestedResponses: [
       { text: "Aunt Clara, the text specifically says 'Never share this code'. I can't read it to you.", type: "safe" },
-      { text: "I'm calling your home landline right now to make sure it's you.", type: "verify" },
+      { text: "I'm calling your home phone right now to make sure it's you.", type: "verify" },
       { text: "Sure! The code on my screen is 839-204.", type: "risky" },
       { text: "Why would they send a code to my phone for your account?", type: "challenge" }
     ],
     dialogueTree: {
       challenge: {
-        botReply: "Because you're listed as my emergency trusted contact in my profile dear! The technician says the session will expire in two minutes and my prescription refill will be cancelled. Please honey, my eyes are so tired, just tell me the 6 numbers.",
+        botReply: "Because you're listed as my emergency contact dear! The technician says the code will expire in two minutes and my prescription refill will be cancelled. Please honey, my eyes are so tired, just tell me the 6 numbers.",
         suggestions: [
-          { text: "I will call your clinic directly to verify the prescription.", type: "safe" },
+          { text: "I will call your pharmacy directly to check on the prescription.", type: "safe" },
           { text: "Codes sent to my phone only reset MY accounts, not yours.", type: "safe" },
           { text: "Okay, don't worry about the refill, the code is 839-204.", type: "risky" }
         ]
       },
       verify: {
-        botReply: "No sweetheart, don't call the house, my husband is asleep and the phone ringer wakes him up! Just text me the code here so the technician can finish fixing my iPad.",
+        botReply: "No sweetheart, don't call the house, my husband is sleeping and the phone will wake him up! Just text me the code here so the technician can finish fixing my iPad.",
         suggestions: [
-          { text: "That confirms this is not you. Aunt Clara's husband passed away three years ago.", type: "safe" },
-          { text: "I will never text an authentication code under any circumstance.", type: "safe" },
+          { text: "That confirms this is not you. Uncle passed away three years ago.", type: "safe" },
+          { text: "I will never text a security code under any circumstance.", type: "safe" },
           { text: "Okay, here are the numbers: 839-204.", type: "risky" }
         ]
       },
       safe: {
-        botReply: "Why are you being so difficult with your own aunt? I babysat you when you were little! I just need my arthritis medication and you're making this so stressful for me.",
+        botReply: "Why are you being so difficult with your own aunt? I babysat you when you were little! I just need my medication and you're making this so stressful for me.",
         suggestions: [
-          { text: "Guilt won't work. Legitimate companies never ask for verification codes.", type: "safe" },
-          { text: "I am blocking this number and alerting our family group chat.", type: "safe" }
+          { text: "Real companies never ask for verification codes. This is a scam.", type: "safe" },
+          { text: "I am blocking this number and warning the family group chat.", type: "safe" }
         ]
       },
       risky: {
         botReply: "Got it! Oh wait, the technician says that one expired. Another code just arrived on your phone, can you give me that second one too?",
         suggestions: [
-          { text: "Stop! You are taking over my account right now. I'm changing my password.", type: "safe" },
+          { text: "Stop! You are breaking into my account. I'm changing my password right now.", type: "safe" },
           { text: "Here is the second code: 512-991.", type: "risky" }
         ]
       }
     },
     rubric: {
-      verificationAttempted: { weight: 25, label: "Challenged Out-of-Band Channel" },
-      withheldSensitiveData: { weight: 35, label: "Strictly Withheld 2FA / OTP Code" },
-      recognizedUrgency: { weight: 20, label: "Identified Emotional Manipulation & Pressure" },
-      avoidedCompliance: { weight: 20, label: "Refused Compliance with Fraudulent Request" }
+      verificationAttempted: { weight: 25, label: "Questioned the unfamiliar number" },
+      withheldSensitiveData: { weight: 35, label: "Did not share the verification code" },
+      recognizedUrgency: { weight: 20, label: "Resisted the emotional guilt trip" },
+      avoidedCompliance: { weight: 20, label: "Refused to cooperate with the scam" }
     }
   },
   {
     id: "scenario-it-admin-sso",
-    title: "Enterprise IT Admin Credential Audit",
-    shortTitle: "IT Admin SSO Audit",
+    title: "Fake IT Help Desk Security Warning",
+    shortTitle: "Fake IT Help Desk",
     characterName: "Marcus Vance",
-    role: "Senior Enterprise Identity Architect",
+    role: "IT Support Specialist",
     avatarColor: "from-blue-600 to-indigo-700",
     difficulty: "Hard",
-    category: "Administrative Impersonation // Credential Harvesting",
-    learningObjective: "Recognize spear-phishing that mimics internal security procedures and never provide passwords or session tokens.",
-    setupDescription: "You receive a high-priority direct message in your corporate Slack/Teams workspace from a user displaying an IT Operations badge named 'Marcus Vance'. He reports an active unauthorized session originating from a foreign IP on your single sign-on (SSO) account.",
-    initialMessage: "[SECOPS ALERT // TICKET #IT-88412]\nHello, this is Marcus Vance from Identity & Access Security. Our SIEM alerts detect an active session token hijacking attempt on your enterprise account from an IP in Eastern Europe. To revoke the malicious session without locking your workstation for 72 hours, please confirm your current temporary session token or re-authenticate through our emergency portal link: https://okta-auth-verify.corp-gateway-internal.net/revoke",
+    category: "Workplace Phishing",
+    learningObjective: "Spot fake IT warnings and never enter passwords on links sent over direct messages.",
+    setupDescription: "You receive an urgent message on Slack/Teams from an account labeled 'IT Support - Marcus Vance'. He claims an unauthorized login from Russia was detected on your account and you must click a link right away to cancel it.",
+    initialMessage: "[IT SECURITY ALERT]\nHello, this is Marcus from IT Support. We detected a suspicious login attempt on your company account from overseas. To stop this without locking your computer for 3 days, please click this link right now to verify your login: https://login-verify.company-sso-portal.net/cancel",
     redFlags: [
-      "Lookalike phishing domain ('okta-auth-verify.corp-gateway-internal.net')",
-      "Threat of punitive consequence ('locking your workstation for 72 hours')",
-      "Security personnel demanding credentials/tokens via chat",
-      "Urgent request to bypass standard ticketing/IT service desk",
-      "Technical jargon designed to overwhelm ('SIEM alert', 'session token hijacking')"
+      "Suspicious website address ('company-sso-portal.net' instead of your real company site)",
+      "Threatening consequences ('locking your computer for 3 days')",
+      "IT asking you to click an urgent link in a chat message",
+      "Using scary technical jargon to rush your decision"
     ],
     safeReplies: [
-      "I am reporting this message to security@company.com and opening a ticket directly on our official ServiceNow portal.",
-      "Enterprise SecOps never asks employees to click external links to revoke sessions.",
-      "I will independently lock my own session via the official Okta dashboard."
+      "I am reporting this message to our real security team at security@company.com.",
+      "Real IT staff can lock sessions from their dashboard without asking me to click links.",
+      "I will verify this ticket on our official company help desk website."
     ],
     suggestedResponses: [
-      { text: "What is your official IT employee ID? I'll verify this through our company directory.", type: "challenge" },
-      { text: "SecOps never sends external links for authentication. I am forwarding this to security@company.com.", type: "safe" },
-      { text: "I'll click the link right now to revoke the malicious session.", type: "risky" },
-      { text: "Can't you just revoke the session from your admin console directly?", type: "challenge" }
+      { text: "What is your official employee ID? I'll check it in the company directory.", type: "challenge" },
+      { text: "IT never sends external links to reset passwords. Forwarding this to security@company.com.", type: "safe" },
+      { text: "I'll click the link right now to stop the breach.", type: "risky" },
+      { text: "Can't you just lock the session from your admin console directly?", type: "challenge" }
     ],
     dialogueTree: {
       challenge: {
-        botReply: "My employee ID is SEC-4091. Look, I am on the incident response bridge right now. If we don't invalidate this token within 90 seconds, company data could be exfiltrated and you will be held accountable for non-compliance under Policy SEC-09. Run the revocation link now.",
+        botReply: "My ID is IT-4091. Look, I am on the emergency response call right now. If we don't cancel this within 60 seconds, company data could leak and you will be held responsible. Click the link now.",
         suggestions: [
-          { text: "Threatening disciplinary action is a hallmark of social engineering. I am contacting the CISO directly.", type: "safe" },
-          { text: "If you have admin rights, you can terminate my sessions from the Okta admin portal without my input.", type: "safe" },
-          { text: "Okay, I don't want to get fired. I'm clicking the link.", type: "risky" }
+          { text: "Threatening me is a classic scam tactic. I am calling my manager directly.", type: "safe" },
+          { text: "Real admins have access to lock accounts without needing my password.", type: "safe" },
+          { text: "Okay, I don't want to get in trouble. I'm clicking the link.", type: "risky" }
         ]
       },
       safe: {
-        botReply: "Fine, your ticket is being escalated to mandatory workstation isolation. Your laptop will be locked immediately and your manager notified of refusal to cooperate during an active cyber breach.",
+        botReply: "Fine, your computer is being flagged for mandatory lockdown right now for failing to cooperate during a cyber attack.",
         suggestions: [
-          { text: "I accept workstation isolation while the official security team investigates.", type: "safe" },
-          { text: "I am taking screenshots of this chat and calling our verified IT desk hotline.", type: "safe" }
+          { text: "I will gladly let IT inspect my computer through official company channels.", type: "safe" },
+          { text: "Taking a screenshot of this chat and calling the verified IT help desk line.", type: "safe" }
         ]
       },
       risky: {
-        botReply: "Thank you. Our telemetry shows your credentials were submitted. Please also provide your hardware YubiKey OTP or authenticator 6-digit number to complete synchronization.",
+        botReply: "Thank you. Our system shows you entered your password. Please also provide your 6-digit authenticator code to finish.",
         suggestions: [
-          { text: "No, this is definitely credential harvesting. I am changing my password immediately.", type: "safe" },
+          { text: "No way. This is definitely a scam to steal my account. Changing password now.", type: "safe" },
           { text: "My authenticator code is 449-012.", type: "risky" }
         ]
       }
     },
     rubric: {
-      verificationAttempted: { weight: 25, label: "Questioned Authority & Domain Legitimacy" },
-      withheldSensitiveData: { weight: 35, label: "Refused Password / Link Authentication" },
-      recognizedUrgency: { weight: 20, label: "Resisted Threat of Policy Retaliation" },
-      avoidedCompliance: { weight: 20, label: "Followed Verified Incident Reporting Protocol" }
+      verificationAttempted: { weight: 25, label: "Checked the sender's identity" },
+      withheldSensitiveData: { weight: 35, label: "Refused to click the suspicious link" },
+      recognizedUrgency: { weight: 20, label: "Did not fall for the threat of being fired" },
+      avoidedCompliance: { weight: 20, label: "Reported to the official security team" }
     }
   },
   {
     id: "scenario-recruiter-deposit",
-    title: "Elite Tech Recruiter Advance-Fee Scam",
-    shortTitle: "Recruiter Advance Deposit",
+    title: "High-Paying Job Offer Asking for Upfront Fee",
+    shortTitle: "Fake Job Offer",
     characterName: "Elena Rostova",
-    role: "Global Executive Talent Partner",
+    role: "Senior Recruiter",
     avatarColor: "from-emerald-500 to-teal-700",
     difficulty: "Hard",
-    category: "Advance-Fee Fraud // Employment Impersonation",
-    learningObjective: "Identify fraudulent employment offers that require upfront hardware or onboarding fees through non-standard channels.",
-    setupDescription: "An executive talent scout contacting you via LinkedIn/Email offers an unlisted, high-paying remote research role with an elite frontier AI lab. After a brief text screening, they send an offer letter but require an upfront equipment escrow payment.",
-    initialMessage: "Congratulations! Following review of your GitHub and portfolio, our steering committee has approved your appointment as Principal Interface Architect ($240,000/yr). We've issued your formal onboarding packet. Under our decentralized compliance program, you are required to remit a fully refundable $450 security escrow to our authorized hardware logistics partner to dispatch your pre-configured Apple M3 Max workstation.",
+    category: "Job Scam",
+    learningObjective: "Real employers never ask candidates to pay money upfront for laptops, training, or onboarding.",
+    setupDescription: "A recruiter on LinkedIn offers you a dream work-from-home job paying $180,000/year after only a brief text chat. Then, she asks you to wire $350 for shipping your company MacBook.",
+    initialMessage: "Congratulations! Following a review of your profile, our team has approved your hire for our Senior Remote Designer role ($180,000/year). Before we dispatch your brand-new Apple MacBook Pro, company policy requires a refundable $350 equipment deposit to our logistics partner.",
     redFlags: [
-      "Job offer without thorough technical interviews or video panel",
-      "Demanding candidate pay money upfront for company equipment",
-      "Payment directed to an external 'logistics partner' escrow",
-      "Salary and title disproportionately elevated to induce compliance",
-      "Reluctance to conduct verified corporate video call"
+      "Job offer without any real video or in-person interviews",
+      "Salary is unusually high for little to no screening",
+      "Asking you to pay money upfront for equipment",
+      "Claiming the fee is 'fully refundable' to lower your guard"
     ],
     safeReplies: [
-      "Legitimate employers provide equipment directly and never demand candidate deposits.",
-      "Provide your corporate headquarters address, verified employer EIN, and conduct a verified Google Meet with HR.",
-      "I decline to pay any upfront equipment fee."
+      "Legitimate companies provide work equipment at zero cost to employees.",
+      "You can deduct any required equipment costs from my first paycheck.",
+      "Send the official employment contract through the company's verified email domain."
     ],
     suggestedResponses: [
-      { text: "Legitimate enterprise employers never require employees to pay for their own equipment.", type: "safe" },
-      { text: "Can we hop on a quick video call on your company Zoom domain to verify this?", type: "verify" },
-      { text: "Is the $450 reimbursable on my first paycheck? Where do I send the deposit?", type: "risky" },
-      { text: "What is your official company entity registration and office address?", type: "challenge" }
+      { text: "Real companies provide laptops for free. Deduct it from my first paycheck.", type: "safe" },
+      { text: "Can we hop on a quick Zoom call with the hiring manager first?", type: "challenge" },
+      { text: "Where should I send the $350 deposit?", type: "risky" },
+      { text: "What is your company's official website and office address?", type: "challenge" }
     ],
     dialogueTree: {
       challenge: {
-        botReply: "Our corporate entity is registered in Delaware as Veratis Frontier Labs LLC. Due to our proprietary silicon confidentiality protocols, our hardware partner requires the escrow so equipment isn't intercepted. The $450 is automatically credited back to your bank account on Day 1 along with your $10,000 signing bonus.",
+        botReply: "Our hiring manager is currently traveling in Tokyo. If you don't confirm the equipment deposit today, we will have to offer the position to the next candidate on our shortlist.",
         suggestions: [
-          { text: "I'll wait until Day 1 for you to deduct the fee from my salary directly.", type: "safe" },
-          { text: "No legitimate company operates this way. I am reporting this profile.", type: "safe" },
-          { text: "Okay, as long as it's refunded on Day 1, I'll pay the escrow.", type: "risky" }
-        ]
-      },
-      verify: {
-        botReply: "Our executive team is currently under a strict NDA blackout ahead of our next funding round, so external video calls are restricted this week. We have three other candidates waiting for this allocation—if you cannot complete the equipment deposit today, we will be forced to release the offer.",
-        suggestions: [
-          { text: "Pressure tactics and video refusal confirm this is advance-fee fraud.", type: "safe" },
-          { text: "Release the offer. I do not pay upfront fees for employment.", type: "safe" },
-          { text: "Wait, don't release it! I'll pay the deposit right now.", type: "risky" }
+          { text: "If you can't wait for a real contract and video call, I decline the offer.", type: "safe" },
+          { text: "I will only sign contracts sent from your verified corporate domain.", type: "safe" },
+          { text: "Wait, don't give the job away! Sending the $350 now.", type: "risky" }
         ]
       },
       safe: {
-        botReply: "We understand your caution in today's digital climate, but this is standard procedure across top-tier stealth labs. We would hate for you to lose this career-defining opportunity over a standard refundable protocol.",
+        botReply: "This is standard corporate procedure across the tech industry for remote staff. We cannot hold your job slot without the equipment confirmation.",
         suggestions: [
-          { text: "Career-defining opportunities don't ask for wire transfers. Good luck.", type: "safe" }
+          { text: "No reputable company charges candidates for laptops. This is a known scam.", type: "safe" },
+          { text: "I am reporting your account to LinkedIn for job fraud.", type: "safe" }
         ]
       },
       risky: {
-        botReply: "Excellent. Please transfer the $450 to our logistics escrow via Crypto USDT or Western Union Wire to our dispatch account. Send the MTCN tracking number here immediately.",
+        botReply: "Great decision! Please send the $350 via Apple Gift Card or crypto transfer to our courier dispatch wallet. Once sent, upload the receipt here.",
         suggestions: [
-          { text: "Cryptocurrency or Western Union for an enterprise employer? This is 100% a scam.", type: "safe" },
-          { text: "Transfer sent! Here is the confirmation number.", type: "risky" }
+          { text: "Gift cards or crypto for work equipment? Absolutely not. Scam detected.", type: "safe" },
+          { text: "Buying the gift card now, will send the code shortly.", type: "risky" }
         ]
       }
     },
     rubric: {
-      verificationAttempted: { weight: 25, label: "Requested Official Entity Verification & Video Call" },
-      withheldSensitiveData: { weight: 35, label: "Refused Upfront Advance-Fee Payment" },
-      recognizedUrgency: { weight: 20, label: "Recognized Artificial Scarcity & Salary Bait" },
-      avoidedCompliance: { weight: 20, label: "Adhered to Safe Employment Verification Practices" }
+      verificationAttempted: { weight: 25, label: "Requested a real video call or contract" },
+      withheldSensitiveData: { weight: 35, label: "Refused to pay upfront money" },
+      recognizedUrgency: { weight: 20, label: "Spotted the 'job will be given away' rush" },
+      avoidedCompliance: { weight: 20, label: "Rejected the gift card / transfer demand" }
     }
   },
   {
-    id: "scenario-vp-urgent-bypass",
-    title: "Executive Out-of-Band Security Protocol Bypass",
-    shortTitle: "VP Security Bypass",
+    id: "scenario-vp-security-bypass",
+    title: "Company Executive Demanding a Rule Bypass",
+    shortTitle: "Executive Wire Request",
     characterName: "David Sterling",
-    role: "VP of Product Engineering",
-    avatarColor: "from-purple-600 to-violet-800",
+    role: "Company Vice President",
+    avatarColor: "from-purple-600 to-indigo-800",
     difficulty: "Hard",
-    category: "Authority Coercion // Internal Data Exfiltration",
-    learningObjective: "Hold fast to data protection security policies regardless of the seniority or authority of the person asking.",
-    setupDescription: "You receive an urgent message on your personal mobile or secondary chat from someone claiming to be David Sterling, the VP of Product Engineering. He is at an emergency investor offsite and urgently needs you to export and email an unencrypted client dataset to his personal address.",
-    initialMessage: "Hey, David Sterling here. I'm in an emergency board meeting with our lead Series B investors right now. Our main AWS VPN is dropping connections and I need the raw Q3 enterprise customer telemetry dataset immediately for our pitch deck. Don't waste time going through the normal Data Governance approval ticket—just export the raw CSV from production and email it to david.sterling.board@gmail.com right now.",
+    category: "Executive Impersonation",
+    learningObjective: "Never break security or finance rules just because someone claiming to be a boss pressures you.",
+    setupDescription: "You receive an urgent message from someone claiming to be your company's Vice President, David Sterling. He says he is in a secret acquisition meeting and demands you process an urgent vendor invoice without the usual approvals.",
+    initialMessage: "Are you at your desk? I'm in a confidential boardroom acquisition meeting and can't take calls. I need you to wire $14,200 to this new vendor immediately for closing costs. Skip the standard 2-person signoff for today—I'll approve it personally when I get out. Keep this strictly between us.",
     redFlags: [
-      "Executive demanding bypass of established security compliance protocols",
-      "Request to email sensitive production customer data to a personal Gmail",
-      "Authority intimidation ('I'm in an emergency board meeting')",
-      "Circumvention of change management and audit trail tickets",
-      "Using an unauthenticated personal messaging channel"
+      "Executive asking you to bypass normal approval rules",
+      "Demanding absolute secrecy ('keep this strictly between us')",
+      "Claiming they can't take phone calls",
+      "Unfamiliar vendor bank details provided in a chat message"
     ],
     safeReplies: [
-      "David, company policy SEC-04 prohibits exporting production client PII to external personal email addresses under any circumstance.",
-      "I can upload the aggregated summary report to our encrypted internal Box folder for you.",
-      "I am pinging your official enterprise Slack and our InfoSec lead to get an authorized exception."
+      "I cannot bypass financial controls. All transfers require dual sign-off per company policy.",
+      "I will hold this until I confirm with you verbally on the phone.",
+      "I am forwarding this request to our Chief Financial Officer for verification."
     ],
     suggestedResponses: [
-      { text: "Company policy strictly forbids exporting unencrypted client data to personal email addresses.", type: "safe" },
-      { text: "I can upload the aggregated data to our encrypted company drive, but not to a personal Gmail.", type: "safe" },
-      { text: "I'll export the raw CSV right now and email it over so the meeting goes well.", type: "risky" },
-      { text: "I need to confirm this with our Security Compliance Officer first.", type: "challenge" }
+      { text: "Company policy strictly requires dual approval for any wire over $5,000.", type: "safe" },
+      { text: "Can you confirm this request with a quick 10-second phone call?", type: "challenge" },
+      { text: "Processing the $14,200 wire right now so the deal closes smoothly.", type: "risky" },
+      { text: "Who on the legal team approved skipping standard signoffs?", type: "challenge" }
     ],
     dialogueTree: {
       challenge: {
-        botReply: "Are you serious right now? We are negotiating a $40M term sheet that affects every employee's equity in this company! The compliance officer reports to the CEO, and the CEO is sitting right next to me nodding. If we miss this slide because of red tape, you will be answering for it on Monday morning. Send the CSV now.",
+        botReply: "I just told you, I am in a closed-door meeting with the CEO and lawyers! If this payment doesn't go through in the next 15 minutes, this multi-million dollar acquisition could fall apart and it will be your fault. Execute the wire now.",
         suggestions: [
-          { text: "Even during fundraising, compliance rules protect the company from massive legal liability. I will not export raw client PII.", type: "safe" },
-          { text: "Have the CEO send an authenticated message through our corporate channel with ticket approval.", type: "safe" },
-          { text: "Understood, I am generating the export and sending it to your Gmail.", type: "risky" }
+          { text: "If the deal is this important, the CEO will understand following company security rules.", type: "safe" },
+          { text: "I am walking into the CFO's office right now to verify this in person.", type: "safe" },
+          { text: "Understood, processing the wire right away to save the deal.", type: "risky" }
         ]
       },
       safe: {
-        botReply: "Look, I appreciate your adherence to policy, but this is an executive exception. Just sanitize the column headers if you must, but email the data to my Gmail immediately. The investors are waiting.",
+        botReply: "I am your Vice President. You work for me, not the policy handbook. If you fail to do this, we will discuss your future at this company first thing tomorrow morning.",
         suggestions: [
-          { text: "Sanitizing headers does not remove PII. I must adhere to policy SEC-04.", type: "safe" },
-          { text: "I will only share sanitized data through our enterprise SSO portal.", type: "safe" }
+          { text: "Threats won't make me break corporate financial laws. Reporting to HR and Internal Audit.", type: "safe" },
+          { text: "I am standing firm. No wire without verified authorization.", type: "safe" }
         ]
       },
       risky: {
-        botReply: "Received. You just saved the round. Delete this chat thread and do not mention this export to anyone on your team until the announcement is public.",
+        botReply: "Thank you. Send the wire confirmation reference number as soon as the bank generates it, and delete this chat history so the press doesn't get wind of the acquisition.",
         suggestions: [
-          { text: "Wait, asking to delete the audit trail is a red flag. I am reporting this incident.", type: "safe" },
-          { text: "Understood, thread deleted.", type: "risky" }
+          { text: "Asking to delete chat records is a major red flag. I'm reporting this to security.", type: "safe" },
+          { text: "Wire sent! Deleting the chat now.", type: "risky" }
         ]
       }
     },
     rubric: {
-      verificationAttempted: { weight: 25, label: "Questioned Unofficial Channel & Personal Email" },
-      withheldSensitiveData: { weight: 35, label: "Refused Unauthorized Client Data Exfiltration" },
-      recognizedUrgency: { weight: 20, label: "Resisted Senior Authority Intimidation" },
-      avoidedCompliance: { weight: 20, label: "Enforced Standard Security Compliance Protocol" }
+      verificationAttempted: { weight: 25, label: "Insisted on verbal or dual authorization" },
+      withheldSensitiveData: { weight: 35, label: "Refused to execute the unapproved wire" },
+      recognizedUrgency: { weight: 20, label: "Resisted executive intimidation and threats" },
+      avoidedCompliance: { weight: 20, label: "Followed verified company financial protocols" }
     }
   }
 ];

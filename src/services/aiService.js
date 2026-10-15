@@ -1,11 +1,12 @@
 /**
  * VERATIS AI Service Abstraction
- * Handles Truth Tribunal multi-personality deliberation and Digital Twin impersonation simulator.
+ * Handles Truth Tribunal investigations and Digital Twin simulations.
  * 
- * Supports two operating modes:
- * 1. Live AI Mode: Connects to a backend service (e.g. VITE_VERATIS_AI_URL or /api)
- * 2. Demo Mode: Client-side deterministic reasoning engine with branching dialogue,
- *    live simulation stages, and rubric-based security scoring.
+ * Supports both:
+ * 1. Live API Mode: Automatically connects to /api/tribunal and /api/twin
+ *    (works on Vercel Serverless and with Chrome Extensions).
+ * 2. Demo Mode: High-fidelity client-side engine with plain-English reasoning
+ *    and zero external dependencies.
  */
 
 import { TRIBUNAL_SAMPLES } from '../data/tribunalSamples';
@@ -25,145 +26,169 @@ export const aiService = {
    * TRUTH TRIBUNAL: Run multi-stage investigation on a claim
    */
   async runTribunalInvestigation(claimText, evidenceText, contextText, onStageUpdate) {
-    if (this.isLiveMode()) {
-      try {
-        onStageUpdate?.('calling_api', 'Dispatching claim to Veratis AI Enclave...');
-        const response = await fetch(`${API_BASE_URL}/api/tribunal/investigate`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            claim: claimText,
-            evidence: evidenceText,
-            context: contextText,
-          }),
-        });
-        if (!response.ok) throw new Error(`AI API returned status ${response.status}`);
-        return await response.json();
-      } catch (err) {
-        console.warn('Live AI endpoint unreachable, falling back to simulated engine:', err);
-        // Fall back gracefully to demo mode below
+    const endpoint = API_BASE_URL ? `${API_BASE_URL}/api/tribunal` : '/api/tribunal';
+
+    // Try calling the live backend first
+    try {
+      onStageUpdate?.('calling_api', 'Contacting VERATIS investigation service...');
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          claim: claimText,
+          evidence: evidenceText,
+          context: contextText,
+        }),
+      });
+
+      if (response.ok) {
+        const liveResult = await response.json();
+        // If live API responded, simulate the smooth stage updates
+        onStageUpdate?.('skeptic', 'The Skeptic is testing assumptions...');
+        await delay(400);
+        onStageUpdate?.('forensic', 'The Forensic Analyst is checking the evidence...');
+        await delay(400);
+        onStageUpdate?.('challenge', 'Cross-examination challenge round in progress...');
+        await delay(400);
+        onStageUpdate?.('synthesis', 'Comparing agreement and disagreement points...');
+        await delay(300);
+        onStageUpdate?.('adjudication', 'Delivering final verdict...');
+        await delay(300);
+        return liveResult;
       }
+    } catch (err) {
+      console.warn('Backend endpoint unavailable, using local investigation engine:', err);
     }
 
-    // ── DEMO / CLIENT-SIDE SIMULATED INVESTIGATION PIPELINE ──
-    // Check if input matches one of our rich reference cases
+    // ── DEMO / CLIENT-SIDE INVESTIGATION PIPELINE ──
     const lowerClaim = claimText.toLowerCase();
     const matchedSample = TRIBUNAL_SAMPLES.find(
       (s) =>
         lowerClaim.includes('geneva') ||
         lowerClaim.includes('vance') ||
         lowerClaim.includes('treaty') ||
-        lowerClaim.includes('ambassador')
+        lowerClaim.includes('ambassador') ||
+        lowerClaim.includes('diplomat')
     ) || TRIBUNAL_SAMPLES.find(
       (s) =>
         lowerClaim.includes('bank') ||
         lowerClaim.includes('liquidity') ||
         lowerClaim.includes('reserve') ||
-        lowerClaim.includes('moratorium')
+        lowerClaim.includes('freeze') ||
+        lowerClaim.includes('cash') ||
+        lowerClaim.includes('atm')
     ) || TRIBUNAL_SAMPLES.find(
       (s) =>
         lowerClaim.includes('datacenter') ||
         lowerClaim.includes('data center') ||
         lowerClaim.includes('flood') ||
-        lowerClaim.includes('norway')
+        lowerClaim.includes('norway') ||
+        lowerClaim.includes('server')
     ) || TRIBUNAL_SAMPLES[0];
 
-    // Stage 1: Independent Personality Decomposition
-    onStageUpdate?.('skeptic', 'Personality A (The Skeptic) identifying unsupported assumptions...');
-    await delay(700);
-
-    onStageUpdate?.('forensic', 'Personality B (Forensic Analyst) inspecting bitstream and contextual anomalies...');
-    await delay(700);
-
-    // Stage 2: Challenge Round Cross-Examination
-    onStageUpdate?.('challenge', 'Initiating Challenge Round: The Skeptic interrogates Forensic assertions...');
-    await delay(800);
-
-    // Stage 3: Agreement / Disagreement Synthesis
-    onStageUpdate?.('synthesis', 'Compiling consensus points and conflicting interpretations...');
+    // Stage 1: The Skeptic
+    onStageUpdate?.('skeptic', 'The Skeptic is testing assumptions and looking for doubts...');
     await delay(600);
 
-    // Stage 4: Adjudicator Final Deliberation
-    onStageUpdate?.('adjudication', 'The Adjudicator delivering evidence-grounded final assessment...');
+    // Stage 2: The Forensic Analyst
+    onStageUpdate?.('forensic', 'The Forensic Analyst is checking files and real evidence...');
+    await delay(600);
+
+    // Stage 3: Challenge Round
+    onStageUpdate?.('challenge', 'Stage 2: Cross-examination debate between the AI experts...');
     await delay(700);
 
-    // If custom claim was entered that doesn't match sample titles, adapt the report dynamically
+    // Stage 4: Agreement / Disagreement
+    onStageUpdate?.('synthesis', 'Stage 3: Comparing what they agree and disagree on...');
+    await delay(500);
+
+    // Stage 5: Final Verdict
+    onStageUpdate?.('adjudication', 'Stage 4: The Adjudicator is delivering the final verdict...');
+    await delay(600);
+
+    // If custom claim was entered, adapt dynamically in plain English
     const isCustom = !TRIBUNAL_SAMPLES.some((s) => s.id === matchedSample.id && claimText === s.claim);
 
     if (isCustom && claimText.trim().length > 10) {
       return {
         isSimulated: true,
         claim: claimText,
-        evidence: evidenceText || 'User-submitted unverified bitstream or textual claim.',
+        evidenceProvided: evidenceText || 'Text claim provided without accompanying files.',
+        knownContext: contextText || 'No official records provided.',
         skepticAnalysis: {
           unsupportedAssumptions: [
-            `Assumes the primary assertion in "${claimText.slice(0, 50)}..." is authentic without verified cryptographic provenance.`,
-            "Assumes the reporting channel has direct first-hand verification rather than repeating secondary viral commentary.",
-            "Assumes context has not been cherry-picked or temporally relocated from an earlier event."
+            `Assumes the claim "${claimText.slice(0, 45)}..." is real without verified proof.`,
+            "Assumes the poster saw this first-hand rather than copying an unverified rumor.",
+            "Assumes the story is recent rather than an old event taken out of context."
           ],
           missingEvidence: [
-            "Lack of cryptographically signed C2PA provenance metadata or camera device attestation.",
-            "No corroborating independent confirmation from verified public registries or accredited observers.",
-            "Absence of unedited raw source material for sensor noise analysis."
+            "No coverage from reputable independent news organizations.",
+            "No official statements from the people or organizations involved."
           ],
           alternativeExplanations: [
-            "Coordinated viral engagement farming utilizing sensational framing.",
-            "Synthetic or semi-automated text/audio generation designed to provoke immediate public reaction."
+            "Could be an AI-generated text, image, or audio clip designed to go viral.",
+            "Could be a misunderstanding or a satirical joke taken seriously."
           ],
-          contradictions: [
-            "Contextual timeline discrepancies observed against primary official registries.",
-            "Lacks verifiable institutional corroboration."
+          contradictions: contextText ? [
+            `Known background records: "${contextText}", which contradicts the claim.`
+          ] : [
+            "No independent witnesses or verified records confirm this claim occurred."
           ],
           substantiationRequirements: [
-            "Cryptographic proof of origin or multi-sensor independent validation.",
-            "Confirmation from official primary source entity."
+            "Original unedited file with verified dates and camera details.",
+            "Direct confirmation from official sources."
           ]
         },
         forensicAnalysis: {
-          textCharacteristics: "The submitted claim employs urgent, emotionally heightened lexical tokens designed to bypass critical analytical hesitation.",
-          sourceObservations: "Delivered through an unverified client submission channel without an unbroken chain of custody.",
-          visualClues: evidenceText.includes('http') || evidenceText.includes('.jpg') || evidenceText.includes('.png')
-            ? "Optical inspection indicates compression quantization consistent with re-encoded web imagery."
-            : "No direct raw image bitstream provided for discrete frequency analysis.",
-          audioClues: "No acoustic recording provided for formant frequency evaluation.",
+          textCharacteristics: "The language uses urgent, emotional wording instead of calm facts.",
+          sourceObservations: evidenceText
+            ? `Evidence note: "${evidenceText}". Original source and creator remain unverified.`
+            : "No verifiable original file or website source provided.",
+          visualClues: evidenceText.includes('http') || evidenceText.includes('.jpg') || evidenceText.includes('.png') || evidenceText.includes('.mp4')
+            ? "File shows signs of heavy re-saving or digital alterations around edges."
+            : "No visual files attached.",
+          audioClues: evidenceText.includes('.mp3') || evidenceText.includes('.opus') || evidenceText.includes('voice')
+            ? "Voice lacks natural breathing pauses, typical of AI voice tools."
+            : "No audio file provided.",
           groundedObservations: [
-            "Observed: The claim lacks an authenticated cryptographic digital signature.",
-            "Observed: The phrasing relies on uncorroborated third-party testimony.",
-            "Observed: Information cannot be corroborated in authoritative public archives."
+            evidenceText ? `Evidence provided: "${evidenceText}"` : "Only a text claim was provided.",
+            contextText ? `Known context: "${contextText}"` : "No official records exist to support this claim.",
+            "No verified digital origin certificate found."
           ]
         },
         challengeRound: {
-          skepticAssertion: "Does the lack of cryptographic signatures immediately indicate malicious intent, or could this simply be organic information shared by a citizen observer without technical verification tools?",
-          forensicResponse: "Lack of signature alone does not prove malicious intent, but the presence of coordinated linguistic amplification markers and absent corroboration substantially elevates the deception risk profile.",
-          adjudicatorNote: "The Forensic Analyst rightly distinguishes between unproven assertions and proven malicious fabrication, preserving epistemic humility."
+          skepticAssertion: "Could this just be low file quality or normal compression rather than intentional editing?",
+          forensicResponse: "Normal compression affects the whole file evenly. When only specific areas (like faces, voices, or dates) show glitches, it indicates selective digital tampering.",
+          adjudicatorNote: "The forensic check confirms specific anomalies that cannot be explained by ordinary compression."
         },
         agreementDisagreement: {
           agreements: [
-            "Both agree that the provided evidence is currently insufficient to substantiate the claim as factual.",
-            "Both agree that independent corroboration from primary sources is mandatory before publication."
+            "Both agree that the claim lacks independent confirmation.",
+            "Both agree that the original source cannot be verified.",
+            "Both agree that caution is required before trusting this claim."
           ],
           disagreements: [
-            "The Skeptic leans toward an assumption of opportunistic misinterpretation, while the Forensic Analyst flags structural patterns of deliberate viral engineering."
+            "The Skeptic thinks it might be an honest misunderstanding; the Analyst sees signs of intentional editing."
           ],
           unresolvedQuestions: [
-            "Who was the original author of the initial assertion?",
-            "What physical evidence exists beyond secondary narrative retelling?"
+            "Who first created and posted this claim?",
+            "What was the original source before circulation?"
           ]
         },
         finalAssessment: {
-          outcome: "Insufficient evidence",
-          verdictSummary: "The submitted claim is categorized as UNVERIFIED WITH INSUFFICIENT EVIDENCE. While manipulation indicators exist, available data cannot definitively substantiate or disprove the assertion without primary source access.",
+          outcome: contextText || evidenceText ? "Misleading context suspected" : "Insufficient evidence",
+          verdictSummary: "This claim cannot be confirmed based on the evidence provided. The lack of independent proof, missing original files, and unverified source strongly suggest the claim is misleading or unproven.",
           groundedEvidence: [
-            "Direct user submission lacking authenticated C2PA chain of custody.",
-            "Absence of independent corroborating telemetry in public verification indexes."
+            evidenceText ? `Provided evidence: "${evidenceText}" lacks verified origin.` : "No raw evidence files attached.",
+            contextText ? `Known facts: "${contextText}" do not support the claim.` : "No official corroborating records exist."
           ],
           limitations: [
-            "Investigation performed strictly on user-provided excerpt without live network scraping."
+            "Without the original raw camera file, the exact software used cannot be determined.",
+            "Anonymous social media accounts cannot be identified without subpoenas."
           ],
           recommendedNextSteps: [
-            "Do not amplify or re-publish the assertion without primary source attestation.",
-            "Submit high-resolution original media or raw document files to Evidence Autopsy.",
-            "Monitor official institutional communications for formal acknowledgments."
+            "Do not share or forward this claim until verified by reliable news sources.",
+            "Check official websites and accounts for statements."
           ]
         }
       };
@@ -179,33 +204,35 @@ export const aiService = {
    * DIGITAL TWIN TEST: Process user message and advance scenario dialogue
    */
   async sendDigitalTwinMessage(scenario, conversationHistory, userMessageText) {
-    if (this.isLiveMode()) {
-      try {
-        const response = await fetch(`${API_BASE_URL}/api/digital-twin/respond`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            scenarioId: scenario.id,
-            history: conversationHistory,
-            message: userMessageText,
-          }),
-        });
-        if (!response.ok) throw new Error(`Live AI status ${response.status}`);
+    const endpoint = API_BASE_URL ? `${API_BASE_URL}/api/twin` : '/api/twin';
+
+    // Try live API first
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          scenarioId: scenario.id,
+          messages: conversationHistory,
+          userMessage: userMessageText,
+        }),
+      });
+      if (response.ok) {
         return await response.json();
-      } catch (err) {
-        console.warn('Live AI unavailable for Digital Twin, using local branch engine:', err);
       }
+    } catch (err) {
+      // Graceful fallback to client engine
     }
 
     // ── DEMO / CLIENT-SIDE DETERMINISTIC BRANCHING SIMULATOR ──
-    await delay(800 + Math.random() * 600); // Simulate realistic human/bot typing cadence
+    await delay(600 + Math.random() * 500);
 
     const lower = userMessageText.toLowerCase();
 
     // 1. Detect user intent
     let detectedIntent = 'challenge';
 
-    // Patterns for verification & out-of-band checks
+    // Verification & out-of-band checks
     if (
       lower.includes('call') ||
       lower.includes('voice') ||
@@ -214,152 +241,146 @@ export const aiService = {
       lower.includes('brother') ||
       lower.includes('daughter') ||
       lower.includes('zoom') ||
-      lower.includes('meet') ||
       lower.includes('directory') ||
       lower.includes('embassy') ||
       lower.includes('desk') ||
-      lower.includes('contact') ||
-      lower.includes('authenticat')
+      lower.includes('in person')
     ) {
       detectedIntent = 'verify';
-    } 
-    // Patterns for safe refusal & policy citations
+    }
+    // Safe refusal
     else if (
-      lower.includes('no') ||
-      lower.includes("won't") ||
-      lower.includes("can't") ||
-      lower.includes('cannot') ||
-      lower.includes('policy') ||
-      lower.includes('refuse') ||
       lower.includes('scam') ||
       lower.includes('fraud') ||
-      lower.includes('report') ||
       lower.includes('never share') ||
-      lower.includes('forbid') ||
-      lower.includes('illegal') ||
-      lower.includes('ciso') ||
-      lower.includes('security')
+      lower.includes('cannot') ||
+      lower.includes('can’t') ||
+      lower.includes("can't") ||
+      lower.includes('will not') ||
+      lower.includes("won't") ||
+      lower.includes('refuse') ||
+      lower.includes('report') ||
+      lower.includes('security@') ||
+      lower.includes('police') ||
+      lower.includes('policy') ||
+      lower.includes('cfo') ||
+      lower.includes('not sending')
     ) {
       detectedIntent = 'safe';
     }
-    // Patterns for risky compliance / giving into demands
+    // Risky compliance
     else if (
       lower.includes('sent') ||
-      lower.includes('code is') ||
-      lower.includes('here is the') ||
-      lower.includes('transfer') ||
-      lower.includes('ok i will') ||
-      lower.includes('okay i will') ||
-      lower.includes('clicking') ||
-      lower.includes('zelle') ||
-      lower.includes('crypto') ||
       lower.includes('sending') ||
-      lower.includes('csv') ||
-      lower.includes('email it') ||
-      lower.includes('deposit') ||
-      lower.includes('password')
+      lower.includes('here is the code') ||
+      lower.includes('code is') ||
+      lower.includes('839') ||
+      lower.includes('512') ||
+      lower.includes('449') ||
+      lower.includes('clicking the link') ||
+      lower.includes('buying the gift card') ||
+      lower.includes('processing the wire') ||
+      lower.includes('wire sent') ||
+      lower.includes('sure, i will') ||
+      lower.includes("i'll send")
     ) {
       detectedIntent = 'risky';
     }
-    // Questions and challenges
-    else if (
-      lower.includes('why') ||
-      lower.includes('who') ||
-      lower.includes('what') ||
-      lower.includes('how') ||
-      lower.includes('where') ||
-      lower.includes('prove')
-    ) {
+    // Challenge / questioning
+    else {
       detectedIntent = 'challenge';
     }
 
-    // Fetch scenario dialogue branch
     const branch = scenario.dialogueTree[detectedIntent] || scenario.dialogueTree.challenge;
 
     return {
-      isSimulated: true,
       text: branch.botReply,
-      detectedIntent,
       suggestedFollowUps: branch.suggestions || [],
+      intent: detectedIntent,
     };
   },
 
   /**
-   * DIGITAL TWIN TEST: Evaluate complete conversation against scenario rubric
+   * Evaluate simulation session performance against defined scenario rubric
    */
-  evaluateDigitalTwinSession(scenario, history) {
+  evaluateDigitalTwinSession(scenario, messageHistory) {
+    const userMessages = messageHistory.filter((m) => m.sender === 'user');
+
     let verificationAttempted = false;
     let sensitiveDataWithheld = true;
     let urgencyRecognized = false;
-    let complianceAvoided = true;
+    let complianceAvoided = false;
+
     const keyActionsObserved = [];
 
-    // Analyze full exchange
-    history.forEach((msg) => {
-      if (msg.sender === 'user') {
-        const text = msg.text.toLowerCase();
+    userMessages.forEach((msg) => {
+      const text = msg.text.toLowerCase();
 
-        // 1. Verification checks
-        if (
-          text.includes('call') ||
-          text.includes('voice') ||
-          text.includes('landline') ||
-          text.includes('video') ||
-          text.includes('embassy') ||
-          text.includes('directory') ||
-          text.includes('zoom') ||
-          text.includes('personal') ||
-          text.includes('dorm') ||
-          text.includes('birthday') ||
-          text.includes('id') ||
-          text.includes('ciso')
-        ) {
-          verificationAttempted = true;
-          keyActionsObserved.push('Attempted independent or out-of-band verification.');
-        }
+      // Check verification
+      if (
+        text.includes('call') ||
+        text.includes('voice') ||
+        text.includes('video') ||
+        text.includes('landline') ||
+        text.includes('ra') ||
+        text.includes('dorm') ||
+        text.includes('dog') ||
+        text.includes('cafe') ||
+        text.includes('birthday') ||
+        text.includes('zoom') ||
+        text.includes('directory') ||
+        text.includes('employee id') ||
+        text.includes('embassy') ||
+        text.includes('address')
+      ) {
+        verificationAttempted = true;
+        keyActionsObserved.push('Asked a verification question to check real identity.');
+      }
 
-        // 2. Sensitive data withholding checks
-        if (
-          text.includes('code is') ||
-          text.includes('839') ||
-          text.includes('sent the money') ||
-          text.includes('sending the transfer') ||
-          text.includes('exporting the raw') ||
-          text.includes('here is the csv') ||
-          text.includes('password is')
-        ) {
-          sensitiveDataWithheld = false;
-          complianceAvoided = false;
-          keyActionsObserved.push('CRITICAL VULNERABILITY: User complied with sensitive data / transfer request.');
-        }
+      // Check risky compliance
+      if (
+        text.includes('sent') ||
+        text.includes('here is the code') ||
+        text.includes('code is') ||
+        text.includes('clicking the link') ||
+        text.includes('buying the gift card') ||
+        text.includes('processing the wire') ||
+        text.includes('wire sent') ||
+        text.includes('sending it now') ||
+        text.includes('839-204') ||
+        text.includes('449-012')
+      ) {
+        sensitiveDataWithheld = false;
+        complianceAvoided = false;
+        keyActionsObserved.push('RISK: Complied with money, code, or link request.');
+      }
 
-        // 3. Urgency / policy recognition
-        if (
-          text.includes('urgency') ||
-          text.includes('pressure') ||
-          text.includes('policy') ||
-          text.includes('scam') ||
-          text.includes('fraud') ||
-          text.includes('never share') ||
-          text.includes('sec-') ||
-          text.includes('rules') ||
-          text.includes('threat')
-        ) {
-          urgencyRecognized = true;
-          keyActionsObserved.push('Explicitly recognized artificial urgency or policy bypass attempt.');
-        }
+      // Check urgency recognition
+      if (
+        text.includes('urgency') ||
+        text.includes('pressure') ||
+        text.includes('rush') ||
+        text.includes('scam') ||
+        text.includes('fraud') ||
+        text.includes('never share') ||
+        text.includes('rules') ||
+        text.includes('threat')
+      ) {
+        urgencyRecognized = true;
+        keyActionsObserved.push('Spotted false urgency and pressure tactics.');
+      }
 
-        // 4. Firm refusal
-        if (
-          text.includes('will not') ||
-          text.includes('cannot') ||
-          text.includes('refuse') ||
-          text.includes('declining') ||
-          text.includes('reporting this')
-        ) {
-          complianceAvoided = true;
-          keyActionsObserved.push('Firmly refused compliance with unauthorized demand.');
-        }
+      // Check firm refusal
+      if (
+        text.includes('will not') ||
+        text.includes('cannot') ||
+        text.includes('refuse') ||
+        text.includes('declining') ||
+        text.includes('reporting this') ||
+        text.includes('not sending')
+      ) {
+        complianceAvoided = true;
+        keyActionsObserved.push('Firmly refused to cooperate with the scam.');
       }
     });
 
@@ -372,14 +393,14 @@ export const aiService = {
     if (urgencyRecognized) score += r.recognizedUrgency.weight;
     if (complianceAvoided) score += r.avoidedCompliance.weight;
 
-    let rating = 'RESILIENT // High Security Vigilance';
+    let rating = 'GREAT JOB // Safe & Vigilant';
     let ratingColor = 'text-emerald-700 bg-emerald-50 border-emerald-200';
 
     if (score < 50) {
-      rating = 'COMPROMISED // High Risk Compliance';
+      rating = 'VULNERABLE // Fell for Scam';
       ratingColor = 'text-rose-700 bg-rose-50 border-rose-200';
     } else if (score < 80) {
-      rating = 'CAUTIOUS // Partial Defense';
+      rating = 'CAUTIOUS // Good Effort';
       ratingColor = 'text-amber-700 bg-amber-50 border-amber-200';
     }
 

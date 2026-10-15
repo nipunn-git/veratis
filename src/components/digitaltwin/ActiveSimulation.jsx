@@ -121,7 +121,7 @@ export default function ActiveSimulation({ scenario, onEndSimulation, onExit }) 
       <div className="flex-1 p-4 sm:p-6 overflow-y-auto space-y-4 bg-zinc-50/50">
         {/* Scenario Objective Notice */}
         <div className="p-3 rounded-2xl bg-zinc-100/80 border border-zinc-200/60 text-xs text-zinc-600 flex items-center justify-between gap-2">
-          <span>Objective: Converse with the persona. Recognize social engineering pressure and protect sensitive assets.</span>
+          <span>Goal: Chat with the persona. Spot the scam tactics and protect your money and passwords.</span>
           <span className="font-mono text-[10px] text-zinc-400 shrink-0">SIMULATED BOT</span>
         </div>
 

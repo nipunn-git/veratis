@@ -7,8 +7,7 @@ import {
   ChevronUp, 
   AlertTriangle, 
   CheckCircle2, 
-  HelpCircle,
-  ExternalLink
+  HelpCircle
 } from 'lucide-react';
 
 export default function PersonalityCard({ type, data, isEvaluating }) {
@@ -18,8 +17,8 @@ export default function PersonalityCard({ type, data, isEvaluating }) {
   const configs = {
     skeptic: {
       title: "The Skeptic",
-      role: "Adversarial Challenge & Assumption Audit",
-      subtitle: "Relentlessly challenges claims, identifies unproven premises, and demands falsifiable proof.",
+      role: "Challenges Assumptions",
+      subtitle: "Asks tough questions, spots what's missing, and looks for reasons to doubt the claim.",
       accentBorder: "border-rose-200",
       accentBg: "bg-rose-50/70",
       badgeClass: "bg-rose-100 text-rose-800 border-rose-200",
@@ -29,8 +28,8 @@ export default function PersonalityCard({ type, data, isEvaluating }) {
     },
     forensic: {
       title: "The Forensic Analyst",
-      role: "Empirical Bitstream & Contextual Inspection",
-      subtitle: "Examines syntax, frequency signatures, metadata, and strictly observed physical artifacts.",
+      role: "Inspects the Evidence",
+      subtitle: "Examines the actual file, dates, background details, and digital clues.",
       accentBorder: "border-sky-200",
       accentBg: "bg-sky-50/70",
       badgeClass: "bg-sky-100 text-sky-800 border-sky-200",
@@ -40,8 +39,8 @@ export default function PersonalityCard({ type, data, isEvaluating }) {
     },
     adjudicator: {
       title: "The Adjudicator",
-      role: "Epistemic Arbitration & Verdict Synthesis",
-      subtitle: "Weighs opposing arguments, separates facts from hypotheses, and issues grounded conclusions.",
+      role: "Delivers the Verdict",
+      subtitle: "Weighs both sides, separates facts from guesses, and reaches a fair conclusion.",
       accentBorder: "border-zinc-300",
       accentBg: "bg-zinc-50/90",
       badgeClass: "bg-zinc-900 text-white border-zinc-900",
@@ -56,13 +55,13 @@ export default function PersonalityCard({ type, data, isEvaluating }) {
 
   if (isEvaluating) {
     return (
-      <div className={`p-6 rounded-3xl bg-white border ${cfg.accentBorder} shadow-xs flex flex-col justify-between min-h-[380px] animate-pulse`}>
+      <div className={`p-6 rounded-3xl bg-white border ${cfg.accentBorder} shadow-xs flex flex-col justify-between min-h-[360px] animate-pulse`}>
         <div className="flex items-center gap-3">
           <div className={`p-2.5 rounded-2xl ${cfg.accentBg} ${cfg.iconColor}`}>
             <Icon className="w-5 h-5 animate-spin" />
           </div>
           <div>
-            <span className="text-xs font-mono tracking-widest text-zinc-400 uppercase">ANALYZING EVIDENCE</span>
+            <span className="text-xs font-mono tracking-widest text-zinc-400 uppercase">ANALYZING</span>
             <h4 className="text-lg font-bold text-zinc-900">{cfg.title}</h4>
           </div>
         </div>
@@ -70,9 +69,8 @@ export default function PersonalityCard({ type, data, isEvaluating }) {
           <div className="h-3 bg-zinc-100 rounded-full w-5/6" />
           <div className="h-3 bg-zinc-100 rounded-full w-4/6" />
           <div className="h-3 bg-zinc-100 rounded-full w-full" />
-          <div className="h-3 bg-zinc-100 rounded-full w-3/4" />
         </div>
-        <span className="text-xs font-mono text-zinc-400">Independent examination in progress...</span>
+        <span className="text-xs font-mono text-zinc-400">Reviewing facts independently...</span>
       </div>
     );
   }
@@ -90,8 +88,8 @@ export default function PersonalityCard({ type, data, isEvaluating }) {
           <div>
             <div className="flex items-center gap-2 flex-wrap">
               <h3 className="text-lg sm:text-xl font-bold text-zinc-900 tracking-tight">{cfg.title}</h3>
-              <span className={`text-[11px] font-mono px-2 py-0.5 rounded-full border font-semibold ${cfg.badgeClass}`}>
-                {type.toUpperCase()}
+              <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full border font-semibold ${cfg.badgeClass}`}>
+                AI 0{type === 'skeptic' ? '1' : type === 'forensic' ? '2' : '3'}
               </span>
             </div>
             <p className="text-xs font-medium text-zinc-600 mt-0.5">{cfg.role}</p>
@@ -100,7 +98,7 @@ export default function PersonalityCard({ type, data, isEvaluating }) {
         <button
           onClick={() => setIsExpanded(!isExpanded)}
           className="p-1.5 rounded-xl hover:bg-zinc-200/50 text-zinc-400 hover:text-zinc-700 transition-colors cursor-pointer shrink-0"
-          title={isExpanded ? "Collapse panel" : "Expand panel"}
+          title={isExpanded ? "Collapse" : "Expand"}
         >
           {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </button>
@@ -108,7 +106,7 @@ export default function PersonalityCard({ type, data, isEvaluating }) {
 
       {/* Expandable Findings Body */}
       {isExpanded && (
-        <div className="p-5 sm:p-6 space-y-6 text-sm text-zinc-700 font-sans">
+        <div className="p-5 sm:p-6 space-y-5 text-sm text-zinc-700 font-sans">
           {/* SKEPTIC FINDINGS */}
           {type === 'skeptic' && (
             <>
@@ -116,9 +114,9 @@ export default function PersonalityCard({ type, data, isEvaluating }) {
               <div className="space-y-2">
                 <span className="text-xs font-mono font-semibold tracking-wider text-rose-700 uppercase flex items-center gap-1.5">
                   <AlertTriangle className="w-3.5 h-3.5" />
-                  Unsupported Assumptions ({data.unsupportedAssumptions?.length || 0})
+                  Unproven Assumptions ({data.unsupportedAssumptions?.length || 0})
                 </span>
-                <ul className="space-y-2 text-xs sm:text-sm text-zinc-600 pl-1">
+                <ul className="space-y-1.5 text-xs sm:text-sm text-zinc-600 pl-1">
                   {data.unsupportedAssumptions?.map((item, idx) => (
                     <li key={idx} className="flex items-start gap-2 leading-relaxed">
                       <span className="text-rose-500 font-bold shrink-0">•</span>
@@ -132,7 +130,7 @@ export default function PersonalityCard({ type, data, isEvaluating }) {
               <div className="space-y-2 pt-2 border-t border-zinc-100">
                 <span className="text-xs font-mono font-semibold tracking-wider text-amber-700 uppercase flex items-center gap-1.5">
                   <HelpCircle className="w-3.5 h-3.5" />
-                  Missing Critical Evidence
+                  Missing Proof
                 </span>
                 <ul className="space-y-1.5 text-xs text-zinc-600 pl-1">
                   {data.missingEvidence?.map((item, idx) => (
@@ -147,7 +145,7 @@ export default function PersonalityCard({ type, data, isEvaluating }) {
               {/* Contradictions */}
               {data.contradictions?.length > 0 && (
                 <div className="p-3.5 rounded-2xl bg-rose-50/80 border border-rose-100 text-xs text-rose-950 space-y-1">
-                  <span className="font-bold block text-rose-900 font-mono tracking-tight uppercase">Direct Contradictions:</span>
+                  <span className="font-bold block text-rose-900 font-mono tracking-tight uppercase">Clear Contradictions:</span>
                   {data.contradictions.map((c, i) => (
                     <p key={i} className="leading-relaxed">{c}</p>
                   ))}
@@ -163,7 +161,7 @@ export default function PersonalityCard({ type, data, isEvaluating }) {
               <div className="space-y-2">
                 <span className="text-xs font-mono font-semibold tracking-wider text-sky-700 uppercase flex items-center gap-1.5">
                   <CheckCircle2 className="w-3.5 h-3.5" />
-                  Empirically Verified Observations
+                  Verified Evidence
                 </span>
                 <div className="space-y-2">
                   {data.groundedObservations?.map((obs, idx) => (
@@ -174,23 +172,23 @@ export default function PersonalityCard({ type, data, isEvaluating }) {
                 </div>
               </div>
 
-              {/* Bitstream / Linguistic Details */}
-              <div className="space-y-2.5 pt-2 border-t border-zinc-100 text-xs">
+              {/* Visual / Audio Details */}
+              <div className="space-y-2 pt-2 border-t border-zinc-100 text-xs">
                 {data.visualClues && (
                   <div>
-                    <span className="font-semibold text-zinc-900 block">Visual / Spectral Signature:</span>
+                    <span className="font-semibold text-zinc-900 block">Visual Clues:</span>
                     <p className="text-zinc-600 mt-0.5 leading-relaxed">{data.visualClues}</p>
                   </div>
                 )}
                 {data.audioClues && data.audioClues !== "Not applicable." && (
                   <div>
-                    <span className="font-semibold text-zinc-900 block">Acoustic / Formant Analysis:</span>
+                    <span className="font-semibold text-zinc-900 block">Audio Clues:</span>
                     <p className="text-zinc-600 mt-0.5 leading-relaxed">{data.audioClues}</p>
                   </div>
                 )}
                 {data.sourceObservations && (
                   <div>
-                    <span className="font-semibold text-zinc-900 block">Source Provenance Telemetry:</span>
+                    <span className="font-semibold text-zinc-900 block">Source & Metadata:</span>
                     <p className="text-zinc-600 mt-0.5 leading-relaxed">{data.sourceObservations}</p>
                   </div>
                 )}
@@ -202,13 +200,13 @@ export default function PersonalityCard({ type, data, isEvaluating }) {
           {type === 'adjudicator' && (
             <div className="space-y-3">
               <span className="text-xs font-mono font-semibold tracking-wider text-zinc-900 uppercase block">
-                Evidence Synthesis & Arbitration
+                Final Summary
               </span>
               <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed">
-                {data.verdictSummary || "Comparing opposing hypotheses against verified observational constraints."}
+                {data.verdictSummary || "Weighing findings to reach a fair verdict."}
               </p>
               <div className="p-3 rounded-xl bg-zinc-100 text-xs text-zinc-800 font-mono">
-                Status: Complete deliberation available below.
+                Full verdict details available below.
               </div>
             </div>
           )}
@@ -217,8 +215,8 @@ export default function PersonalityCard({ type, data, isEvaluating }) {
 
       {/* Footer Meta */}
       <div className="px-5 sm:px-6 py-3 bg-zinc-50 border-t border-zinc-100 flex items-center justify-between text-[11px] font-mono text-zinc-400">
-        <span>INDEPENDENT AGENT 0{type === 'skeptic' ? '1' : type === 'forensic' ? '2' : '3'}</span>
-        <span className="text-zinc-600 font-medium">Deterministic Context</span>
+        <span>EXPERT {type === 'skeptic' ? '01' : type === 'forensic' ? '02' : '03'}</span>
+        <span className="text-zinc-600 font-medium">Independent Check</span>
       </div>
     </div>
   );

@@ -1,238 +1,230 @@
 /**
  * Sample Investigation Claims for Truth Tribunal
- * Realistic, high-stakes synthetic media, leaked document, and deceptive claim scenarios.
+ * Simple, clear, plain-English investigations of viral claims and fakes.
  */
 export const TRIBUNAL_SAMPLES = [
   {
     id: "sample-geneva-peace",
-    title: "Geneva Closed-Door Peace Treaty Withdrawal",
-    category: "Diplomatic Disinformation",
-    claim: "Leaked video shows European Ambassador Vance announcing immediate unilateral withdrawal from the bilateral security treaty during an emergency press briefing in Geneva.",
-    evidenceProvided: "A 48-second video clip uploaded to an anonymous Telegram relay at 14:02 UTC. The clip shows Ambassador Vance speaking at a podium bearing the UN Geneva emblem, with active press photographers in the background.",
-    knownContext: "Ambassador Vance was scheduled to travel from Bern to Zurich on that day. Swiss Federal Council records show the protocol lapel pin worn in the clip was retired in 2024. The bilateral treaty codex A/78/304 does not contain the clause read aloud.",
+    title: "Leaked Video: Diplomat Cancels Peace Treaty",
+    category: "Diplomatic Video",
+    claim: "A viral video claims European Ambassador Vance announced his country is quitting the security treaty during a press meeting in Geneva.",
+    evidenceProvided: "A 48-second video clip posted on an anonymous Telegram channel showing Ambassador Vance speaking at a podium with UN logos and reporters in the background.",
+    knownContext: "Official flight records show Ambassador Vance was flying to Zurich at that exact time. The suit pin he is wearing was retired in 2024. The real treaty text has no rule matching what he says.",
     skepticAnalysis: {
       unsupportedAssumptions: [
-        "Assumes the speaker in the footage is genuinely Ambassador Vance rather than a neural face-swap synthesis.",
-        "Assumes the event took place on the claimed date (Oct 14, 2026) rather than repurposed 2023 stock archival footage.",
-        "Assumes an ambassador has constitutional authority to unilaterally dissolve a ratified bilateral treaty without parliamentary assent."
+        "Assumes the person in the video is really Ambassador Vance, not a computer face-swap.",
+        "Assumes this happened recently, rather than being recycled old footage from 2023.",
+        "Assumes an ambassador has the legal authority to cancel a treaty by himself."
       ],
       missingEvidence: [
-        "Zero independent press pool verification or raw camera feeds from accredited journalists present in the room.",
-        "Absence of official diplomatic cables, press office advisories, or UN depository notifications.",
-        "No matching audio track on official UN WebTV broadcasting logs for Geneva Hall 4."
+        "No real news reporters or TV channels at the UN reported this.",
+        "No official government statement or UN document exists."
       ],
       alternativeExplanations: [
-        "A sophisticated synthetic face-swap and voice-clone applied over genuine 2023 press conference footage to trigger financial market panic.",
-        "A coordinated geopolitical deception operation timed during market trading hours."
+        "Someone used AI face-swapping over old footage to cause panic in the financial markets.",
+        "An actor wearing makeup made to look like the ambassador."
       ],
       contradictions: [
-        "Flight transponder records from the Swiss Air Force confirm Ambassador Vance's transport was airborne over Zurich at the exact 14:00 CET timestamp cited in the video.",
-        "Visual inspection confirms the lapel pin design was officially decommissioned 22 months ago."
+        "Air traffic logs prove Ambassador Vance was on an airplane flying to Zurich when this was recorded.",
+        "The suit pin in the video hasn't been worn in over two years."
       ],
       substantiationRequirements: [
-        "Cryptographically signed camera hardware attestation (C2PA) from the recording device.",
-        "Official Swiss Department of Foreign Affairs confirmation of a special session."
+        "Original raw camera file with verified date and GPS metadata.",
+        "Official confirmation from the Swiss Department of Foreign Affairs."
       ]
     },
     forensicAnalysis: {
-      textCharacteristics: "Syntax in the statement exhibits unnatural grammatical calques characteristic of automated translation engines. Phrasing deviates from formal diplomatic treaty dissolution language.",
-      sourceObservations: "First seed originated on Telegram relay channel 'Channel_8092_Leaks' (account created < 72 hours prior to upload). Metadata headers completely stripped; no EXIF, GPS, or camera sensor signatures.",
-      visualClues: "Sub-surface skin scattering inconsistency detected around zygomatic arc; localized 64px tiling boundary along mandibular margin. Corneal specular reflections show light source divergence > 41 degrees.",
-      audioClues: "Spectrogram analysis reveals absence of room reverberation harmonics above 8.2 kHz, consistent with neural vocoder synthesis (voice cloning) overdubbed on muffled ambient noise.",
+      textCharacteristics: "The speech sounds like robotic translation, not how real diplomats speak.",
+      sourceObservations: "Posted from an anonymous Telegram account created 2 days ago. All camera and location data was erased.",
+      visualClues: "Blurry seam along the jawline where the face was pasted on. The lighting on the face does not match the room.",
+      audioClues: "The voice cuts off unnaturally and has no room echo, typical of cloned AI voices.",
       groundedObservations: [
-        "Observed: The video file lacks original camera metadata and shows re-quantization at 88% JPEG/MPEG compression.",
-        "Observed: The audio frequency distribution displays synthetic cutoff at 16kHz typical of standard consumer text-to-speech models.",
-        "Observed: Podium seal geometry matches 2023 press room configuration, not current 2026 renovated dais."
+        "The file has no camera data and was heavily compressed.",
+        "The podium logo matches the 2023 press room, not the newly renovated 2026 room."
       ]
     },
     challengeRound: {
-      skepticAssertion: "The forensic analyst highlights a 64px jawline blend line as proof of deepfake face-swapping. However, aggressive social media re-compression and downsampling on Telegram can introduce boundary blockiness without malicious intent. Can we distinguish compression artifacts from neural boundary masking?",
-      forensicResponse: "Yes. When an authentic image undergoes standard video transcoding, the Discrete Cosine Transform (DCT) quantization error is uniform across the entire frame. In this specimen, high-frequency noise variance drops by 37% strictly inside the mandibular polygon while remaining natural across the collar and background. This localized step-function drop cannot be produced by global codec compression.",
-      adjudicatorNote: "The Forensic Analyst successfully demonstrates localized variance inconsistency, ruling out benign platform compression."
+      skepticAssertion: "Could the blur on the jawline just be normal video compression from Telegram rather than a fake face-swap?",
+      forensicResponse: "No. Normal compression blurs the whole screen evenly. Here, the blur is only around the mouth and jaw, while the shirt collar and background stay sharp. That only happens when a new face is pasted onto a body.",
+      adjudicatorNote: "The forensic check confirms the blur is only on the face, proving it was digitally edited."
     },
     agreementDisagreement: {
       agreements: [
-        "Both agree that the video file has zero authentic provenance and originated from an unverified relay node.",
-        "Both agree that the flight transponder timeline directly contradicts the claimed time and physical presence of the speaker.",
-        "Both agree that no corroborating international diplomatic records substantiate the claim."
+        "Both agree the video came from an anonymous, unverified source.",
+        "Both agree flight records prove the ambassador was not in Geneva.",
+        "Both agree no genuine news outlets covered the event."
       ],
       disagreements: [
-        "The Skeptic argues the entire scene might be an actor with practical prosthetic makeup, whereas the Forensic Analyst identifies digital neural latent inpainting boundaries.",
-        "The Skeptic questions whether the audio was an actual impersonator rather than an AI model; Forensic analysis demonstrates vocoder frequency cutoff."
+        "The Skeptic wondered if it was an actor; the Analyst showed it was a digital face-swap."
       ],
       unresolvedQuestions: [
-        "Who commissioned the generation and distribution of the synthetic asset?",
-        "Was the original base footage recorded with an authentic camera in 2023 or generated through text-to-video diffusion?"
+        "Who created and shared the video?"
       ]
     },
     finalAssessment: {
       outcome: "Potential manipulation indicators",
-      verdictSummary: "The submitted claim is categorized as SYNTHETICALLY FABRICATED with High Confidence. Physical flight telemetry renders the speaker's presence impossible, while multi-spectral forensic analysis reveals localized neural boundary discontinuities and vocal cloning harmonics.",
+      verdictSummary: "This video is very likely a deepfake. Official flight records prove the ambassador was on an airplane at the time, and video checks reveal clear digital seams around the jaw and a cloned voice.",
       groundedEvidence: [
-        "Swiss Air Force flight logs showing Ambassador Vance was airborne at claimed timestamp.",
-        "Localized 37% noise variance drop and 64px tiling along jawline.",
-        "Historical mismatch of decommissioned 2024 diplomatic lapel insignia.",
-        "Complete absence of C2PA provenance signatures or corroborating diplomatic records."
+        "Flight records prove the ambassador was in an airplane at the time.",
+        "Digital editing seams detected along the jawline.",
+        "Old 2023 room background used instead of current 2026 setup."
       ],
       limitations: [
-        "Without the uncompressed raw camera recording, absolute mathematical proof of the exact deepfake model weights cannot be determined.",
-        "Source attribution beyond the primary Telegram relay node remains cryptographically obfuscated."
+        "Without the original file from the phone/camera, we cannot name the exact AI software used.",
+        "The anonymous Telegram creator cannot be identified yet."
       ],
       recommendedNextSteps: [
-        "Issue cryptographic provenance alert to international news wires referencing Swiss transponder logs.",
-        "Request subpoena on Telegram ingress IP and infrastructure hosting the relay node.",
-        "Cross-reference base footage against the 2023 UN Geneva audio/video archival library."
+        "Release a public note citing the ambassador's verified flight records.",
+        "Compare the clip with 2023 UN archives to find the original video used to make the fake."
       ]
     }
   },
   {
     id: "sample-bank-liquidity",
-    title: "Central Bank Emergency Liquidity Freeze",
-    category: "Financial System Deception",
-    claim: "Audio recording circulating on WhatsApp claims Federal Reserve Vice Chair announced an immediate 48-hour moratorium on interbank transfers and domestic retail withdrawals.",
-    evidenceProvided: "A 32-second voice note (.opus format) forwarded 'frequently' on private messaging groups. Audio quality is clear with faint background air conditioning hum.",
-    knownContext: "Federal Reserve Board meeting calendar shows open market operations are normal. Interbank Fedwire and ACH status dashboards indicate 100% operational uptime.",
+    title: "Viral Audio: Central Bank Freezing Bank Accounts",
+    category: "Financial Audio",
+    claim: "An audio clip forwarded on WhatsApp claims the Central Bank announced an immediate 48-hour freeze on bank transfers and ATM withdrawals.",
+    evidenceProvided: "A 32-second voice message forwarded many times in family and trading chat groups. The voice sounds urgent with quiet air conditioning hum in the background.",
+    knownContext: "The official Central Bank website and all national payment systems show 100% normal operations. No banks reported any transfer issues.",
     skepticAnalysis: {
       unsupportedAssumptions: [
-        "Assumes an announcement of this magnitude would be communicated through a low-bitrate voice memo rather than a public press conference on federalreserve.gov.",
-        "Assumes emergency capital controls can be declared verbally by an individual official without executive presidential directive or FOMC resolution."
+        "Assumes a historic financial emergency would be shared through a WhatsApp voice note instead of a live televised press conference.",
+        "Assumes a single official can freeze the nation's banking system alone without a government decree."
       ],
       missingEvidence: [
-        "Absence of Federal Register notice, official press release, or emergency regulatory order.",
-        "No matching wire reports on Bloomberg Terminal, Reuters, or financial regulatory registries.",
-        "No corroborating banking distress signals in overnight repo or SOFR borrowing rates."
+        "Zero official press releases on the Central Bank website.",
+        "No reporting by financial news wires like Reuters or Bloomberg."
       ],
       alternativeExplanations: [
-        "A synthetic voice clone generated via zero-shot voice cloning tools designed to trigger coordinated bank run panic or crypto volatility.",
-        "A voice actor practicing a hypothetical scenario or tabletop crisis exercise leaked out of context."
+        "An AI voice clone created to cause panic and profit from stock drops.",
+        "A recording from an internal training drill leaked out of context."
       ],
       contradictions: [
-        "Real-time Fedwire, FedNow, and CHIPS payment networks are processing transactions in continuous real time.",
-        "The Vice Chair was speaking at an open academic symposium in Chicago during the alleged recording window."
+        "Real-time bank transfers and ATM networks are running normally nationwide.",
+        "The official was giving a public speech at a university when this was allegedly recorded."
       ],
       substantiationRequirements: [
-        "Official publication on the Federal Reserve Board public bulletin.",
-        "Independent verification through commercial banking clearinghouse advisories."
+        "An official statement on the Central Bank website.",
+        "Written notices from major commercial banks."
       ]
     },
     forensicAnalysis: {
-      textCharacteristics: "The script uses sensational, non-statutory terminology ('immediate account freeze', 'interbank bank halt') rather than standard Federal Reserve Act regulatory definitions.",
-      sourceObservations: "OPUS audio format with multiple re-encoding containers. Metadata indicates file was created using consumer audio editing software 4 hours prior to viral circulation.",
-      visualClues: "Not applicable (pure audio specimen).",
-      audioClues: "Voice prosody exhibits robotic pitch-contour flatness with absent micro-tremors typical of human vocal cords under high emotional stress. Spectrogram indicates discrete 24kHz cutoff with phase stitching artifacts.",
+      textCharacteristics: "Uses dramatic slang ('lock down your cash') instead of standard banking terms.",
+      sourceObservations: "Audio file created in consumer editing software 4 hours before going viral. Origin cannot be traced.",
+      visualClues: "Not applicable (audio only).",
+      audioClues: "The voice has no natural breathing pauses between sentences and robotic pitch consistency.",
       groundedObservations: [
-        "Observed: Spectral phase continuity breaks every 1.8 seconds, indicating concatenated acoustic tokens.",
-        "Observed: Absence of natural breathing inhalations between long sentences.",
-        "Observed: Real-time payments telemetry shows zero operational disruption across participating financial institutions."
+        "Voice pitch is completely flat with zero human vocal tremors.",
+        "No sounds of breathing between long sentences.",
+        "National payment networks show 100% uptime with zero payment delays."
       ]
     },
     challengeRound: {
-      skepticAssertion: "Could this recording be authentic audio from an internal, classified crisis simulation exercise rather than an AI-generated clone?",
-      forensicResponse: "While internal training exercises occur, acoustic analysis reveals micro-phase discontinuities and vocoder pitch quantization. Natural human speech—even when role-playing—contains respiratory pauses and sub-glottal resonance. The voice profile exactly matches a commercially available eleven-labs voice model trained on the official's congressional testimonies.",
-      adjudicatorNote: "The acoustic evidence confirms synthetic generation, substantially weakening the 'leaked internal exercise' hypothesis."
+      skepticAssertion: "Could this audio be from a private government disaster simulation exercise rather than an AI clone?",
+      forensicResponse: "Even during a drill, humans breathe and have natural tone pitch changes. This audio has zero breath pauses and matches the exact frequency pattern of an AI voice generator.",
+      adjudicatorNote: "The lack of human breathing strongly confirms an AI voice clone."
     },
     agreementDisagreement: {
       agreements: [
-        "Both agree that real-time payment rails are functioning with zero disruption, disproving the factual truth of the claim.",
-        "Both agree the voice note was crafted to induce viral emotional reaction and panic.",
-        "Both agree that no official documentation exists."
+        "Both agree all banks and payment networks are operating normally.",
+        "Both agree the voice note was created to trigger panic.",
+        "Both agree no official agency issued any warning."
       ],
       disagreements: [
-        "The Skeptic cautions against declaring intentional economic warfare without attribution; the Forensic Analyst notes high correlation with market manipulation schemes."
+        "The Skeptic questioned the motive; the Analyst showed patterns matching stock manipulation scams."
       ],
       unresolvedQuestions: [
-        "Did the creator profit from short positions in regional banking equities during the panic window?"
+        "Did the person who posted this profit from trading on the panic?"
       ]
     },
     finalAssessment: {
       outcome: "Misleading context suspected",
-      verdictSummary: "The claim is categorized as UNVERIFIED AND HIGHLY DECEPTIVE. Telemetry from payment settlement systems confirms normal operations, while speech acoustic forensics demonstrate synthetic neural voice cloning.",
+      verdictSummary: "The audio note is fake and deceptive. All national payment systems are operating normally, and audio testing shows the clip was generated using an AI voice clone.",
       groundedEvidence: [
-        "Payment network telemetry (Fedwire / CHIPS) operating at nominal volume.",
-        "Acoustic phase discontinuities and artificial pitch quantization in voice recording.",
-        "Official public schedule placing the speaker in an open public forum in Chicago."
+        "Bank payment networks show normal operations with zero errors.",
+        "Robotic tone with zero human breath sounds in the voice recording.",
+        "The official was speaking at a university event at the claimed time."
       ],
       limitations: [
-        "Voice clone training dataset cannot be determined with legal finality without access to the creator's local compute environment."
+        "We cannot identify the exact computer where the voice clone was rendered."
       ],
       recommendedNextSteps: [
-        "Financial institutions should issue standardized fraud advisory notices.",
-        "Cross-reference social media amplification nodes against known market manipulation accounts."
+        "Banks should post an alert confirming services are fully operational.",
+        "Share a public debunking notice to stop the audio from spreading on WhatsApp."
       ]
     }
   },
   {
     id: "sample-submerged-datacenter",
-    title: "Leaked Photo of Flooded AI Data Center Core",
-    category: "Corporate Infrastructure",
-    claim: "Confidential photograph allegedly leaked by a contractor shows catastrophic coolant breach and sea-water flooding at a frontier AI lab's coastal cluster in Norway.",
-    evidenceProvided: "A high-resolution JPEG showing server racks partially submerged in turbulent water with glowing neon cables and emergency flashing red lights.",
-    knownContext: "The facility operator reported 99.99% cluster availability over the past 30 days. Independent marine seismic sensors around the fjord detected no structural or geological events.",
+    title: "Leaked Photo: Flooded AI Server Facility",
+    category: "Infrastructure Photo",
+    claim: "A leaked photo claims catastrophic ocean flooding destroyed a major AI company's underground server center in Norway.",
+    evidenceProvided: "A crisp photo showing glowing server racks halfway under turbulent water with flashing red emergency lights.",
+    knownContext: "The company's cloud status dashboard shows 100% normal uptime. Local marine sensors recorded no leaks, tidal surges, or earthquakes.",
     skepticAnalysis: {
       unsupportedAssumptions: [
-        "Assumes an industrial data center would utilize decorative exposed neon cables inside a hermetically sealed immersion facility.",
-        "Assumes catastrophic ocean flooding would leave server LED status lights operational underwater without triggering electrical arc containment."
+        "Assumes an actual data center would have exposed neon wires dangling in water.",
+        "Assumes high-voltage electrical servers would stay lit underwater without short-circuiting."
       ],
       missingEvidence: [
-        "Zero employee chatter, contractor reports, or insurance casualty filings.",
-        "No compute capacity drop observed across the public cloud API status monitor.",
-        "No emergency maritime or environmental response teams deployed to the fjord."
+        "No employee posts or news reports about an outage.",
+        "No drop in speed or availability on the company's AI services."
       ],
       alternativeExplanations: [
-        "A photorealistic text-to-image generation (e.g. Midjourney v6 / FLUX.1) depicting a fictional cyberpunk disaster scenario.",
-        "An artistic render commissioned for a science-fiction publication misattributed as a factual leak."
+        "An AI-generated picture made with Midjourney or DALL-E for fun or sci-fi art.",
+        "A 3D computer graphic from a video game passed off as real."
       ],
       contradictions: [
-        "Physical server racks in the image display incoherent text on warning labels and non-standard form factor dimensions.",
-        "Water surface physics exhibit conflicting reflection angles and impossible caustic patterns."
+        "Warning labels on the servers have distorted, unreadable gibberish letters.",
+        "The water reflections don't line up with the ceiling lights."
       ],
       substantiationRequirements: [
-        "Local emergency services incident report from the municipal fire department.",
-        "Noticeable GPU capacity degradation on public LLM inference endpoints."
+        "Incident report from the local fire department or coastal guard.",
+        "Noticeable service disruptions on the AI platform."
       ]
     },
     forensicAnalysis: {
-      textCharacteristics: "Inspection of warning labels on the server chassis reveals classic neural diffusion pseudotext ('CAUTON: NYDRO-VOLT FLUX') rather than compliant European electrical hazard signage.",
-      sourceObservations: "EXIF metadata contains standard image generator tags; color profile conforms to sRGB Web standard with synthetic noise dithering.",
-      visualClues: "Optical analysis reveals impossible perspective convergence on server rack rails; server cables blend smoothly into the concrete wall without termination jacks. Water ripples lack physical surface tension caustics.",
+      textCharacteristics: "Warning signs on the servers show fake, garbled AI letters ('CAUTON: NYDRO-VOLT FLUX').",
+      sourceObservations: "The image has metadata matching AI image generation tools.",
+      visualClues: "Cables fade into concrete without plugs. A hand reflected in the water has 6 fingers.",
       audioClues: "Not applicable.",
       groundedObservations: [
-        "Observed: Warning signage contains unreadable pseudo-typographic characters.",
-        "Observed: Server rack power cables lack physical junction termination and fuse blocks.",
-        "Observed: Facility cloud cluster has served 1.2 billion token requests without interruption."
+        "Warning labels contain garbled, nonsense letters common in AI images.",
+        "Reflected hand in the puddle has six distinct fingers.",
+        "The company's servers processed millions of requests with zero downtime."
       ]
     },
     challengeRound: {
-      skepticAssertion: "Could this be a real high-security prototype underwater data center (like Microsoft Project Natick) experiencing a controlled sealed test?",
-      forensicResponse: "Project Natick used sealed cylindrical pressure vessels without exposed loose wiring or ceiling catwalks. Furthermore, close optical examination of the reflections reveals fingers on the photographer's reflection in the water that have 6 digits—a definitive hallmark of diffusion image synthesis.",
-      adjudicatorNote: "The anatomical reflection anomaly and non-standard equipment topology establish synthetic fabrication."
+      skepticAssertion: "Could this be an experimental sealed underwater test capsule rather than an AI image?",
+      forensicResponse: "Real test capsules are sealed metal cylinders, not rooms with loose wires. More importantly, the reflection in the water shows a human hand with six fingers—a classic sign of AI image generation.",
+      adjudicatorNote: "The six-fingered reflection and garbled text prove this is an AI-generated image."
     },
     agreementDisagreement: {
       agreements: [
-        "Both agree the image is an artificial generation rather than a real industrial catastrophe.",
-        "Both agree that operational telemetry disproves any actual infrastructure loss."
+        "Both agree the photo is an AI-generated image, not a real accident.",
+        "Both agree server operations have had zero downtime."
       ],
       disagreements: [
-        "The Skeptic believes it was harmless sci-fi art shared playfully; the Forensic Analyst notes it was targeted at stock short-sellers."
+        "The Skeptic suggested it was harmless sci-fi art; the Analyst noted it was shared to manipulate tech stocks."
       ],
       unresolvedQuestions: [
-        "Was the prompt specifically engineered to manipulate technology stock valuations?"
+        "Was the image created intentionally to harm the company's stock price?"
       ]
     },
     finalAssessment: {
       outcome: "Potential manipulation indicators",
-      verdictSummary: "The image is categorized as SYNTHETIC MEDIA GENERATION (AI Image Synthesis). Diffusion rendering artifacts, typographic pseudo-text, and uninterrupted cluster telemetry definitively disprove the claimed catastrophic flood.",
+      verdictSummary: "The photo is an AI-generated fake. Glitches typical of AI image generators—including garbled sign text and a reflection with six fingers—along with 100% normal server uptime prove the claim is false.",
       groundedEvidence: [
-        "Incoherent pseudo-text on server chassis warning plates.",
-        "Anatomical anomalies in the water specular reflection.",
-        "Uninterrupted 99.99% cluster telemetry and zero cloud API service degradation."
+        "Garbled, unreadable text on the server labels.",
+        "Water reflection clearly shows a hand with 6 fingers.",
+        "Server status monitoring confirms 100% normal uptime."
       ],
       limitations: [
-        "Prompt text used to generate the image cannot be recovered from the pixel matrix alone."
+        "The exact text prompt used to generate the image cannot be recovered from the photo alone."
       ],
       recommendedNextSteps: [
-        "Tag media asset with C2PA synthetic label.",
-        "Notify financial misinformation tracking desks of viral synthetic imagery."
+        "Label the photo as AI-generated on social media platforms.",
+        "Refer inquiries to the public cloud service status page."
       ]
     }
   }

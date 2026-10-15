@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
-import { Swords, ShieldAlert, Cpu, Scale, ArrowRight, Check } from 'lucide-react';
+import React from 'react';
+import { Swords, ShieldAlert, Cpu, Scale } from 'lucide-react';
 
 export default function ChallengeRoundSection({ challengeRound }) {
-  const [activeStep, setActiveStep] = useState('both'); // 'skeptic' | 'forensic' | 'both'
-
   if (!challengeRound) return null;
 
   return (
@@ -17,10 +15,10 @@ export default function ChallengeRoundSection({ challengeRound }) {
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xs font-mono font-semibold tracking-wider text-rose-400 uppercase">
-                STAGE 02 // CROSS-EXAMINATION
+                STAGE 02 // AI DEBATE
               </span>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/15 text-zinc-300 font-mono">
-                INTER-AGENT CHALLENGE
+                CROSS-EXAMINATION
               </span>
             </div>
             <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight mt-0.5">
@@ -30,7 +28,7 @@ export default function ChallengeRoundSection({ challengeRound }) {
         </div>
 
         <p className="text-xs text-zinc-400 max-w-md sm:text-right">
-          The Skeptic aggressively interrogates the Forensic Analyst's assertions to eliminate confirmation bias.
+          The Skeptic questions the Forensic Analyst's claims to make sure nothing was assumed or rushed.
         </p>
       </div>
 
@@ -42,7 +40,7 @@ export default function ChallengeRoundSection({ challengeRound }) {
             <div className="flex items-center gap-2.5 pb-3 border-b border-rose-100">
               <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0" />
               <span className="text-xs font-mono font-bold text-rose-900 tracking-wider uppercase">
-                THE SKEPTIC'S CHALLENGE ASSERTION
+                THE SKEPTIC'S CHALLENGE
               </span>
             </div>
             <p className="text-sm sm:text-base text-zinc-800 leading-relaxed font-sans italic">
@@ -50,7 +48,7 @@ export default function ChallengeRoundSection({ challengeRound }) {
             </p>
             <div className="text-[11px] font-mono text-zinc-400 pt-2 flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-              <span>Target: Ruling out benign codec compression / non-malicious artifacts</span>
+              <span>Goal: Rule out normal file compression or honest mistakes</span>
             </div>
           </div>
 
@@ -59,7 +57,7 @@ export default function ChallengeRoundSection({ challengeRound }) {
             <div className="flex items-center gap-2.5 pb-3 border-b border-sky-100">
               <Cpu className="w-4 h-4 text-sky-600 shrink-0" />
               <span className="text-xs font-mono font-bold text-sky-900 tracking-wider uppercase">
-                FORENSIC ANALYST'S EVIDENTIARY REBUTTAL
+                THE FORENSIC ANALYST'S ANSWER
               </span>
             </div>
             <p className="text-sm sm:text-base text-zinc-800 leading-relaxed font-sans">
@@ -67,7 +65,7 @@ export default function ChallengeRoundSection({ challengeRound }) {
             </p>
             <div className="text-[11px] font-mono text-zinc-400 pt-2 flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
-              <span>Method: Localized DCT quantization & mathematical frequency variance</span>
+              <span>Evidence: Technical proof and visual checks</span>
             </div>
           </div>
         </div>
@@ -80,7 +78,7 @@ export default function ChallengeRoundSection({ challengeRound }) {
             </div>
             <div className="space-y-1">
               <span className="text-xs font-mono font-bold tracking-wider text-emerald-900 uppercase block">
-                ADJUDICATOR INTERIM RULING
+                THE ADJUDICATOR'S NOTE
               </span>
               <p className="text-xs sm:text-sm text-emerald-900/90 leading-relaxed font-sans">
                 {challengeRound.adjudicatorNote}

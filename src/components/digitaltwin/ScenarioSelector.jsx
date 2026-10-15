@@ -13,7 +13,7 @@ import {
 import { DIGITAL_TWIN_SCENARIOS } from '../../data/digitalTwinScenarios';
 
 export default function ScenarioSelector({ onSelectScenario }) {
-  const [difficultyFilter, setDifficultyFilter] = useState('all'); // 'all' | 'Easy' | 'Hard'
+  const [difficultyFilter, setDifficultyFilter] = useState('all');
 
   const filtered = DIGITAL_TWIN_SCENARIOS.filter((s) => {
     if (difficultyFilter === 'all') return true;
@@ -27,23 +27,23 @@ export default function ScenarioSelector({ onSelectScenario }) {
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className="text-xs font-mono font-bold tracking-widest text-zinc-500 uppercase">
-              SOCIAL ENGINEERING SIMULATOR // BEHAVIORAL CYBERSECURITY
+              PRACTICE SIMULATOR // SPOT SCAMS & FAKES
             </span>
             <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-700 border border-zinc-200 font-semibold">
-              FICTIONAL TRAINING EXERCISES
+              SAFE TRAINING EXERCISES
             </span>
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-zinc-950">
             Digital Twin Test
           </h2>
-          <p className="text-base sm:text-lg text-zinc-500 mt-2 max-w-3xl leading-relaxed">
-            Converse with adaptive bots role-playing impersonated contacts, deceptive recruiters, and authority figures. Practice recognizing synthetic urgency and social engineering before real-world attacks happen.
+          <p className="text-base sm:text-lg text-zinc-600 mt-2 max-w-3xl leading-relaxed">
+            Chat with simulated bots pretending to be friends, coworkers, or family asking for money, passwords, or urgent favors. Practice spotting the red flags before it happens in real life.
           </p>
         </div>
 
         {/* Difficulty Filter Tabs */}
         <div className="flex flex-col items-start md:items-end gap-2">
-          <span className="text-xs font-mono text-zinc-400 uppercase">DIFFICULTY FILTER</span>
+          <span className="text-xs font-mono text-zinc-400 uppercase">DIFFICULTY</span>
           <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-zinc-100/90 border border-zinc-200/60 text-xs font-semibold">
             {['all', 'Easy', 'Hard'].map((diff) => (
               <button
@@ -80,11 +80,11 @@ export default function ScenarioSelector({ onSelectScenario }) {
                       ? 'bg-rose-50 text-rose-800 border-rose-200'
                       : 'bg-emerald-50 text-emerald-800 border-emerald-200'
                   }`}>
-                    {scenario.difficulty.toUpperCase()} LEVEL
+                    {scenario.difficulty.toUpperCase()}
                   </span>
 
                   <span className="text-xs font-mono text-zinc-400">
-                    {scenario.category.split('//')[0]}
+                    {scenario.category}
                   </span>
                 </div>
 
@@ -100,40 +100,33 @@ export default function ScenarioSelector({ onSelectScenario }) {
                   </div>
                 </div>
 
-                {/* Setup Description */}
-                <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed font-sans line-clamp-3">
+                <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed">
                   {scenario.setupDescription}
                 </p>
 
                 {/* Learning Objective Box */}
-                <div className="p-3.5 rounded-2xl bg-zinc-50 border border-zinc-100/90 text-xs text-zinc-700 space-y-1">
-                  <div className="flex items-center gap-1.5 font-mono font-bold text-zinc-900 uppercase tracking-tight text-[10px]">
-                    <Target className="w-3.5 h-3.5 text-zinc-600" />
-                    <span>Learning Objective</span>
-                  </div>
-                  <p className="leading-snug text-zinc-600">{scenario.learningObjective}</p>
+                <div className="p-3.5 rounded-2xl bg-zinc-50 border border-zinc-100 text-xs text-zinc-700 space-y-1">
+                  <span className="font-bold text-zinc-900 block flex items-center gap-1.5">
+                    <Target className="w-3.5 h-3.5 text-zinc-500" />
+                    <span>Learning Objective:</span>
+                  </span>
+                  <p className="text-zinc-600 leading-relaxed pl-5">
+                    {scenario.learningObjective}
+                  </p>
                 </div>
               </div>
 
-              {/* Launch Action Button */}
+              {/* Start Simulation Action */}
               <button
                 onClick={() => onSelectScenario(scenario)}
-                className="w-full py-3 rounded-2xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs group-hover:bg-emerald-700"
+                className="w-full py-3 px-4 rounded-2xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs tracking-wide transition-all cursor-pointer flex items-center justify-center gap-2 group-hover:bg-emerald-600 shadow-xs"
               >
-                <span>Launch Interactive Simulation</span>
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                <span>Start Practice Chat</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </button>
             </div>
           );
         })}
-      </div>
-
-      {/* Safety & Fictional Disclaimer */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-zinc-100/70 border border-zinc-200/60 text-xs text-zinc-500 flex items-center gap-3">
-        <Lock className="w-4 h-4 text-zinc-400 shrink-0" />
-        <span>
-          <strong>Ethical & Safety Boundary:</strong> All scenarios use synthetic fictional personas to train cybersecurity defense. Never send real credentials or financial transfers during simulations.
-        </span>
       </div>
     </div>
   );

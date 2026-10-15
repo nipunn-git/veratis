@@ -14,15 +14,15 @@ export default function DisagreementMatrix({ matrix }) {
           </div>
           <div>
             <span className="text-xs font-mono font-semibold tracking-wider text-zinc-500 uppercase">
-              STAGE 03 // DIALECTICAL SYNTHESIS
+              STAGE 03 // COMPARE FINDINGS
             </span>
             <h3 className="text-lg sm:text-xl font-bold text-zinc-900 tracking-tight mt-0.5">
-              Consensus & Disagreement Matrix
+              Agreement & Disagreement Points
             </h3>
           </div>
         </div>
         <p className="text-xs text-zinc-500 max-w-sm sm:text-right">
-          Explicit boundary mapping separating corroborated consensus from divergent theories.
+          A clear side-by-side view showing where the AI experts agree, where they differ, and what is still unconfirmed.
         </p>
       </div>
 
@@ -33,10 +33,10 @@ export default function DisagreementMatrix({ matrix }) {
           <div className="flex items-center gap-2 pb-2 border-b border-zinc-100">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
             <h4 className="text-xs font-mono font-bold text-zinc-900 uppercase tracking-wider">
-              Consensus Points ({matrix.agreements?.length || 0})
+              What They Agree On ({matrix.agreements?.length || 0})
             </h4>
           </div>
-          <ul className="space-y-3 text-xs sm:text-sm text-zinc-600">
+          <ul className="space-y-2 text-xs sm:text-sm text-zinc-600">
             {matrix.agreements?.map((item, idx) => (
               <li key={idx} className="flex items-start gap-2.5 leading-relaxed p-2.5 rounded-xl bg-emerald-50/40 border border-emerald-100/50">
                 <span className="text-emerald-600 font-bold mt-0.5">•</span>
@@ -51,10 +51,10 @@ export default function DisagreementMatrix({ matrix }) {
           <div className="flex items-center gap-2 pb-2 border-b border-zinc-100">
             <AlertOctagon className="w-4 h-4 text-amber-600 shrink-0" />
             <h4 className="text-xs font-mono font-bold text-zinc-900 uppercase tracking-wider">
-              Conflicting Views ({matrix.disagreements?.length || 0})
+              Where They Disagree ({matrix.disagreements?.length || 0})
             </h4>
           </div>
-          <ul className="space-y-3 text-xs sm:text-sm text-zinc-600">
+          <ul className="space-y-2 text-xs sm:text-sm text-zinc-600">
             {matrix.disagreements?.map((item, idx) => (
               <li key={idx} className="flex items-start gap-2.5 leading-relaxed p-2.5 rounded-xl bg-amber-50/40 border border-amber-100/50">
                 <span className="text-amber-600 font-bold mt-0.5">•</span>
@@ -69,10 +69,10 @@ export default function DisagreementMatrix({ matrix }) {
           <div className="flex items-center gap-2 pb-2 border-b border-zinc-100">
             <HelpCircle className="w-4 h-4 text-purple-600 shrink-0" />
             <h4 className="text-xs font-mono font-bold text-zinc-900 uppercase tracking-wider">
-              Unresolved Variables ({matrix.unresolvedQuestions?.length || 0})
+              Still Unknown ({matrix.unresolvedQuestions?.length || 0})
             </h4>
           </div>
-          <ul className="space-y-3 text-xs sm:text-sm text-zinc-600">
+          <ul className="space-y-2 text-xs sm:text-sm text-zinc-600">
             {matrix.unresolvedQuestions?.map((item, idx) => (
               <li key={idx} className="flex items-start gap-2.5 leading-relaxed p-2.5 rounded-xl bg-purple-50/40 border border-purple-100/50">
                 <span className="text-purple-600 font-bold mt-0.5">•</span>

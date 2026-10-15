@@ -1,15 +1,12 @@
 import React from 'react';
 import { 
   ShieldCheck, 
-  ShieldAlert, 
   RotateCcw, 
   ArrowLeft, 
   CheckCircle2, 
   XCircle, 
   AlertTriangle, 
-  Target, 
-  Info,
-  Sparkles
+  Target
 } from 'lucide-react';
 
 export default function SimulationDebrief({
@@ -27,14 +24,14 @@ export default function SimulationDebrief({
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <span className="text-xs font-mono font-bold tracking-widest text-emerald-400 uppercase">
-              DEBRIEF // CYBERSECURITY TRAINING REVEAL
+              DEBRIEF // HOW YOU DID
             </span>
             <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/10 text-zinc-300">
-              SIMULATION CONCLUDED
+              FINISHED
             </span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            Simulation Debrief & Performance Score
+            Your Score & Analysis
           </h2>
           <p className="text-xs sm:text-sm text-zinc-400">
             Scenario: <strong className="text-white">{scenario.title}</strong> · Role: {scenario.characterName} ({scenario.role})
@@ -43,7 +40,7 @@ export default function SimulationDebrief({
 
         {/* Score Card */}
         <div className="flex flex-col items-start sm:items-end gap-1.5 p-4 rounded-2xl bg-white/10 border border-white/10 shrink-0">
-          <span className="text-xs font-mono text-zinc-400 uppercase">SECURITY RATING</span>
+          <span className="text-xs font-mono text-zinc-400 uppercase">SAFETY SCORE</span>
           <div className="text-3xl sm:text-4xl font-extrabold text-white tabular-nums">
             {evaluation.score}<span className="text-lg font-normal text-zinc-400"> / 100</span>
           </div>
@@ -58,9 +55,9 @@ export default function SimulationDebrief({
         <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
           <h3 className="text-base sm:text-lg font-bold text-zinc-950 tracking-tight flex items-center gap-2">
             <Target className="w-5 h-5 text-zinc-700" />
-            <span>Observable Performance Rubric</span>
+            <span>How Your Score Was Calculated</span>
           </h3>
-          <span className="text-xs font-mono text-zinc-400">BEHAVIORAL CRITERIA</span>
+          <span className="text-xs font-mono text-zinc-400">SCORING CHECKLIST</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -81,7 +78,7 @@ export default function SimulationDebrief({
               <div className="space-y-0.5">
                 <span className="font-bold text-xs sm:text-sm block">{metric.label}</span>
                 <span className="text-[11px] font-mono text-zinc-500">
-                  {metric.achieved ? `+${metric.weight} pts earned` : '0 pts · Vulnerability triggered'}
+                  {metric.achieved ? `+${metric.weight} pts earned` : '0 pts · Risky action taken'}
                 </span>
               </div>
             </div>
@@ -93,10 +90,10 @@ export default function SimulationDebrief({
       <div className="p-6 sm:p-8 bg-white rounded-3xl border border-zinc-200/90 shadow-xs space-y-4">
         <h3 className="text-base sm:text-lg font-bold text-zinc-950 tracking-tight flex items-center gap-2">
           <AlertTriangle className="w-5 h-5 text-amber-600" />
-          <span>Active Red Flags Present in Scenario</span>
+          <span>Red Flags in This Scenario</span>
         </h3>
         <p className="text-xs sm:text-sm text-zinc-500">
-          These subtle deception vectors were deployed by the persona during the conversation:
+          Tricks the scammer tried to use during the chat:
         </p>
         <div className="space-y-2.5 pt-2">
           {evaluation.redFlagsPresent.map((flag, idx) => (
@@ -112,10 +109,10 @@ export default function SimulationDebrief({
       <div className="p-6 sm:p-8 bg-white rounded-3xl border border-zinc-200/90 shadow-xs space-y-4">
         <h3 className="text-base sm:text-lg font-bold text-zinc-950 tracking-tight flex items-center gap-2">
           <ShieldCheck className="w-5 h-5 text-emerald-600" />
-          <span>Recommended Defensive Counter-Responses</span>
+          <span>Recommended Safe Replies</span>
         </h3>
         <p className="text-xs sm:text-sm text-zinc-500">
-          In real life, using these responses neutralizes social engineering without escalating conflict:
+          How to respond safely without starting an argument or giving away information:
         </p>
         <div className="space-y-2.5 pt-2">
           {evaluation.safeRepliesRecommended.map((reply, idx) => (
@@ -133,7 +130,7 @@ export default function SimulationDebrief({
           className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-zinc-100 hover:bg-zinc-200/80 text-zinc-800 font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Return to All Scenarios</span>
+          <span>Back to Scenarios</span>
         </button>
 
         <button
@@ -141,7 +138,7 @@ export default function SimulationDebrief({
           className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs"
         >
           <RotateCcw className="w-4 h-4" />
-          <span>Retry This Scenario</span>
+          <span>Try Again</span>
         </button>
       </div>
     </div>
