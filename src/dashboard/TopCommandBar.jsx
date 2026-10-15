@@ -14,7 +14,7 @@ export default function TopCommandBar({
   onExportDossier,
 }) {
   return (
-    <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-zinc-200/60 px-6 sm:px-10 lg:px-16 py-3 font-sans">
+    <header className="sticky top-0 z-30 bg-white/70 backdrop-blur-md border-b border-zinc-200/60 px-6 sm:px-10 lg:px-16 py-3 font-sans">
       <div className="w-full flex items-center justify-between gap-4">
         {/* Left: Clean Brand + Active Case */}
         <div className="flex items-center gap-3 sm:gap-4 min-w-0">

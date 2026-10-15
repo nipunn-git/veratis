@@ -206,7 +206,7 @@ export default function Dashboard({ onBackToLanding, initialCaseIndex = 0 }) {
   };
 
   return (
-    <div className="relative min-h-screen text-zinc-900 font-sans pb-24 selection:bg-zinc-900 selection:text-white overflow-x-hidden bg-[#f8fafd]">
+    <div className="relative min-h-screen text-zinc-900 font-sans selection:bg-zinc-900 selection:text-white overflow-x-hidden bg-[#f8fafd]">
       {/* 0. Live Ambient Halftone Nebula Canvas Background (Fast-moving & Shiny White) */}
       <div className="fixed inset-0 z-0 pointer-events-auto">
         <HalftoneNebula
@@ -260,9 +260,9 @@ export default function Dashboard({ onBackToLanding, initialCaseIndex = 0 }) {
             </div>
           )}
 
-          {/* FOCUSED FEATURE VIEWS: Attached edge-to-edge to sides, open top/bottom, without redundant back headers */}
+          {/* FOCUSED FEATURE VIEWS: Attached edge-to-edge to sides, open top/bottom revealing live moving background */}
           {activeTab !== 'overview' && (
-            <div className="w-full bg-white/80 backdrop-blur-xl border-y border-zinc-200/60 border-x-0 py-10 sm:py-14 px-6 sm:px-12 lg:px-20 xl:px-28 2xl:px-36 shadow-xs pb-36">
+            <div className="w-full mt-4 sm:mt-5 mb-24 sm:mb-28 max-h-[calc(100vh-170px)] overflow-y-auto bg-white/70 backdrop-blur-md border-y border-zinc-200/60 border-x-0 py-6 sm:py-8 px-6 sm:px-12 lg:px-20 xl:px-28 2xl:px-36 shadow-xs">
               {/* VIEW B: DECEPTION RADAR */}
               {activeTab === 'radar' && (
                 <DeceptionRadar
