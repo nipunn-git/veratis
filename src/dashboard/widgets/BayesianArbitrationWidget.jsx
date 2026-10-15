@@ -15,26 +15,26 @@ export default function BayesianArbitrationWidget({ currentCase }) {
       {/* Header */}
       <div>
         <div className="flex items-center justify-between pb-3 border-b border-zinc-100 pr-16">
-          <span className="text-xs font-medium text-zinc-400">
-            Bayesian arbitration
+          <span className="text-sm font-medium text-zinc-500">
+            Bayesian Arbitration
           </span>
-          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-zinc-900 text-white">
+          <span className="text-sm font-semibold text-zinc-900">
             Leading
           </span>
         </div>
 
         {/* Primary Probability */}
-        <div className="mt-3">
-          <div className="text-3xl font-semibold text-zinc-900 tracking-tight">
+        <div className="mt-3.5">
+          <div className="text-4xl font-bold text-zinc-950 tracking-tight">
             {leading.probability}%
           </div>
-          <span className="text-xs text-zinc-600 font-medium block mt-0.5 truncate">
+          <span className="text-sm text-zinc-700 font-medium block mt-1 truncate">
             {leading.title}
           </span>
         </div>
 
         {/* Two-Tone Progress Bar */}
-        <div className="w-full h-2 rounded-full bg-zinc-100 flex overflow-hidden mt-3">
+        <div className="w-full h-2 rounded-full bg-zinc-100 flex overflow-hidden mt-3.5">
           <div 
             style={{ width: `${leading.probability}%` }}
             className="h-full bg-zinc-900"
@@ -46,20 +46,20 @@ export default function BayesianArbitrationWidget({ currentCase }) {
         </div>
 
         {/* Scenario Comparison Breakdown */}
-        <div className="space-y-1.5 mt-3 text-xs">
-          <div className="flex justify-between text-zinc-700">
-            <span className="truncate pr-2">{leading.title}</span>
-            <span className="font-semibold text-zinc-900">{leading.probability}%</span>
+        <div className="space-y-2 mt-3.5 text-sm">
+          <div className="flex justify-between text-zinc-800">
+            <span className="truncate pr-2 font-medium">{leading.title}</span>
+            <span className="font-semibold text-zinc-950">{leading.probability}%</span>
           </div>
-          <div className="flex justify-between text-zinc-400">
+          <div className="flex justify-between text-zinc-500">
             <span className="truncate pr-2">{counter.title}</span>
-            <span className="font-medium text-zinc-500">{counter.probability}%</span>
+            <span className="font-medium text-zinc-600">{counter.probability}%</span>
           </div>
         </div>
       </div>
 
       {/* Footer */}
-      <div className="text-[11px] text-zinc-400 pt-3 border-t border-zinc-100 flex items-center justify-between">
+      <div className="text-xs text-zinc-400 pt-3 border-t border-zinc-100 flex items-center justify-between">
         <span>Hypothesis divergence</span>
         <span className="text-zinc-700 font-medium">Empirical match</span>
       </div>

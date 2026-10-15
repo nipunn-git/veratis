@@ -90,8 +90,8 @@ export default function UploadArea({ onFileSelected, onSelectSampleCase }) {
         </p>
 
         {selectedFile && (
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-800 text-xs font-medium border border-emerald-200/70">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+          <div className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
             <span>Specimen staged · {selectedFile.size}</span>
           </div>
         )}
@@ -115,7 +115,7 @@ export default function UploadArea({ onFileSelected, onSelectSampleCase }) {
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600 font-medium">
+                  <span className="text-xs font-mono text-zinc-400 font-medium">
                     {c.code}
                   </span>
                   <span className="text-[11px] font-semibold text-rose-600">

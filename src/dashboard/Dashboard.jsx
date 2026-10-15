@@ -23,13 +23,12 @@ import { generateReportFile } from '../utils/exportReport';
 // Feature deep-dive components
 import DeceptionRadar from '../components/dashboard/DeceptionRadar';
 import EvidenceAutopsy from '../components/dashboard/EvidenceAutopsy';
-import RealityTimeline from '../components/dashboard/RealityTimeline';
-import EvidenceGravityMap from '../components/dashboard/EvidenceGravityMap';
 import CompetingHypotheses from '../components/dashboard/CompetingHypotheses';
-import UncertaintyEngine from '../components/dashboard/UncertaintyEngine';
 import RealityInversion from '../components/dashboard/RealityInversion';
 import TruthTribunal from '../components/tribunal/TruthTribunal';
 import DigitalTwinSimulator from '../components/digitaltwin/DigitalTwinSimulator';
+import Neutralizer from '../components/dashboard/Neutralizer';
+import RumorReactor from '../components/dashboard/RumorReactor';
 
 const STORAGE_KEY = 'veratis_dashboard_white_v2';
 
@@ -261,6 +260,8 @@ export default function Dashboard({ onBackToLanding, initialCaseIndex = 0 }) {
                 onNewUpload={() => setUploadModalOpen(true)}
                 onPredictOriginal={() => setActiveTab('reconstruct')}
                 onNavigateTab={setActiveTab}
+                onOpenNeutralizer={() => setActiveTab('neutralizer')}
+                onOpenReactor={() => setActiveTab('reactor')}
               />
             </div>
           )}
@@ -276,6 +277,16 @@ export default function Dashboard({ onBackToLanding, initialCaseIndex = 0 }) {
               {/* VIEW: DIGITAL TWIN TEST (Social Engineering Conversation Simulator) */}
               {activeTab === 'twin' && (
                 <DigitalTwinSimulator />
+              )}
+
+              {/* VIEW: RUMOR REACTOR (Information Propagation Simulation) */}
+              {activeTab === 'reactor' && (
+                <RumorReactor onBackToOverview={() => setActiveTab('overview')} />
+              )}
+
+              {/* VIEW: NEUTRALIZER (Epistemic Framing De-Escalation & Analysis) */}
+              {activeTab === 'neutralizer' && (
+                <Neutralizer onBackToOverview={() => setActiveTab('overview')} />
               )}
 
               {/* VIEW: REALITY INVERSION (AI Original Prediction & Reconstruction) */}
@@ -303,26 +314,11 @@ export default function Dashboard({ onBackToLanding, initialCaseIndex = 0 }) {
                 />
               )}
 
-              {/* VIEW D: REALITY TIMELINE */}
-              {activeTab === 'timeline' && (
-                <RealityTimeline timeline={currentCase.timeline} />
-              )}
-
-              {/* VIEW E: GRAVITY MAP */}
-              {activeTab === 'gravity' && (
-                <EvidenceGravityMap gravityMap={currentCase.gravityMap} />
-              )}
-
-              {/* VIEW F: COMPETING HYPOTHESES */}
+              {/* VIEW: COMPETING HYPOTHESES */}
               {activeTab === 'hypotheses' && (
                 <CompetingHypotheses
                   hypotheses={currentCase.competingHypotheses}
                 />
-              )}
-
-              {/* VIEW G: UNCERTAINTY ENGINE */}
-              {activeTab === 'uncertainty' && (
-                <UncertaintyEngine uncertainty={currentCase.uncertaintyEngine} />
               )}
             </div>
           )}

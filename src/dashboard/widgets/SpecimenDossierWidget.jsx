@@ -1,5 +1,4 @@
-import React from 'react';
-import { Download, RefreshCw, Upload, ShieldAlert, Sparkles, CheckCircle2, Gavel, Bot } from 'lucide-react';
+import { Download, RefreshCw, Upload, ShieldAlert, Sparkles, CheckCircle2, Gavel, Bot, FileText, Activity } from 'lucide-react';
 
 export default function SpecimenDossierWidget({ 
   currentCase, 
@@ -7,7 +6,9 @@ export default function SpecimenDossierWidget({
   onExportDossier, 
   onNewUpload,
   onPredictOriginal,
-  onNavigateTab
+  onNavigateTab,
+  onOpenNeutralizer,
+  onOpenReactor
 }) {
   if (!currentCase) return null;
 
@@ -17,109 +18,125 @@ export default function SpecimenDossierWidget({
     <div className="h-full flex flex-col justify-between font-sans">
       {/* Top Meta Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-zinc-100">
-        <div className="flex items-center gap-2.5">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-          </span>
-          <span className="text-xs font-semibold text-zinc-900 tracking-tight">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-zinc-900 tracking-tight">
             Active investigation
           </span>
-          <span className="text-zinc-300">·</span>
-          <span className="text-xs text-zinc-500 font-medium">
+          <span className="text-zinc-300">/</span>
+          <span className="text-xs font-medium tracking-wide text-zinc-400 uppercase">
             {currentCase.code}
           </span>
         </div>
 
-        <div className="flex items-center gap-2 text-xs">
-          <span className={`px-2.5 py-0.5 rounded-full font-medium ${
-            isCritical ? 'bg-rose-50 text-rose-700' : 'bg-amber-50 text-amber-700'
+        <div className="flex items-center gap-3 text-xs sm:text-sm">
+          <span className={`font-semibold tracking-tight ${
+            isCritical ? 'text-rose-600' : 'text-amber-600'
           }`}>
             {currentCase.threatLevel === 'CRITICAL' ? 'High priority' : 'Evaluating'}
           </span>
           <span className="text-zinc-300 hidden sm:inline">·</span>
-          <span className="text-zinc-400 hidden sm:inline text-[11px]">{currentCase.dateLogged}</span>
+          <span className="text-zinc-400 hidden sm:inline text-xs font-normal">
+            {currentCase.dateLogged ? currentCase.dateLogged.replace('//', '·') : 'Oct 14, 2026 · 18:42 UTC'}
+          </span>
         </div>
       </div>
 
       {/* Main Specimen Details */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 my-4 items-center">
-        <div className="md:col-span-8 space-y-2">
-          <h3 className="text-xl sm:text-2xl font-semibold text-zinc-900 tracking-tight leading-snug">
+        <div className="md:col-span-8 space-y-2.5">
+          <h3 className="text-2xl sm:text-3xl font-semibold text-zinc-950 tracking-tight leading-snug">
             {currentCase.title}
           </h3>
-          <p className="text-xs sm:text-sm text-zinc-500 leading-relaxed line-clamp-2">
+          <p className="text-sm sm:text-base text-zinc-600 leading-relaxed line-clamp-2">
             {currentCase.subject}
           </p>
 
-          <div className="flex flex-wrap items-center gap-2 pt-2">
+          <div className="flex flex-wrap items-center gap-2.5 pt-2">
             <button
               onClick={() => onNavigateTab?.('tribunal')}
-              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-white transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
-              title="Open Truth Tribunal investigation"
+              className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-zinc-50 border border-zinc-200/90 text-zinc-800 text-sm font-medium transition-all cursor-pointer flex items-center gap-2 shadow-2xs"
+              title="Open Truth Tribunal deliberation"
             >
-              <Gavel className="w-3.5 h-3.5 text-zinc-300" />
+              <Gavel className="w-3.5 h-3.5 text-zinc-500" />
               <span>Tribunal</span>
             </button>
 
             <button
               onClick={() => onNavigateTab?.('twin')}
-              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border border-indigo-200/80 transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
+              className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-zinc-50 border border-zinc-200/90 text-zinc-800 text-sm font-medium transition-all cursor-pointer flex items-center gap-2 shadow-2xs"
               title="Launch Digital Twin social engineering simulator"
             >
-              <Bot className="w-3.5 h-3.5 text-indigo-600" />
+              <Bot className="w-3.5 h-3.5 text-zinc-500" />
               <span>Digital Twin</span>
             </button>
 
             <button
               onClick={onPredictOriginal}
-              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
+              className="px-4 py-2.5 rounded-xl bg-zinc-950 hover:bg-black text-white text-sm font-medium transition-all cursor-pointer flex items-center gap-2 shadow-xs"
             >
-              <Sparkles className="w-3.5 h-3.5 text-emerald-200" />
+              <Sparkles className="w-4 h-4 text-emerald-400" />
               <span>Predict Original</span>
             </button>
 
             <button
-              onClick={onSwitchCase}
-              className="text-xs font-medium px-3 py-1.5 rounded-lg bg-zinc-100/80 hover:bg-zinc-200/70 text-zinc-700 transition-colors cursor-pointer flex items-center gap-1.5"
+              onClick={onOpenReactor}
+              className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-zinc-50 border border-zinc-200/90 text-zinc-800 text-sm font-medium transition-all cursor-pointer flex items-center gap-2 shadow-2xs"
+              title="Simulate rumor network propagation & mutation"
             >
-              <RefreshCw className="w-3.5 h-3.5 text-zinc-500" />
-              <span>Switch case</span>
+              <Activity className="w-4 h-4 text-zinc-500" />
+              <span>Rumor Reactor</span>
+            </button>
+
+            <button
+              onClick={onOpenNeutralizer}
+              className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-zinc-50 border border-zinc-200/90 text-zinc-800 text-sm font-medium transition-all cursor-pointer flex items-center gap-2 shadow-2xs"
+              title="Neutralize manipulative language & framing"
+            >
+              <FileText className="w-4 h-4 text-zinc-500" />
+              <span>Neutralizer</span>
+            </button>
+
+            <button
+              onClick={onSwitchCase}
+              className="px-3 py-2.5 rounded-xl bg-white hover:bg-zinc-50 border border-zinc-200/90 text-zinc-600 hover:text-zinc-900 text-sm font-medium transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+            >
+              <RefreshCw className="w-3.5 h-3.5 text-zinc-400" />
+              <span>Cases</span>
             </button>
 
             <button
               onClick={onNewUpload}
-              className="text-xs font-medium px-3 py-1.5 rounded-lg bg-zinc-100/80 hover:bg-zinc-200/70 text-zinc-700 transition-colors cursor-pointer flex items-center gap-1.5"
+              className="px-3 py-2.5 rounded-xl bg-white hover:bg-zinc-50 border border-zinc-200/90 text-zinc-600 hover:text-zinc-900 text-sm font-medium transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
             >
-              <Upload className="w-3.5 h-3.5 text-zinc-500" />
-              <span>Ingest</span>
+              <Upload className="w-3.5 h-3.5 text-zinc-400" />
+              <span>Upload</span>
             </button>
           </div>
         </div>
 
-        {/* Forensic Determination Badge (Clean, Unboxed) */}
-        <div className="md:col-span-4 p-4 rounded-2xl bg-zinc-50/80 border border-zinc-100 flex flex-col justify-center text-center">
-          <span className="text-xs text-zinc-400 font-medium block mb-1">
+        {/* Forensic Determination Badge (Clean, Minimal, No Capsule) */}
+        <div className="md:col-span-4 p-5 rounded-2xl bg-zinc-50/70 border border-zinc-100 flex flex-col justify-center text-center">
+          <span className="text-xs text-zinc-400 font-semibold uppercase tracking-wider block mb-1">
             Forensic determination
           </span>
-          <div className="text-sm font-semibold text-zinc-900 leading-tight">
+          <div className="text-base font-semibold text-zinc-950 leading-tight">
             {currentCase.verdict}
           </div>
-          <div className="text-3xl font-semibold text-zinc-900 mt-1 tracking-tight tabular-nums">
+          <div className="text-4xl font-bold text-zinc-950 mt-1.5 tracking-tight tabular-nums">
             {currentCase.verdictConfidence}%
           </div>
-          <span className="text-[11px] text-emerald-600 font-medium block mt-0.5">
+          <span className="text-xs text-emerald-700 font-medium block mt-1">
             Verified match certainty
           </span>
         </div>
       </div>
 
       {/* Footer Meta */}
-      <div className="flex items-center justify-between text-xs text-zinc-500 pt-3 border-t border-zinc-100">
+      <div className="flex items-center justify-between text-xs sm:text-sm text-zinc-500 pt-3 border-t border-zinc-100">
         <span>Authentic Ground Truth Recovery</span>
         <button
           onClick={onPredictOriginal}
-          className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 cursor-pointer transition-colors"
+          className="text-xs sm:text-sm font-semibold text-zinc-900 hover:text-emerald-700 flex items-center gap-1.5 cursor-pointer transition-colors"
         >
           <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
           <span>Invert Latent Deepfake →</span>

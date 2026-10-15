@@ -187,18 +187,16 @@ export default function RealityInversion({ currentCase, onIngestNew }) {
       {/* Header Bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-zinc-200/70">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/60">
+          <div className="mb-1.5">
+            <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
               Neural Latent Inverter
             </span>
-            <span className="text-xs text-zinc-400">·</span>
-            <span className="text-xs text-zinc-500 font-medium">De-Morphing & Pre-Morph Ground Truth Reconstruction</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950 mt-1">
-            Predict & Reconstruct Original
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-950">
+            Reality Inversion
           </h2>
-          <p className="text-xs sm:text-sm text-zinc-600 mt-0.5 max-w-2xl">
-            Attach any AI-morphed or face-swapped media. The inversion engine isolates synthetic latents, strips generative artifacts, and reconstructs the predicted authentic original photograph on the spot.
+          <p className="text-sm text-zinc-500 mt-1 max-w-xl">
+            Isolate synthetic generative latents and reconstruct predicted pre-morph ground truth.
           </p>
         </div>
 
@@ -285,8 +283,8 @@ export default function RealityInversion({ currentCase, onIngestNew }) {
                     alt="AI Predicted Original"
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute top-3 right-3 z-10 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-emerald-200/80 shadow-sm text-xs font-semibold text-emerald-800 flex items-center gap-1.5 font-sans">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                  <div className="absolute top-3 right-3 z-10 px-3.5 py-1.5 rounded-xl bg-white/95 backdrop-blur-md border border-emerald-200/80 shadow-xs text-sm font-semibold text-emerald-800 flex items-center gap-2 font-sans">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
                     <span>AI Predicted Original Ground Truth</span>
                   </div>
                 </div>
@@ -302,7 +300,7 @@ export default function RealityInversion({ currentCase, onIngestNew }) {
                     className="w-full h-full object-cover max-w-none"
                     style={{ width: sliderContainerRef.current ? sliderContainerRef.current.clientWidth : '100%' }}
                   />
-                  <div className="absolute top-3 left-3 z-10 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-rose-200/80 shadow-sm text-xs font-semibold text-rose-800 flex items-center gap-1.5 font-sans">
+                  <div className="absolute top-3 left-3 z-10 px-3.5 py-1.5 rounded-xl bg-white/95 backdrop-blur-md border border-rose-200/80 shadow-xs text-sm font-semibold text-rose-800 flex items-center gap-2 font-sans">
                     <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
                     <span>Morphed AI Specimen</span>
                   </div>

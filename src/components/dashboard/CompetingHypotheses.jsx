@@ -105,9 +105,12 @@ export default function CompetingHypotheses({ hypotheses = [] }) {
                   <div className="flex items-center gap-2.5">
                     <span className="text-sm text-zinc-400 font-medium">Scenario {i + 1}</span>
                     {isLeading && (
-                      <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-zinc-900 text-white">
-                        Leading hypothesis
-                      </span>
+                      <>
+                        <span className="text-zinc-300">·</span>
+                        <span className="text-sm font-semibold text-zinc-950">
+                          Leading hypothesis
+                        </span>
+                      </>
                     )}
                   </div>
                   <h3 className="text-xl sm:text-2xl font-semibold text-zinc-900 tracking-tight">

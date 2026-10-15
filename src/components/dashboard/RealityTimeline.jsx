@@ -91,14 +91,14 @@ export default function RealityTimeline({ timeline = [] }) {
                   <span className="text-zinc-500 font-medium">
                     {item.platform}
                   </span>
-                  <span className={`text-xs font-medium px-3 py-0.5 rounded-full ${
+                  <span className={`text-sm font-semibold ${
                     isVerified 
-                      ? 'bg-emerald-50 text-emerald-700' 
+                      ? 'text-emerald-600' 
                       : isCritical 
-                      ? 'bg-rose-50 text-rose-700' 
-                      : 'bg-amber-50 text-amber-700'
+                      ? 'text-rose-600' 
+                      : 'text-amber-600'
                   }`}>
-                    {isVerified ? 'Verified' : isCritical ? 'Critical anomaly' : 'Suspicious'}
+                    · {isVerified ? 'Verified' : isCritical ? 'Critical anomaly' : 'Suspicious'}
                   </span>
                 </div>
 

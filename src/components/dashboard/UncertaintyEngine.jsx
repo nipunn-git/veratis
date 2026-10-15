@@ -38,7 +38,7 @@ export default function UncertaintyEngine({ uncertainty = { known: [], unknown: 
               <span className="text-lg sm:text-2xl font-semibold text-zinc-900 tracking-tight">
                 Verified facts
               </span>
-              <span className="text-xs sm:text-sm font-medium px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-600">
+              <span className="text-sm font-semibold text-emerald-700">
                 Empirical
               </span>
             </div>
@@ -64,7 +64,7 @@ export default function UncertaintyEngine({ uncertainty = { known: [], unknown: 
               <span className="text-lg sm:text-2xl font-semibold text-zinc-900 tracking-tight">
                 Unresolved variables
               </span>
-              <span className="text-xs sm:text-sm font-medium px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-600">
+              <span className="text-sm font-semibold text-amber-700">
                 Pending
               </span>
             </div>
@@ -90,7 +90,7 @@ export default function UncertaintyEngine({ uncertainty = { known: [], unknown: 
               <span className="text-lg sm:text-2xl font-semibold text-zinc-900 tracking-tight">
                 Untestable factors
               </span>
-              <span className="text-xs sm:text-sm font-medium px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-600">
+              <span className="text-sm font-semibold text-zinc-500">
                 Assumption
               </span>
             </div>

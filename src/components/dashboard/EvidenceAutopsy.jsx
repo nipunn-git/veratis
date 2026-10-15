@@ -98,9 +98,8 @@ export default function EvidenceAutopsy({ image, annotations = [], onNavigateTab
       {/* Editorial Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-zinc-200/80">
         <div>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-xs font-semibold tracking-wider uppercase text-zinc-500 font-mono">
+          <div className="mb-2">
+            <span className="text-xs font-semibold tracking-wider uppercase text-zinc-400">
               Visual Forensics · Multi-Spectral Decomposition
             </span>
           </div>
@@ -138,8 +137,8 @@ export default function EvidenceAutopsy({ image, annotations = [], onNavigateTab
           {/* Viewport Top Bar */}
           <div className="flex items-center justify-between text-xs sm:text-sm px-1">
             <div className="flex items-center gap-2.5 text-zinc-600">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 font-medium text-xs border border-emerald-200/60">
-                <Scan className="w-3.5 h-3.5" />
+              <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-700">
+                <Scan className="w-4 h-4" />
                 <span>Calibrated 4K Specimen</span>
               </span>
               <span className="text-zinc-300">·</span>
@@ -332,19 +331,19 @@ export default function EvidenceAutopsy({ image, annotations = [], onNavigateTab
               <span className="text-xs font-semibold tracking-wider uppercase text-zinc-400 font-mono">
                 Anomaly Inspection Report
               </span>
-              <span className={`text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1.5 ${
+              <span className={`text-sm font-semibold flex items-center gap-1.5 ${
                 selectedAnnotation?.severity === 'critical' 
-                  ? 'bg-rose-50 text-rose-700 border border-rose-200/60' 
-                  : 'bg-amber-50 text-amber-700 border border-amber-200/60'
+                  ? 'text-rose-600' 
+                  : 'text-amber-600'
               }`}>
                 {selectedAnnotation?.severity === 'critical' ? (
                   <>
-                    <AlertTriangle className="w-3.5 h-3.5" />
+                    <AlertTriangle className="w-4 h-4" />
                     <span>Critical Variance</span>
                   </>
                 ) : (
                   <>
-                    <Activity className="w-3.5 h-3.5" />
+                    <Activity className="w-4 h-4" />
                     <span>Elevated Variance</span>
                   </>
                 )}

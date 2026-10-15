@@ -13,7 +13,9 @@ import {
   Layers,
   Sparkles,
   Gavel,
-  Bot
+  Bot,
+  FileText,
+  Activity
 } from 'lucide-react';
 
 export default function BottomNavbar({
@@ -26,15 +28,14 @@ export default function BottomNavbar({
 }) {
   const tabs = [
     { id: 'overview', label: 'Grid', icon: LayoutGrid, hotkey: '1' },
-    { id: 'tribunal', label: 'Tribunal', icon: Gavel, hotkey: '2' },
-    { id: 'twin', label: 'Digital Twin', icon: Bot, hotkey: '3' },
+    { id: 'radar', label: 'Radar', icon: Radar, hotkey: '2' },
+    { id: 'autopsy', label: 'Autopsy', icon: Search, hotkey: '3' },
     { id: 'reconstruct', label: 'Reconstruct', icon: Sparkles, hotkey: '4' },
-    { id: 'radar', label: 'Radar', icon: Radar, hotkey: '5' },
-    { id: 'autopsy', label: 'Autopsy', icon: Search, hotkey: '6' },
-    { id: 'timeline', label: 'Timeline', icon: Clock, hotkey: '7' },
-    { id: 'gravity', label: 'Gravity', icon: GitFork, hotkey: '8' },
-    { id: 'hypotheses', label: 'Hypotheses', icon: Scale, hotkey: '9' },
-    { id: 'uncertainty', label: 'Uncertainty', icon: HelpCircle, hotkey: '0' },
+    { id: 'hypotheses', label: 'Hypotheses', icon: Scale, hotkey: '5' },
+    { id: 'tribunal', label: 'Tribunal', icon: Gavel, hotkey: '6' },
+    { id: 'twin', label: 'Digital Twin', icon: Bot, hotkey: '7' },
+    { id: 'reactor', label: 'Reactor', icon: Activity, hotkey: '8' },
+    { id: 'neutralizer', label: 'Neutralizer', icon: FileText, hotkey: '9' },
   ];
 
   // Keyboard shortcuts

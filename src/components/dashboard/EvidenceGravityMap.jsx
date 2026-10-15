@@ -124,7 +124,7 @@ export default function EvidenceGravityMap({ gravityMap = { nodes: [], connectio
               <span className="text-sm font-medium text-zinc-400">
                 Selected evidence
               </span>
-              <span className="text-xs sm:text-sm font-medium px-3.5 py-1 rounded-full bg-zinc-100 text-zinc-700 capitalize">
+              <span className="text-sm font-semibold text-zinc-600 capitalize">
                 {selectedNode?.type} · {selectedNode?.gravity}% weight
               </span>
             </div>

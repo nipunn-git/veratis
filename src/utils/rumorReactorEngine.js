@@ -1,0 +1,637 @@
+/**
+ * VERATIS RUMOR REACTOR — Simulation Engine & Pedagogical Propagation Model
+ * 
+ * Simulates information flow, claim mutations, context stripping, 
+ * and user interventions across a fictional network of social accounts.
+ * 
+ * Educational simulation: Deterministic, reproducible, and strictly pedagogical.
+ */
+
+// Fictional Account Archetypes
+export const ACCOUNT_ROLES = {
+  SOURCE: {
+    id: 'source',
+    name: 'Primary Source',
+    badgeClass: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+    color: '#10b981',
+  },
+  NEUTRAL: {
+    id: 'neutral',
+    name: 'Ordinary Reposter',
+    badgeClass: 'bg-zinc-100 text-zinc-700 border-zinc-200',
+    color: '#71717a',
+  },
+  CONTEXT_STRIPPER: {
+    id: 'context_stripper',
+    name: 'Context-Stripper',
+    badgeClass: 'bg-amber-100 text-amber-800 border-amber-200',
+    color: '#f59e0b',
+  },
+  SENSATIONALIST: {
+    id: 'sensationalist',
+    name: 'Sensationalizer',
+    badgeClass: 'bg-rose-100 text-rose-800 border-rose-200',
+    color: '#f43f5e',
+  },
+  INFLUENCER: {
+    id: 'influencer',
+    name: 'Amplifier Hub',
+    badgeClass: 'bg-purple-100 text-purple-800 border-purple-200',
+    color: '#8b5cf6',
+  },
+  FACT_CHECKER: {
+    id: 'fact_checker',
+    name: 'Cautious Fact-Checker',
+    badgeClass: 'bg-blue-100 text-blue-800 border-blue-200',
+    color: '#3b82f6',
+  },
+  CORRECTOR: {
+    id: 'corrector',
+    name: 'Verified Context Provider',
+    badgeClass: 'bg-teal-100 text-teal-800 border-teal-200',
+    color: '#14b8a6',
+  },
+};
+
+// 4 Predefined Educational Scenarios
+export const SCENARIOS = [
+  {
+    id: 'scenario-flood',
+    title: 'Local Flood Alert Escalation',
+    category: 'Public Safety Exaggeration',
+    tagline: 'How localized road maintenance snowballs into a city-wide panic headline',
+    initialClaim: 'County Road 4 is temporarily closed between Elm and Oak St following localized rain accumulation. Drainage crews are on site.',
+    sourceInfo: {
+      origin: 'County Department of Public Works',
+      verifiedFacts: [
+        'Closure is strictly limited to a 200-meter stretch of County Road 4',
+        'Municipal storm drains are operational; crews deployed at 14:15',
+        'No residential property damage or flood warnings issued for the city',
+      ],
+      missingOrUncertain: [
+        'Expected reopening hour depends on evening rainfall totals',
+      ],
+    },
+    // Propagation sequence through 7 simulation steps
+    steps: [
+      {
+        step: 1,
+        activeNodeId: 'node-1',
+        actor: { name: 'County Works Dept', handle: '@county_works', role: 'SOURCE' },
+        timestamp: 'T+00m',
+        content: 'County Road 4 is temporarily closed between Elm and Oak St following localized rain accumulation. Drainage crews are on site.',
+        variantType: 'original',
+        mutationLabel: 'Original Verified Bulletins',
+        changeNotes: 'Primary authoritative release with specific street boundaries and context.',
+        significance: 'Baseline ground truth: localized, bounded, maintenance crews actively working.',
+        affectedNodeIds: ['node-1'],
+      },
+      {
+        step: 2,
+        activeNodeId: 'node-2',
+        actor: { name: 'Metro Commute Alert', handle: '@metro_traffic', role: 'NEUTRAL' },
+        timestamp: 'T+08m',
+        content: 'Traffic notice: County Road 4 closed near Oak St due to localized water on roadway. Plan alternate routes.',
+        variantType: 'repost',
+        mutationLabel: 'Informational Repost',
+        changeNotes: 'Shortened for commute broadcast; preserves localized nature.',
+        significance: 'Accurate summary maintaining geographical bounds.',
+        affectedNodeIds: ['node-2'],
+      },
+      {
+        step: 3,
+        activeNodeId: 'node-3',
+        actor: { name: 'Neighborhood Watch', handle: '@suburban_eyes', role: 'CONTEXT_STRIPPER' },
+        timestamp: 'T+18m',
+        content: 'Flooding causing road closures in the district. Stay alert!',
+        variantType: 'context_stripped',
+        mutationLabel: 'Context Dropped (Specific Road Removed)',
+        changeNotes: 'Removed specific road name ("County Road 4") and replaced with plural "road closures". Dropped "temporary" and "drainage crews on site".',
+        significance: 'First critical divergence: readers no longer know which road is affected or that crews are present.',
+        affectedNodeIds: ['node-3'],
+      },
+      {
+        step: 4,
+        activeNodeId: 'node-4',
+        actor: { name: 'Regional Pulse Hub', handle: '@regional_pulse', role: 'INFLUENCER' },
+        timestamp: 'T+32m',
+        content: 'Reports coming in of severe flooding affecting roadways across the county. Avoid all travel!',
+        variantType: 'amplified',
+        mutationLabel: 'Geographic Scale Inflated',
+        changeNotes: 'Elevated localized water accumulation to "severe flooding across the county" and added travel prohibition directive.',
+        significance: 'High-fanout account multiplies reach while converting minor ponding into a county-wide hazard.',
+        affectedNodeIds: ['node-4'],
+      },
+      {
+        step: 5,
+        activeNodeId: 'node-5',
+        actor: { name: 'Breaking Viral Alert', handle: '@viral_news_now', role: 'SENSATIONALIST' },
+        timestamp: 'T+45m',
+        content: 'BREAKING: Massive floods overwhelm drainage systems across the city! Drivers trapped!',
+        variantType: 'sensationalized',
+        mutationLabel: 'Panic Fabrication ("Drivers Trapped")',
+        changeNotes: 'Fabricated "drivers trapped" and "overwhelmed drainage systems" with all-caps sensationalism.',
+        significance: 'Complete detachment from reality: pure emotional engagement bait.',
+        affectedNodeIds: ['node-5'],
+      },
+      {
+        step: 6,
+        activeNodeId: 'node-6',
+        actor: { name: 'Clara Hughes (Civic Reporter)', handle: '@clara_reporter', role: 'FACT_CHECKER' },
+        timestamp: 'T+55m',
+        content: 'Checking with DPW dispatch: only County Rd 4 has 3 inches of runoff. No vehicles stranded, storm pumps functioning normally.',
+        variantType: 'fact_check',
+        mutationLabel: 'Verification Inquiry',
+        changeNotes: 'Provides empirical depth from primary dispatch records to counteract rumors.',
+        significance: 'Fact-checking node attempts to tether claim back to empirical reality.',
+        affectedNodeIds: ['node-6'],
+      },
+      {
+        step: 7,
+        activeNodeId: 'node-7',
+        actor: { name: 'Alarmist Echoes', handle: '@daily_shock', role: 'SENSATIONALIST' },
+        timestamp: 'T+68m',
+        content: 'URGENT: Entire city underwater! Why are authorities staying silent?! Retweet to warn others!',
+        variantType: 'sensationalized',
+        mutationLabel: 'Conspiracy & Total Catastrophe Framing',
+        changeNotes: 'Total hyperbole ("entire city underwater") plus conspiratorial institutional blame ("authorities staying silent").',
+        significance: 'Peak distortion: an unverified narrative designed to induce acute distress and viral forwarding.',
+        affectedNodeIds: ['node-7'],
+      },
+    ],
+  },
+  {
+    id: 'scenario-library',
+    title: 'University Campus Library Rumor',
+    category: 'Institutional Cover-Up Framing',
+    tagline: 'Routine HVAC filter replacement morphs into a toxic chemical leak cover-up',
+    initialClaim: 'Campus Library West Wing will be closed Saturday from 8am–1pm for scheduled ventilation filter replacement. Study spaces in East Wing remain open.',
+    sourceInfo: {
+      origin: 'University Facilities & Operations',
+      verifiedFacts: [
+        'Standard biannual HEPA filter replacement for West Wing air handlers',
+        'East Wing, cafeteria, and digital archives remain fully open',
+        'Zero hazardous materials or environmental risks logged with campus police',
+      ],
+      missingOrUncertain: [
+        'Whether work will complete ahead of 1pm schedule',
+      ],
+    },
+    steps: [
+      {
+        step: 1,
+        activeNodeId: 'node-1',
+        actor: { name: 'Campus Operations', handle: '@campus_ops', role: 'SOURCE' },
+        timestamp: 'T+00m',
+        content: 'Campus Library West Wing will be closed Saturday from 8am–1pm for scheduled ventilation filter replacement. Study spaces in East Wing remain open.',
+        variantType: 'original',
+        mutationLabel: 'Official Schedule Notice',
+        changeNotes: 'Precise administrative notice with timeline and alternative study locations.',
+        significance: 'Baseline truth: planned maintenance, safe alternatives provided.',
+        affectedNodeIds: ['node-1'],
+      },
+      {
+        step: 2,
+        activeNodeId: 'node-2',
+        actor: { name: 'Student Daily Digest', handle: '@student_digest', role: 'NEUTRAL' },
+        timestamp: 'T+14m',
+        content: 'Library notice: West Wing closed Saturday morning for maintenance work. East Wing open.',
+        variantType: 'repost',
+        mutationLabel: 'Concise Campus Repost',
+        changeNotes: 'Condensed bulletin for student calendar.',
+        significance: 'Accurate reflection of hours and location.',
+        affectedNodeIds: ['node-2'],
+      },
+      {
+        step: 3,
+        activeNodeId: 'node-3',
+        actor: { name: 'Campus Rumor Mill', handle: '@quad_chatter', role: 'CONTEXT_STRIPPER' },
+        timestamp: 'T+25m',
+        content: 'Wait, why is the library suddenly closed this weekend? Someone saw maintenance trucks outside.',
+        variantType: 'context_stripped',
+        mutationLabel: 'Artificial Uncertainty Injected',
+        changeNotes: 'Replaced scheduled notice with "suddenly closed" and framed routine trucks as suspicious.',
+        significance: 'Omits the published notice to manufacture artificial mystery.',
+        affectedNodeIds: ['node-3'],
+      },
+      {
+        step: 4,
+        activeNodeId: 'node-4',
+        actor: { name: 'Campus Whistleblower', handle: '@campus_leaks', role: 'SENSATIONALIST' },
+        timestamp: 'T+40m',
+        content: 'URGENT: Library shut down due to hazardous air contamination! Admin covering up building safety failures!',
+        variantType: 'sensationalized',
+        mutationLabel: 'Cover-Up & Contamination Accusation',
+        changeNotes: 'Reinterpreted "ventilation filter replacement" as "hazardous air contamination" and declared administrative cover-up.',
+        significance: 'Transforms routine safety hygiene into an acute environmental crime.',
+        affectedNodeIds: ['node-4'],
+      },
+      {
+        step: 5,
+        activeNodeId: 'node-6',
+        actor: { name: 'Science Student Council', handle: '@science_council', role: 'FACT_CHECKER' },
+        timestamp: 'T+52m',
+        content: 'Facilities confirmed this is routine annual Merv-13 filter replacement on calendar since August. No air quality alerts.',
+        variantType: 'fact_check',
+        mutationLabel: 'Calendar Audit Verification',
+        changeNotes: 'Cites published university facilities maintenance schedule.',
+        significance: 'Demonstrates maintenance was scheduled months in advance.',
+        affectedNodeIds: ['node-6'],
+      },
+      {
+        step: 6,
+        activeNodeId: 'node-5',
+        actor: { name: 'Viral Outrage Hub', handle: '@higher_ed_watch', role: 'SENSATIONALIST' },
+        timestamp: 'T+65m',
+        content: 'SHOCKING: Prestigious university exposed hiding deadly toxic bio-hazard in student library! Students evacuated!',
+        variantType: 'sensationalized',
+        mutationLabel: 'Extreme Sensationalism & Fabricated Evacuation',
+        changeNotes: 'Fabricated "deadly toxic bio-hazard" and "students evacuated".',
+        significance: 'Extreme virality optimized for social media outrage algorithms.',
+        affectedNodeIds: ['node-5'],
+      },
+    ],
+  },
+  {
+    id: 'scenario-transit',
+    title: 'Public Transit Signal Delay',
+    category: 'Infrastructure Rumor Spreading',
+    tagline: 'A 12-minute signal recalibration turns into a citywide transit strike panic',
+    initialClaim: 'Green Line trains experiencing 10–12 minute delays near Central Station while technicians calibrate track switching signals.',
+    sourceInfo: {
+      origin: 'Metro Transit Authority Dispatch',
+      verifiedFacts: [
+        'Signal calibration at switch 14B near Central Station platform 2',
+        'Normal service frequency retained across Red and Blue lines',
+        'Estimated completion within 25 minutes of 17:00 peak hours',
+      ],
+      missingOrUncertain: [
+        'Minor passenger crowding on Central Station platform',
+      ],
+    },
+    steps: [
+      {
+        step: 1,
+        activeNodeId: 'node-1',
+        actor: { name: 'Transit Authority', handle: '@metro_transit', role: 'SOURCE' },
+        timestamp: 'T+00m',
+        content: 'Green Line trains experiencing 10–12 minute delays near Central Station while technicians calibrate track switching signals.',
+        variantType: 'original',
+        mutationLabel: 'Official Dispatch Alert',
+        changeNotes: 'Direct operational bulletin with delay duration and technical reason.',
+        significance: 'Routine 10-minute technical calibration.',
+        affectedNodeIds: ['node-1'],
+      },
+      {
+        step: 2,
+        activeNodeId: 'node-2',
+        actor: { name: 'Commuter Bot', handle: '@commute_updates', role: 'NEUTRAL' },
+        timestamp: 'T+06m',
+        content: 'Green Line: Expect 10-15m delays through Central Station due to signal adjustments.',
+        variantType: 'repost',
+        mutationLabel: 'Commuter Feed Repost',
+        changeNotes: 'Standard feed broadcast.',
+        significance: 'Accurate delay window.',
+        affectedNodeIds: ['node-2'],
+      },
+      {
+        step: 3,
+        activeNodeId: 'node-3',
+        actor: { name: 'Frustrated Passenger', handle: '@subway_rider_9', role: 'CONTEXT_STRIPPER' },
+        timestamp: 'T+19m',
+        content: 'Trains completely stopped at Central Station. Zero information given as usual. System is broken.',
+        variantType: 'context_stripped',
+        mutationLabel: 'Emotional Hyperbole ("Completely Stopped")',
+        changeNotes: 'Replaced 10-minute delay with "completely stopped" and asserted "zero information".',
+        significance: 'Personal frustration substitutes for operational facts.',
+        affectedNodeIds: ['node-3'],
+      },
+      {
+        step: 4,
+        activeNodeId: 'node-4',
+        actor: { name: 'City Buzz Aggregate', handle: '@city_buzz', role: 'INFLUENCER' },
+        timestamp: 'T+31m',
+        content: 'Total transit collapse underway at Central Station! All train lines halted indefinitely!',
+        variantType: 'amplified',
+        mutationLabel: 'Scope Multiplied Across All Lines',
+        changeNotes: 'Broadened single Green Line signal delay to "all train lines halted indefinitely".',
+        significance: 'Creates panic among thousands of commuters planning evening travel.',
+        affectedNodeIds: ['node-4'],
+      },
+      {
+        step: 5,
+        activeNodeId: 'node-5',
+        actor: { name: 'Breaking Flash', handle: '@strike_watch', role: 'SENSATIONALIST' },
+        timestamp: 'T+44m',
+        content: 'CONFIRMED: Wildcat transit union strike shuts down all city transport! Workers walk off job!',
+        variantType: 'sensationalized',
+        mutationLabel: 'Fabricated Cause ("Wildcat Strike")',
+        changeNotes: 'Invented non-existent labor dispute and walkout to explain the delay.',
+        significance: 'Attributes political and labor malice to an electronic switch calibration.',
+        affectedNodeIds: ['node-5'],
+      },
+      {
+        step: 6,
+        activeNodeId: 'node-6',
+        actor: { name: 'Transit Workers Union Local 4', handle: '@atu_local4', role: 'FACT_CHECKER' },
+        timestamp: 'T+52m',
+        content: 'Rumors of a strike are completely false. No labor action underway. Crews are currently finishing switch calibration with dispatch.',
+        variantType: 'fact_check',
+        mutationLabel: 'Union Direct Refutation',
+        changeNotes: 'Direct authoritative clarification by labor representatives.',
+        significance: 'Debunks the manufactured labor strike narrative.',
+        affectedNodeIds: ['node-6'],
+      },
+    ],
+  },
+  {
+    id: 'scenario-snack',
+    title: 'Food Packaging Inspection Notice',
+    category: 'Commercial & Health Panic',
+    tagline: 'Voluntary snack packaging inspection becomes a poisoned food supply rumor',
+    initialClaim: 'GreenValley Foods announces a precautionary check of Batch 402 oat bars regarding package seal tightness. No contamination reported.',
+    sourceInfo: {
+      origin: 'GreenValley Foods Quality Control',
+      verifiedFacts: [
+        'Packaging seal tightness test across 1,200 units in warehouse storage',
+        'Zero microbiological or chemical contamination detected in food samples',
+        'Voluntary warehouse audit prior to retail distribution',
+      ],
+      missingOrUncertain: [
+        'Retailers receiving replacement batch stock by Wednesday',
+      ],
+    },
+    steps: [
+      {
+        step: 1,
+        activeNodeId: 'node-1',
+        actor: { name: 'GreenValley QC', handle: '@greenvalley_corp', role: 'SOURCE' },
+        timestamp: 'T+00m',
+        content: 'GreenValley Foods announces a precautionary check of Batch 402 oat bars regarding package seal tightness. No contamination reported.',
+        variantType: 'original',
+        mutationLabel: 'Precautionary Audit Bulletin',
+        changeNotes: 'Strictly limited seal-integrity quality audit.',
+        significance: 'Precautionary seal check without contamination.',
+        affectedNodeIds: ['node-1'],
+      },
+      {
+        step: 2,
+        activeNodeId: 'node-3',
+        actor: { name: 'Consumer Watch Blog', handle: '@clean_eats', role: 'CONTEXT_STRIPPER' },
+        timestamp: 'T+15m',
+        content: 'Major recall on GreenValley oat bars! Do not eat batch 402!',
+        variantType: 'context_stripped',
+        mutationLabel: 'Audit Labeled as Urgent Recall',
+        changeNotes: 'Converts voluntary seal check into an alarming "Do not eat" recall warning.',
+        significance: 'Strips out "No contamination reported" disclaimer.',
+        affectedNodeIds: ['node-3'],
+      },
+      {
+        step: 3,
+        activeNodeId: 'node-4',
+        actor: { name: 'Wellness Guru', handle: '@natural_living_now', role: 'SENSATIONALIST' },
+        timestamp: 'T+30m',
+        content: 'WARNING: Toxic chemical contamination found in grocery store snack bars! Throw them away immediately!',
+        variantType: 'sensationalized',
+        mutationLabel: 'Toxic Contamination Fabricated',
+        changeNotes: 'Invents "toxic chemical contamination" and expands target to all grocery store bars.',
+        significance: 'Induces food poisoning anxiety and economic waste.',
+        affectedNodeIds: ['node-4'],
+      },
+      {
+        step: 4,
+        activeNodeId: 'node-5',
+        actor: { name: 'Health Alert Network', handle: '@holistic_cure_hub', role: 'SENSATIONALIST' },
+        timestamp: 'T+45m',
+        content: 'BIG PHARMA & FOOD CORP CAUGHT POISONING OUR CHILDREN! Thousands hospitalized in secret cover-up!',
+        variantType: 'sensationalized',
+        mutationLabel: 'Conspiratorial Poisoning Narrative',
+        changeNotes: 'Fabricates mass hospitalizations and conspiracy to harm children.',
+        significance: 'Weaponizes health fears into broad corporate conspiracy tropes.',
+        affectedNodeIds: ['node-5'],
+      },
+      {
+        step: 5,
+        activeNodeId: 'node-6',
+        actor: { name: 'Food Safety Auditor', handle: '@food_audits', role: 'FACT_CHECKER' },
+        timestamp: 'T+55m',
+        content: 'Official state lab reports show zero toxins. The issue was nitrogen pillow packaging seal pressure in 1 warehouse pallet.',
+        variantType: 'fact_check',
+        mutationLabel: 'Lab Test Empirical Corroboration',
+        changeNotes: 'Cites state laboratory microbiological verification findings.',
+        significance: 'Restores empirical truth to packaging science level.',
+        affectedNodeIds: ['node-6'],
+      },
+    ],
+  },
+];
+
+// Fictional Network Node Topology (16 nodes arranged aesthetically)
+export const NETWORK_NODES = [
+  // Center Source Cluster
+  { id: 'node-1', name: 'Primary Source', handle: '@verified_source', role: 'SOURCE', x: 260, y: 160, community: 'official' },
+  { id: 'node-2', name: 'Metro Newsfeed', handle: '@metro_traffic', role: 'NEUTRAL', x: 140, y: 240, community: 'local' },
+  { id: 'node-3', name: 'Community Forum', handle: '@suburban_eyes', role: 'CONTEXT_STRIPPER', x: 380, y: 220, community: 'local' },
+  
+  // Amplification Cluster
+  { id: 'node-4', name: 'Regional Pulse', handle: '@regional_pulse', role: 'INFLUENCER', x: 490, y: 160, community: 'viral' },
+  { id: 'node-5', name: 'Viral News Network', handle: '@viral_news_now', role: 'SENSATIONALIST', x: 620, y: 240, community: 'viral' },
+  { id: 'node-6', name: 'Civic Fact-Check', handle: '@clara_reporter', role: 'FACT_CHECKER', x: 340, y: 350, community: 'journalism' },
+  { id: 'node-7', name: 'Alarmist Echoes', handle: '@daily_shock', role: 'SENSATIONALIST', x: 660, y: 360, community: 'viral' },
+  
+  // Secondary / Peripheral Community
+  { id: 'node-8', name: 'Suburban Commuter', handle: '@commuter_john', role: 'NEUTRAL', x: 100, y: 360, community: 'local' },
+  { id: 'node-9', name: 'Local Parent Chat', handle: '@school_moms_chat', role: 'NEUTRAL', x: 230, y: 440, community: 'local' },
+  { id: 'node-10', name: 'Civic Dispatch Hub', handle: '@civic_wire', role: 'CORRECTOR', x: 220, y: 310, community: 'official' },
+  { id: 'node-11', name: 'Outrage Amplifier', handle: '@trend_chaser', role: 'SENSATIONALIST', x: 540, y: 440, community: 'viral' },
+  { id: 'node-12', name: 'Neighborhood Group', handle: '@oak_street_watch', role: 'NEUTRAL', x: 440, y: 420, community: 'local' },
+  { id: 'node-13', name: 'Broadcast Relay', handle: '@wire_relay', role: 'NEUTRAL', x: 110, y: 120, community: 'official' },
+  { id: 'node-14', name: 'Student Bulletin', handle: '@student_board', role: 'NEUTRAL', x: 370, y: 80, community: 'journalism' },
+  { id: 'node-15', name: 'Public Safety Bot', handle: '@safety_bot', role: 'CORRECTOR', x: 480, y: 60, community: 'official' },
+  { id: 'node-16', name: 'Digital Skeptic', handle: '@truth_sleuth', role: 'FACT_CHECKER', x: 590, y: 110, community: 'journalism' },
+];
+
+// Network Edges / Connections
+export const NETWORK_EDGES = [
+  { from: 'node-1', to: 'node-2', type: 'repost' },
+  { from: 'node-1', to: 'node-3', type: 'repost' },
+  { from: 'node-1', to: 'node-13', type: 'syndication' },
+  { from: 'node-1', to: 'node-14', type: 'syndication' },
+  { from: 'node-2', to: 'node-8', type: 'exposure' },
+  { from: 'node-2', to: 'node-10', type: 'corroboration' },
+  { from: 'node-3', to: 'node-4', type: 'propagation' },
+  { from: 'node-3', to: 'node-12', type: 'exposure' },
+  { from: 'node-4', to: 'node-5', type: 'amplification' },
+  { from: 'node-4', to: 'node-11', type: 'amplification' },
+  { from: 'node-5', to: 'node-7', type: 'cascade' },
+  { from: 'node-6', to: 'node-3', type: 'correction' },
+  { from: 'node-6', to: 'node-10', type: 'fact_check' },
+  { from: 'node-6', to: 'node-12', type: 'fact_check' },
+  { from: 'node-7', to: 'node-11', type: 'echo' },
+  { from: 'node-8', to: 'node-9', type: 'word_of_mouth' },
+  { from: 'node-10', to: 'node-9', type: 'official_guidance' },
+  { from: 'node-12', to: 'node-9', type: 'discussion' },
+  { from: 'node-14', to: 'node-16', type: 'inquiry' },
+  { from: 'node-15', to: 'node-4', type: 'caution_advisory' },
+  { from: 'node-16', to: 'node-5', type: 'challenge' },
+];
+
+// Interactive Intervention Types
+export const INTERVENTION_TYPES = [
+  {
+    id: 'context',
+    title: 'Attach Original Context',
+    description: 'Displays the original official release alongside the post, preventing downstream nodes from mutating further.',
+    icon: 'FileText',
+    color: 'blue',
+    buttonClass: 'bg-blue-50 text-blue-800 border-blue-200 hover:bg-blue-100',
+  },
+  {
+    id: 'correction',
+    title: 'Share a Correction',
+    description: 'Deploys a verified correction node from a fact-checker or official source, cascading accurate facts to connected accounts.',
+    icon: 'ShieldCheck',
+    color: 'emerald',
+    buttonClass: 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100',
+  },
+  {
+    id: 'flag',
+    title: 'Flag Unsupported Claim',
+    description: 'Marks post with a prominent "Under Review" notice, dampening sharing velocity by 65%.',
+    icon: 'AlertTriangle',
+    color: 'rose',
+    buttonClass: 'bg-rose-50 text-rose-800 border-rose-200 hover:bg-rose-100',
+  },
+  {
+    id: 'caution',
+    title: 'Add a Caution Label',
+    description: 'Attaches an amber epistemic disclaimer informing readers that the claim lacks empirical verification.',
+    icon: 'HelpCircle',
+    color: 'amber',
+    buttonClass: 'bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100',
+  },
+  {
+    id: 'inspect_source',
+    title: 'Inspect Source Dossier',
+    description: 'Review verified primary facts vs uncorroborated elements before information spreads further.',
+    icon: 'Search',
+    color: 'zinc',
+    buttonClass: 'bg-zinc-100 text-zinc-800 border-zinc-200 hover:bg-zinc-200',
+  },
+];
+
+/**
+ * Generate plausible fictional mutations for arbitrary user-entered claims
+ */
+export function generateFictionalScenarioFromClaim(userClaim) {
+  const cleanClaim = (userClaim || 'Notice: localized event under investigation').trim();
+  
+  return {
+    id: `custom-sim-${Date.now()}`,
+    title: 'Custom User Scenario Simulation',
+    category: 'User-Initiated Specimen',
+    tagline: 'Pedagogical model simulating mutation and framing distortion across a network',
+    initialClaim: cleanClaim,
+    sourceInfo: {
+      origin: 'User Input Specimen',
+      verifiedFacts: [
+        'Initial baseline text as provided by the investigator',
+        'Demonstrates potential amplification vectors in conversational networks',
+      ],
+      missingOrUncertain: [
+        'Real-world factual verification not performed (Pedagogical demonstration only)',
+      ],
+    },
+    steps: [
+      {
+        step: 1,
+        activeNodeId: 'node-1',
+        actor: { name: 'Originating Account', handle: '@initial_author', role: 'SOURCE' },
+        timestamp: 'T+00m',
+        content: cleanClaim,
+        variantType: 'original',
+        mutationLabel: 'Original Starting Claim',
+        changeNotes: 'Starting text provided in simulation console.',
+        significance: 'Baseline statement as originally entered.',
+        affectedNodeIds: ['node-1'],
+      },
+      {
+        step: 2,
+        activeNodeId: 'node-2',
+        actor: { name: 'Metro Digest', handle: '@metro_digest', role: 'NEUTRAL' },
+        timestamp: 'T+11m',
+        content: cleanClaim.slice(0, 110) + (cleanClaim.length > 110 ? '...' : ''),
+        variantType: 'repost',
+        mutationLabel: 'Direct Repost',
+        changeNotes: 'Accurate reshare without significant alterations.',
+        significance: 'Maintains original premise and scope.',
+        affectedNodeIds: ['node-2'],
+      },
+      {
+        step: 3,
+        activeNodeId: 'node-3',
+        actor: { name: 'Rapid Relay', handle: '@rapid_relay', role: 'CONTEXT_STRIPPER' },
+        timestamp: 'T+24m',
+        content: `Breaking update: ${stripCaveats(cleanClaim)}`,
+        variantType: 'context_stripped',
+        mutationLabel: 'Caveats & Conditions Dropped',
+        changeNotes: 'Stripped qualifiers, dates, or technical caveats to fit short social format.',
+        significance: 'Readers lose situational boundaries and conditionality.',
+        affectedNodeIds: ['node-3'],
+      },
+      {
+        step: 4,
+        activeNodeId: 'node-4',
+        actor: { name: 'Pulse Influencer', handle: '@pulse_network', role: 'INFLUENCER' },
+        timestamp: 'T+38m',
+        content: `Everyone is talking about this: ${escalateUrgency(cleanClaim)}`,
+        variantType: 'amplified',
+        mutationLabel: 'Urgency & Reach Escalation',
+        changeNotes: 'Elevated personal account to broad viral spectacle.',
+        significance: 'Amplifier hub increases downstream exposure.',
+        affectedNodeIds: ['node-4'],
+      },
+      {
+        step: 5,
+        activeNodeId: 'node-5',
+        actor: { name: 'Sensational Echo', handle: '@viral_echoes', role: 'SENSATIONALIST' },
+        timestamp: 'T+51m',
+        content: `SHOCKING: ${sensationalizeText(cleanClaim)} Authorities silent!`,
+        variantType: 'sensationalized',
+        mutationLabel: 'Hyperbolic Sensationalism & Blame',
+        changeNotes: 'Added emotional hyperbole, accusatory tone, and all-caps markers.',
+        significance: 'Distorts factual claim into sensationalized engagement bait.',
+        affectedNodeIds: ['node-5'],
+      },
+      {
+        step: 6,
+        activeNodeId: 'node-6',
+        actor: { name: 'Fact-Check Desk', handle: '@fact_audit', role: 'FACT_CHECKER' },
+        timestamp: 'T+62m',
+        content: `Context check: The circulating claim exaggerates the original statement. Original text specifies localized parameters.`,
+        variantType: 'fact_check',
+        mutationLabel: 'Epistemic Fact-Check',
+        changeNotes: 'Contrasts viral narrative against initial baseline report.',
+        significance: 'Clarifies boundaries and restores original context.',
+        affectedNodeIds: ['node-6'],
+      },
+    ],
+  };
+}
+
+function stripCaveats(text) {
+  return text
+    .replace(/\b(temporarily|precautionary|scheduled|minor|preliminary|unverified|alleged)\b/gi, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
+function escalateUrgency(text) {
+  const snippet = text.slice(0, 90);
+  return `Critical situation reported: ${snippet}... Spread the word!`;
+}
+
+function sensationalizeText(text) {
+  const snippet = text.slice(0, 80);
+  return `MASSIVE SCANDAL! ${snippet.toUpperCase()} — Everyone must see this!`;
+}
