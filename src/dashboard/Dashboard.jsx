@@ -13,7 +13,6 @@ import {
 import HalftoneNebula from '@/components/ui/halftone-nebula';
 import TopCommandBar from './TopCommandBar';
 import BottomNavbar from './BottomNavbar';
-import DraggableGrid from './DraggableGrid';
 import CaseSwitcherModal from './modals/CaseSwitcherModal';
 import IngestModal from './modals/IngestModal';
 import { DEFAULT_WIDGETS, LAYOUT_PRESETS } from './widgetRegistry';
@@ -22,8 +21,6 @@ import { generateReportFile } from '../utils/exportReport';
 
 // Feature deep-dive components
 import DeceptionRadar from '../components/dashboard/DeceptionRadar';
-import EvidenceAutopsy from '../components/dashboard/EvidenceAutopsy';
-import CompetingHypotheses from '../components/dashboard/CompetingHypotheses';
 import RealityInversion from '../components/dashboard/RealityInversion';
 import TruthTribunal from '../components/tribunal/TruthTribunal';
 import DigitalTwinSimulator from '../components/digitaltwin/DigitalTwinSimulator';
@@ -36,7 +33,7 @@ export default function Dashboard({ onBackToLanding, initialCaseIndex = 0 }) {
   const [currentCase, setCurrentCase] = useState(
     INVESTIGATION_CASES[initialCaseIndex] || INVESTIGATION_CASES[0]
   );
-  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'radar' | 'autopsy' | 'timeline' | 'gravity' | 'hypotheses' | 'uncertainty'
+  const [activeTab, setActiveTab] = useState('home'); // 'home' | 'tribunal' | 'twin' | 'reconstruct' | 'reactor' | 'neutralizer' | 'radar'
   const [widgets, setWidgets] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -246,28 +243,25 @@ export default function Dashboard({ onBackToLanding, initialCaseIndex = 0 }) {
 
         {/* 2. Main Dashboard Content Canvas (Constant Ratio, Only Feature Area Scrollable) */}
         <main className="flex-1 w-full min-h-0 flex flex-col justify-center my-auto overflow-hidden">
-          {/* VIEW A: OVERVIEW - The 21st.dev Draggable Widget Grid (6 cards only) */}
-          {activeTab === 'overview' && (
-            <div className="max-w-[1800px] w-full mx-auto px-4 sm:px-8 lg:px-12 my-auto max-h-[calc(100vh-170px)] overflow-y-auto pb-4">
-              <DraggableGrid
-                widgets={widgets}
-                onReorderWidgets={handleReorderWidgets}
-                onResetLayout={handleResetLayout}
-                onToggleWidgetVisibility={handleToggleWidgetVisibility}
-                currentCase={currentCase}
-                onSwitchCase={() => setCaseModalOpen(true)}
-                onExportDossier={handleExportDossier}
-                onNewUpload={() => setUploadModalOpen(true)}
-                onPredictOriginal={() => setActiveTab('reconstruct')}
-                onNavigateTab={setActiveTab}
-                onOpenNeutralizer={() => setActiveTab('neutralizer')}
-                onOpenReactor={() => setActiveTab('reactor')}
-              />
+          {/* HOME VIEW: Bold and big and visible text directly over the live background effect */}
+          {activeTab === 'home' && (
+            <div className="w-full flex-1 flex flex-col items-center justify-center text-center px-6 sm:px-12 my-auto select-none pointer-events-auto">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-zinc-950 max-w-5xl leading-[1.15] mb-8">
+                Your eyes are not enough to see the real world, take one of ours.
+              </h1>
+              <a
+                href="/veratis-extension.zip"
+                download="veratis-extension.zip"
+                className="text-xl sm:text-2xl md:text-3xl font-bold text-zinc-600 hover:text-zinc-950 transition-colors tracking-tight inline-flex items-center gap-3 cursor-pointer group"
+              >
+                <span>Download our chrome extension</span>
+                <span className="text-2xl sm:text-3xl transition-transform group-hover:translate-x-1.5 font-sans">→</span>
+              </a>
             </div>
           )}
 
           {/* FOCUSED FEATURE VIEWS: Attached edge-to-edge to sides, open top/bottom revealing live moving background */}
-          {activeTab !== 'overview' && (
+          {activeTab !== 'home' && (
             <div className="w-full my-auto max-h-[calc(100vh-160px)] overflow-y-auto bg-white/70 backdrop-blur-md border-y border-zinc-200/60 border-x-0 py-6 sm:py-8 px-6 sm:px-12 lg:px-20 xl:px-28 2xl:px-36 shadow-xs">
               {/* VIEW: TRUTH TRIBUNAL (Multi-Personality Deliberation) */}
               {activeTab === 'tribunal' && (
@@ -279,16 +273,6 @@ export default function Dashboard({ onBackToLanding, initialCaseIndex = 0 }) {
                 <DigitalTwinSimulator />
               )}
 
-              {/* VIEW: RUMOR REACTOR (Information Propagation Simulation) */}
-              {activeTab === 'reactor' && (
-                <RumorReactor onBackToOverview={() => setActiveTab('overview')} />
-              )}
-
-              {/* VIEW: NEUTRALIZER (Epistemic Framing De-Escalation & Analysis) */}
-              {activeTab === 'neutralizer' && (
-                <Neutralizer onBackToOverview={() => setActiveTab('overview')} />
-              )}
-
               {/* VIEW: REALITY INVERSION (AI Original Prediction & Reconstruction) */}
               {activeTab === 'reconstruct' && (
                 <RealityInversion
@@ -297,27 +281,21 @@ export default function Dashboard({ onBackToLanding, initialCaseIndex = 0 }) {
                 />
               )}
 
-              {/* VIEW B: DECEPTION RADAR */}
+              {/* VIEW: RUMOR REACTOR (Information Propagation Simulation) */}
+              {activeTab === 'reactor' && (
+                <RumorReactor onBackToOverview={() => setActiveTab('home')} />
+              )}
+
+              {/* VIEW: NEUTRALIZER (Epistemic Framing De-Escalation & Analysis) */}
+              {activeTab === 'neutralizer' && (
+                <Neutralizer onBackToOverview={() => setActiveTab('home')} />
+              )}
+
+              {/* VIEW: DECEPTION RADAR */}
               {activeTab === 'radar' && (
                 <DeceptionRadar
                   scores={currentCase.radarScores}
                   analysis={currentCase.radarAnalysis}
-                />
-              )}
-
-              {/* VIEW C: EVIDENCE AUTOPSY */}
-              {activeTab === 'autopsy' && (
-                <EvidenceAutopsy
-                  image={currentCase.image}
-                  annotations={currentCase.annotations}
-                  onNavigateTab={setActiveTab}
-                />
-              )}
-
-              {/* VIEW: COMPETING HYPOTHESES */}
-              {activeTab === 'hypotheses' && (
-                <CompetingHypotheses
-                  hypotheses={currentCase.competingHypotheses}
                 />
               )}
             </div>

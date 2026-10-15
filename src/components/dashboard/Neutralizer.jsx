@@ -229,35 +229,41 @@ export default function Neutralizer({ onBackToOverview }) {
   };
 
   return (
-    <div className="space-y-8 font-sans max-w-7xl mx-auto">
-      {/* 1. Header Bar: Ultra-Minimal Editorial Design */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-zinc-200/80">
+    <div className="space-y-10 font-sans max-w-[1800px] mx-auto">
+      {/* 1. Header Bar: Ultra-Minimal Editorial Design - Matches Image 2 */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-zinc-200/80">
         <div>
-          <div className="mb-1.5">
-            <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
-              Linguistic Forensic Reconstruction
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xs font-mono font-bold tracking-widest text-zinc-500 uppercase">
+              LINGUISTIC FORENSIC RECONSTRUCTION // EPISTEMIC FRAMING
+            </span>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-700 border border-zinc-200 font-semibold">
+              DE-ESCALATION ENGINE
             </span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-950">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-zinc-950">
             Neutralizer
-          </h1>
+          </h2>
 
-          <p className="text-sm text-zinc-500 mt-1 max-w-xl">
-            Transforms sensationalized messaging into epistemically honest wording.
+          <p className="text-base sm:text-lg text-zinc-600 mt-2 max-w-3xl leading-relaxed">
+            Transforms sensationalized and manipulative messaging into epistemically honest wording and objective framing.
           </p>
         </div>
 
         {/* Top Actions */}
-        <div className="flex items-center gap-2.5 shrink-0">
-          <button
-            onClick={handleReset}
-            className="px-3.5 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
-            title="Reset to default case"
-          >
-            <RotateCcw className="w-3.5 h-3.5 text-zinc-500" />
-            <span>Reset</span>
-          </button>
+        <div className="flex flex-col items-start md:items-end gap-2 shrink-0">
+          <span className="text-xs font-mono text-zinc-400 uppercase">ANALYSIS STATE</span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleReset}
+              className="px-3.5 py-1.5 rounded-xl bg-zinc-100/90 hover:bg-zinc-200 text-zinc-700 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer border border-zinc-200/60"
+              title="Reset to default case"
+            >
+              <RotateCcw className="w-3.5 h-3.5 text-zinc-500" />
+              <span>Reset</span>
+            </button>
+          </div>
         </div>
       </div>
 
