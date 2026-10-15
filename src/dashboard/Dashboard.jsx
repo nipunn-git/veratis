@@ -119,7 +119,7 @@ export default function Dashboard({ onBackToLanding, initialCaseIndex = 0 }) {
       leadInvestigator: 'VERATIS ENCLAVE // CLIENT LOCAL',
       image:
         fileInfo.dataUrl ||
-        'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1200&q=80',
+        '/assets/morphed_diplomat.jpg',
       radarScores: {
         visual: 84,
         contextual: 72,
@@ -286,6 +286,7 @@ export default function Dashboard({ onBackToLanding, initialCaseIndex = 0 }) {
                 <EvidenceAutopsy
                   image={currentCase.image}
                   annotations={currentCase.annotations}
+                  onNavigateTab={setActiveTab}
                 />
               )}
 

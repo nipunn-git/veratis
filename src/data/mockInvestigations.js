@@ -12,7 +12,7 @@ export const INVESTIGATION_CASES = [
     verdictConfidence: 94.8,
     dateLogged: "OCT 14, 2026 // 18:42:09 UTC",
     leadInvestigator: "VERATIS UNIT 09 // S. HAWTHORNE",
-    image: "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1200&q=80",
+    image: "/assets/morphed_diplomat.jpg",
     radarScores: {
       visual: 94,
       contextual: 88,
@@ -204,7 +204,7 @@ export const INVESTIGATION_CASES = [
     verdictConfidence: 98.2,
     dateLogged: "OCT 12, 2026 // 09:15:33 UTC",
     leadInvestigator: "VERATIS UNIT 04 // M. REYES",
-    image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80",
+    image: "/assets/morphed_portrait.jpg",
     radarScores: {
       visual: 98,
       contextual: 82,
@@ -312,7 +312,7 @@ export const INVESTIGATION_CASES = [
     verdictConfidence: 96.1,
     dateLogged: "OCT 15, 2026 // 06:10:14 UTC",
     leadInvestigator: "VERATIS UNIT 02 // E. CHEN",
-    image: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1200&q=80",
+    image: "/assets/morphed_diplomat.jpg",
     radarScores: {
       visual: 22,
       contextual: 96,

@@ -2,11 +2,11 @@ import React from 'react';
 import EvidenceAutopsy from '../../components/dashboard/EvidenceAutopsy';
 
 export default function EvidenceAutopsyWidget({ image, annotations }) {
-  if (!image) return null;
+  const specimen = image || '/assets/morphed_diplomat.jpg';
 
   return (
     <div className="w-full">
-      <EvidenceAutopsy image={image} annotations={annotations || []} />
+      <EvidenceAutopsy image={specimen} annotations={annotations || []} />
     </div>
   );
 }

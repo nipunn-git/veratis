@@ -50,7 +50,7 @@ export default function DashboardLayout({ onBackToLanding, initialCaseIndex = 0 
       verdictConfidence: 89.4,
       dateLogged: new Date().toUTCString(),
       leadInvestigator: "VERATIS UNIT 01 // LOCAL ENCLAVE",
-      image: fileInfo.dataUrl || "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1200&q=80",
+      image: fileInfo.dataUrl || "/assets/morphed_diplomat.jpg",
       radarScores: {
         visual: 84,
         contextual: 72,
