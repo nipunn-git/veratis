@@ -120,7 +120,7 @@ function generateSmartCompanionFallback(action, query, text, pageTitle, pageUrl)
       return {
         action: 'investigate',
         isLiveAI: false,
-        response: `**VERATIS Investigation:**\n\n• **Content Reviewed:** "${snippet.slice(0, 120)}..."\n• **Source Page:** ${pageTitle} (${pageUrl || 'unknown'})\n\n**Findings:**\n${flags.map((f, i) => `${i + 1}. **${f}**`).join('\n')}\n\n**Verdict:** ${flags.length > 1 ? '⚠️ Exercise Caution — verify through independent official sources before acting.' : 'ℹ️ Informational — cross-reference key assertions before relying on them.'}`,
+        response: `**Investigation Assessment:**\n\n• **Content Reviewed:** "${snippet.slice(0, 120)}..."\n• **Source Page:** ${pageTitle} (${pageUrl || 'unknown'})\n\n**Findings:**\n${flags.map((f, i) => `${i + 1}. **${f}**`).join('\n')}\n\n**Verdict:** ${flags.length > 1 ? 'Exercise Caution — verify through independent official sources before acting.' : 'Informational — cross-reference key assertions before relying on them.'}`,
         suggestedNext: ['Challenge This', 'Find Claims', 'Check Phishing']
       };
     }
@@ -138,7 +138,7 @@ function generateSmartCompanionFallback(action, query, text, pageTitle, pageUrl)
       return {
         action: 'phishing',
         isLiveAI: false,
-        response: `**Phishing & Social Engineering Assessment:**\n\n• **Threat Level:** ${isSuspicious ? '⚠️ Potential Social Engineering Detected' : '✅ Low Risk Profile'}\n\n**Inspection Checklist:**\n1. **Sender / Domain:** Check if the URL (${pageUrl || 'current site'}) matches the official organization.\n2. **Urgency Tactics:** Does the message pressure you to act within minutes to avoid penalties?\n3. **Data Requests:** Never share 2FA codes, passwords, or wire money to unverified accounts.\n\n**Advice:** If this arrived as an unexpected message or email, do not click internal links or reply directly. Navigate to the verified official portal manually.`,
+        response: `**Phishing & Social Engineering Assessment:**\n\n• **Threat Level:** ${isSuspicious ? 'Potential Social Engineering Detected' : 'Low Risk Profile'}\n\n**Inspection Checklist:**\n1. **Sender / Domain:** Check if the URL (${pageUrl || 'current site'}) matches the official organization.\n2. **Urgency Tactics:** Does the message pressure you to act within minutes to avoid penalties?\n3. **Data Requests:** Never share 2FA codes, passwords, or wire money to unverified accounts.\n\n**Advice:** If this arrived as an unexpected message or email, do not click internal links or reply directly. Navigate to the verified official portal manually.`,
         suggestedNext: ['Draft Safe Reply', 'Investigate Content']
       };
     }

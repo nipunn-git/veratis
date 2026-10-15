@@ -1,5 +1,6 @@
 /**
  * VERATIS Companion - Side Panel Controller
+ * Minimal, White & Matte Grey Editorial Design
  * Handles context extraction, action chips, real-time AI API integration,
  * voice speech-to-text dictation, and text-to-speech audio playback.
  */
@@ -36,6 +37,7 @@ const capturePageBtn = document.getElementById('capturePageBtn');
 const clearContextBtn = document.getElementById('clearContextBtn');
 const contextSnippet = document.getElementById('contextSnippet');
 const snippetText = document.getElementById('snippetText');
+const wordCountLabel = document.getElementById('wordCountLabel');
 
 const chatContainer = document.getElementById('chatContainer');
 const welcomeState = document.getElementById('welcomeState');
@@ -74,7 +76,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initVoiceRecognition();
   checkBackendHealth();
 
-  // Listen for tab switches and updates
+  // Listen for tab switching and updates
   if (chrome.tabs) {
     chrome.tabs.onActivated?.addListener(async () => {
       await refreshActiveTab();
@@ -123,7 +125,7 @@ async function refreshActiveTab() {
       currentTab = tabs[0];
       const isRestricted = isRestrictedUrl(currentTab.url);
       if (isRestricted) {
-        pageTitleLabel.textContent = 'Chrome System Page (open any website to analyze)';
+        pageTitleLabel.textContent = 'Chrome system page (open any website to analyze)';
       } else {
         const domain = currentTab.url ? new URL(currentTab.url).hostname : 'Webpage';
         pageTitleLabel.textContent = `${domain} · ${currentTab.title || 'Active Tab'}`;
@@ -172,7 +174,6 @@ async function checkBackendHealth() {
     clearTimeout(timer);
 
     if (res.ok) {
-      const data = await res.json();
       updateModeBadge(true);
     } else {
       updateModeBadge(false);
@@ -188,7 +189,7 @@ function updateModeBadge(isLive) {
     modeText.textContent = 'LIVE AI';
   } else {
     modeBadge.className = 'mode-badge demo';
-    modeText.textContent = 'DEMO MODE';
+    modeText.textContent = 'DEMO';
   }
 }
 
@@ -217,7 +218,7 @@ async function extractFromTab(actionType) {
     await refreshActiveTab();
   }
   if (!currentTab || !currentTab.id) {
-    addMessage('assistant', '⚠️ Could not access the active tab. Please make sure a normal webpage is open.');
+    addMessage('assistant', 'Could not access the active tab. Please make sure a normal webpage is open.');
     return;
   }
 
@@ -225,44 +226,36 @@ async function extractFromTab(actionType) {
   if (isRestrictedUrl(currentTab.url)) {
     addMessage(
       'assistant',
-      'ℹ️ Chrome restricts all extensions from reading internal **chrome://** system pages for browser security.\n\n👉 **To test VERATIS Companion:** Switch to any regular public website (like Wikipedia, BBC News, or your local website), highlight some text, and click **"Get Selection"** or choose an action!\n\n*(You can also ask general digital-trust or fact-checking questions directly in the box below.)*'
+      'Chrome restricts extensions from accessing internal system pages (chrome://) for security reasons.\n\nTo analyze webpage text, switch to any normal website (such as Wikipedia, news, or your local web app), highlight text, and click Get Selection.\n\nYou can also type or paste content directly in the composer below.'
     );
     return;
   }
 
-  // Attempt message passing first
-  try {
-    chrome.tabs.sendMessage(currentTab.id, { action: actionType }, (response) => {
-      if (chrome.runtime.lastError || !response) {
-        // Fallback: inject content script via scripting API
-        injectAndExtract(actionType);
-      } else {
-        handleExtractionResponse(response, actionType);
-      }
-    });
-  } catch (e) {
-    injectAndExtract(actionType);
-  }
-}
+  // 1. Send direct message to the content script
+  chrome.tabs.sendMessage(currentTab.id, { action: actionType }, async (response) => {
+    if (chrome.runtime.lastError || !response) {
+      // 2. If content script was not already listening (e.g. page loaded before extension installation), inject it dynamically
+      try {
+        await chrome.scripting.executeScript({
+          target: { tabId: currentTab.id },
+          files: ['content.js']
+        });
 
-async function injectAndExtract(actionType) {
-  try {
-    await chrome.scripting.executeScript({
-      target: { tabId: currentTab.id },
-      files: ['content.js']
-    });
-
-    chrome.tabs.sendMessage(currentTab.id, { action: actionType }, (response) => {
-      if (response) {
-        handleExtractionResponse(response, actionType);
-      } else {
-        addMessage('assistant', 'ℹ️ No text found or page is restricted (e.g. chrome:// internal pages).');
+        chrome.tabs.sendMessage(currentTab.id, { action: actionType }, (retryResponse) => {
+          if (retryResponse) {
+            handleExtractionResponse(retryResponse, actionType);
+          } else {
+            addMessage('assistant', 'Could not read text from this tab. Please highlight text directly on the page or paste it in the composer below.');
+          }
+        });
+      } catch (err) {
+        console.warn('Script injection failed:', err);
+        addMessage('assistant', 'Unable to inspect this page. Please enter or paste text in the composer below.');
       }
-    });
-  } catch (err) {
-    console.warn('Script injection failed:', err);
-    addMessage('assistant', '⚠️ Cannot read this webpage due to browser security restrictions on internal pages.');
-  }
+    } else {
+      handleExtractionResponse(response, actionType);
+    }
+  });
 }
 
 function handleExtractionResponse(response, actionType) {
@@ -273,13 +266,13 @@ function handleExtractionResponse(response, actionType) {
     if (response.selectedText && response.selectedText.trim()) {
       setCapturedContext(response.selectedText, 'selection');
     } else {
-      addMessage('assistant', 'ℹ️ No text is currently highlighted on the webpage. Highlight some text with your mouse and click "Get Selection", or click "Read Page".');
+      addMessage('assistant', 'No text is currently highlighted on the webpage. Highlight text with your mouse and click Get Selection, or click Read Page.');
     }
   } else {
     if (response.pageText && response.pageText.trim()) {
       setCapturedContext(response.pageText, 'page');
     } else {
-      addMessage('assistant', 'ℹ️ Could not find readable main content on this page.');
+      addMessage('assistant', 'Could not find readable main content on this page.');
     }
   }
 }
@@ -293,6 +286,9 @@ function setCapturedContext(text, type) {
 
   const wordCount = text.trim().split(/\s+/).length;
   snippetText.textContent = text;
+  if (wordCountLabel) {
+    wordCountLabel.textContent = `${wordCount} words`;
+  }
   contextSnippet.classList.remove('hidden');
 
   composerContextTag.classList.remove('hidden');
@@ -373,21 +369,21 @@ function setupEventListeners() {
 
   testApiBtn.addEventListener('click', async () => {
     testApiBtn.disabled = true;
-    apiStatusMessage.textContent = 'Testing...';
+    apiStatusMessage.textContent = 'Testing connection...';
     apiStatusMessage.className = 'api-status-msg';
 
     try {
       const url = apiUrlInput.value.trim().replace('/companion', '/health');
       const res = await fetch(url);
       if (res.ok) {
-        apiStatusMessage.textContent = '✓ Connected successfully!';
+        apiStatusMessage.textContent = 'Connected successfully';
         apiStatusMessage.className = 'api-status-msg success';
       } else {
-        apiStatusMessage.textContent = `✗ HTTP Error ${res.status}`;
+        apiStatusMessage.textContent = `HTTP error ${res.status}`;
         apiStatusMessage.className = 'api-status-msg error';
       }
     } catch (e) {
-      apiStatusMessage.textContent = '✗ Connection failed (offline)';
+      apiStatusMessage.textContent = 'Connection failed (server offline)';
       apiStatusMessage.className = 'api-status-msg error';
     } finally {
       testApiBtn.disabled = false;
@@ -436,19 +432,19 @@ async function triggerAction(actionName) {
   if (!currentContext.selectedText && !currentContext.pageText && isRestrictedUrl(currentTab?.url)) {
     addMessage(
       'assistant',
-      'ℹ️ You are currently on a Chrome system page (`chrome://`). Please switch to any regular website (like Wikipedia, BBC, or your local site) to analyze page text, or type/paste your text directly in the box below!'
+      'You are currently on a Chrome system page (chrome://). Please switch to a regular website (like Wikipedia or BBC) to analyze page text, or enter text directly in the box below.'
     );
     return;
   }
 
   const actionLabels = {
-    investigate: '🔍 Investigate this content',
-    explain: '💡 Explain in simple terms',
-    challenge: '⚔️ Challenge assumptions & proof',
-    phishing: '🎣 Check for phishing & scam signals',
-    claims: '📋 Find verifiable claims',
-    'safe-reply': '🛡️ Draft a safe reply',
-    summarize: '📄 Summarize this page'
+    investigate: 'Investigate this content',
+    explain: 'Explain in simple terms',
+    challenge: 'Challenge assumptions and evidence',
+    phishing: 'Check for phishing and scam indicators',
+    claims: 'Find verifiable claims',
+    'safe-reply': 'Draft a safe reply',
+    summarize: 'Summarize this page'
   };
 
   const label = actionLabels[actionName] || actionName;
@@ -513,7 +509,7 @@ async function executeAIRequest(action, query) {
 
   } catch (err) {
     typingIndicator.classList.add('hidden');
-    addMessage('assistant', `⚠️ An error occurred during analysis: ${err.message}. Running in offline fallback.`);
+    addMessage('assistant', `An error occurred: ${err.message}. Operating in offline mode.`);
   }
 }
 
@@ -547,7 +543,7 @@ function addMessage(sender, text) {
     const copyBtn = document.createElement('button');
     copyBtn.className = 'action-tool-btn';
     copyBtn.innerHTML = `
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
         <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
       </svg>
@@ -555,7 +551,7 @@ function addMessage(sender, text) {
     `;
     copyBtn.addEventListener('click', () => {
       navigator.clipboard.writeText(text);
-      copyBtn.querySelector('span').textContent = 'Copied!';
+      copyBtn.querySelector('span').textContent = 'Copied';
       setTimeout(() => copyBtn.querySelector('span').textContent = 'Copy', 1500);
     });
 
@@ -563,7 +559,7 @@ function addMessage(sender, text) {
     const ttsBtn = document.createElement('button');
     ttsBtn.className = 'action-tool-btn';
     ttsBtn.innerHTML = `
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
         <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
       </svg>
@@ -625,7 +621,7 @@ function initVoiceRecognition() {
   speechRecognition.onstart = () => {
     isRecordingVoice = true;
     voiceBtn.classList.add('active');
-    messageInput.placeholder = 'Listening... speak now';
+    messageInput.placeholder = 'Listening...';
   };
 
   speechRecognition.onresult = (event) => {
@@ -661,7 +657,7 @@ function initVoiceRecognition() {
 function stopRecording() {
   isRecordingVoice = false;
   voiceBtn.classList.remove('active');
-  messageInput.placeholder = 'Ask a question or select an action...';
+  messageInput.placeholder = 'Ask a question or enter text to analyze...';
 }
 
 function speakText(text) {
@@ -702,7 +698,7 @@ function stopSpeech() {
 }
 
 /* ==========================================================================
-   Client-Side Fallback Analysis (Demo Mode)
+   Client-Side Fallback Analysis (Demo Mode) - Zero Emojis, Minimal
    ========================================================================== */
 
 function clientFallbackAnalysis(action, query, ctx) {
@@ -714,50 +710,50 @@ function clientFallbackAnalysis(action, query, ctx) {
     case 'explain':
       return {
         isLiveAI: false,
-        response: `**Simple Summary:**\n\nThis content is talking about: "${snippet}..."\n\n**Key Takeaways:**\n• **Main Point:** It provides information regarding ${title}.\n• **What to Know:** Written clearly without complex jargon.\n• **Context:** Make sure to cross-check claims with official sources.`
+        response: `**Summary**\n\nThis content discusses: "${snippet}..."\n\n**Key Points**\n• It provides information regarding ${title}.\n• Written in standard descriptive language without specialized verification seals.\n• Recommendation: Cross-check claims against primary institutional records.`
       };
 
     case 'investigate':
       return {
         isLiveAI: false,
-        response: `**VERATIS Digital Trust Investigation:**\n\n• **Content Checked:** "${snippet}..."\n• **Page:** ${title}\n\n**Findings:**\n1. **Verification Status:** Unverified third-party content.\n2. **Language Check:** Look out for false urgency, extreme claims, or missing author names.\n3. **Recommendation:** Seek independent confirmation before sharing or making decisions.`
+        response: `**Investigation Assessment**\n\n• **Content:** "${snippet}..."\n• **Source Page:** ${title}\n\n**Findings**\n1. **Verification Status:** Unverified third-party content.\n2. **Language Indicators:** Evaluated for urgency, unsupported claims, and missing corroboration.\n3. **Conclusion:** Exercise caution before relying on this information without secondary confirmation.`
       };
 
     case 'challenge':
       return {
         isLiveAI: false,
-        response: `**Skeptic's Challenge:**\n\n1. **Unproven Claims:** What evidence proves this statement is true?\n2. **Missing Proof:** No primary source links or verifiable public documents are cited.\n3. **Alternate Possibility:** This could be selective framing or unverified speculation.`
+        response: `**Skeptic's Challenge**\n\n1. **Unproven Premises:** What primary evidence substantiates this claim?\n2. **Missing Proof:** No primary source links or certified public documents are cited.\n3. **Alternative Possibility:** This could be selective framing or unverified speculation.`
       };
 
     case 'phishing':
       return {
         isLiveAI: false,
-        response: `**Phishing & Scam Check:**\n\n• **Safety Rule:** Never share 2FA codes, passwords, or send money to unverified contacts.\n• **Domain Check:** Verify that the website address in your browser bar is genuine.\n• **Urgency Alert:** Scammers often rush you with fake deadlines to prevent you from double-checking.`
+        response: `**Security & Phishing Assessment**\n\n• **Guideline:** Never share authentication codes, passwords, or initiate financial transfers over direct messaging.\n• **Domain Check:** Verify that the browser URL matches the official organization domain.\n• **Urgency:** Scammers often introduce artificial deadlines to bypass standard verification protocols.`
       };
 
     case 'claims':
       return {
         isLiveAI: false,
-        response: `**Claims Requiring Verification:**\n\n1. "${snippet}..."\n   ↳ *Check if official agencies or reputable news wires have reported this.*\n2. Look up any named people or numbers mentioned in the text.`
+        response: `**Factual Claims Requiring Verification**\n\n1. "${snippet}..."\n   ↳ Check official press registers or accredited news wire coverage.\n2. Cross-reference any named individuals or figures against verified public registries.`
       };
 
     case 'safe-reply':
       return {
         isLiveAI: false,
-        response: `**Recommended Safe Reply:**\n\n> "Thank you for reaching out. Per our security guidelines, I cannot process requests or click external links without verbal verification through our official company channels."`
+        response: `**Recommended Safe Reply**\n\n> "Thank you for contacting me. In accordance with security protocols, I cannot process requests or access external links without direct verification through official verified channels."`
       };
 
     case 'summarize':
       return {
         isLiveAI: false,
-        response: `**Page Summary for ${title}:**\n\n• **Topic:** Discusses ${snippet}...\n• **Source:** Read from active tab.\n• **Advice:** Check the author and publication date for freshness.`
+        response: `**Page Summary for ${title}**\n\n• **Overview:** Covers ${snippet}...\n• **Source:** Captured from active tab.\n• **Note:** Confirm the publication date and author credentials before citation.`
       };
 
     case 'ask':
     default:
       return {
         isLiveAI: false,
-        response: `Regarding: *"${query || 'Analyze this content'}"*\n\nBased on **${title}** ("${snippet}..."): The content presents these details for consideration. Remember to confirm important actions through verified direct channels.`
+        response: `Regarding: "${query || 'Analysis'}"\n\nBased on ${title} ("${snippet}..."): The content presents these details for consideration. Important assertions should be verified through independent primary sources.`
       };
   }
 }

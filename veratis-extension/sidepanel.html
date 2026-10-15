@@ -11,7 +11,7 @@
   <header class="header">
     <div class="brand">
       <div class="logo-mark">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
           <polyline points="2 17 12 22 22 17"></polyline>
           <polyline points="2 12 12 17 22 12"></polyline>
@@ -19,25 +19,27 @@
       </div>
       <div class="brand-text">
         <span class="brand-title">VERATIS</span>
-        <span class="brand-badge">COMPANION</span>
+        <span class="brand-divider">/</span>
+        <span class="brand-subtitle">COMPANION</span>
       </div>
     </div>
 
     <div class="header-actions">
       <button id="modeBadge" class="mode-badge demo" title="Click to configure backend API">
         <span class="mode-dot"></span>
-        <span id="modeText">DEMO MODE</span>
+        <span id="modeText">DEMO</span>
       </button>
 
-      <button id="clearChatBtn" class="icon-btn" title="Clear conversation">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="3 6 5 6 21 6"></polyline>
-          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+      <button id="clearChatBtn" class="icon-btn" title="Clear conversation" aria-label="Clear conversation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 6h18"></path>
+          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
         </svg>
       </button>
 
-      <button id="settingsBtn" class="icon-btn" title="Settings & API">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <button id="settingsBtn" class="icon-btn" title="Settings" aria-label="Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="3"></circle>
           <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
         </svg>
@@ -48,82 +50,81 @@
   <!-- Active Page Context Card -->
   <section id="contextCard" class="context-card">
     <div class="context-header">
-      <div class="context-title-wrap">
-        <span class="context-indicator"></span>
-        <span id="pageTitleLabel" class="page-title-label">Detecting active tab...</span>
+      <div class="context-meta">
+        <span class="context-dot"></span>
+        <span id="pageTitleLabel" class="page-title-label">Detecting active page...</span>
       </div>
-      <div class="context-buttons">
-        <button id="captureSelectionBtn" class="context-action-btn" title="Capture text you selected on the page">
-          <span>Get Selection</span>
+      <div class="context-actions">
+        <button id="captureSelectionBtn" class="context-pill-btn">
+          Get Selection
         </button>
-        <button id="capturePageBtn" class="context-action-btn" title="Read visible text from current page">
-          <span>Read Page</span>
+        <button id="capturePageBtn" class="context-pill-btn">
+          Read Page
         </button>
-        <button id="clearContextBtn" class="context-close-btn" title="Clear captured context">✕</button>
+        <button id="clearContextBtn" class="context-clear-btn" title="Clear context">
+          Clear
+        </button>
       </div>
     </div>
     <div id="contextSnippet" class="context-snippet hidden">
-      <span class="snippet-tag">CAPTURED CONTEXT</span>
+      <div class="snippet-header">
+        <span class="snippet-tag">CAPTURED TEXT</span>
+        <span id="wordCountLabel" class="word-count-label"></span>
+      </div>
       <p id="snippetText"></p>
     </div>
   </section>
 
-  <!-- Quick Action Chips Bar -->
-  <div class="chips-container">
+  <!-- Action Chips Bar -->
+  <nav class="chips-container" aria-label="Quick analysis actions">
     <button class="chip" data-action="investigate">
-      <span class="chip-icon">🔍</span>
       <span>Investigate</span>
     </button>
     <button class="chip" data-action="explain">
-      <span class="chip-icon">💡</span>
       <span>Explain</span>
     </button>
     <button class="chip" data-action="challenge">
-      <span class="chip-icon">⚔️</span>
-      <span>Challenge This</span>
+      <span>Challenge</span>
     </button>
     <button class="chip" data-action="phishing">
-      <span class="chip-icon">🎣</span>
-      <span>Phishing Check</span>
+      <span>Phishing</span>
     </button>
     <button class="chip" data-action="claims">
-      <span class="chip-icon">📋</span>
       <span>Find Claims</span>
     </button>
     <button class="chip" data-action="safe-reply">
-      <span class="chip-icon">🛡️</span>
       <span>Safe Reply</span>
     </button>
     <button class="chip" data-action="summarize">
-      <span class="chip-icon">📄</span>
       <span>Summarize</span>
     </button>
-  </div>
+  </nav>
 
   <!-- Main Chat Conversation Area -->
   <main id="chatContainer" class="chat-container">
     <!-- Welcome Empty State -->
     <div id="welcomeState" class="welcome-state">
       <div class="welcome-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
         </svg>
       </div>
-      <h3>Welcome to VERATIS Companion</h3>
-      <p>Your on-page AI digital-trust assistant. Select text on any website or choose an action below to begin.</p>
+      <h3>VERATIS Companion</h3>
+      <p>Analyze web content for misleading claims, verify facts, and spot potential deception directly from your browser.</p>
 
       <div class="suggested-prompts">
-        <button class="prompt-btn" data-prompt="Check this page for suspicious claims or deceptive wording.">
-          <span>🔍 Check this page for suspicious claims</span>
+        <span class="prompts-heading">Quick Actions</span>
+        <button class="prompt-btn" data-prompt="Investigate this content for misleading context or manipulation.">
+          Investigate claims and context
         </button>
-        <button class="prompt-btn" data-prompt="Explain this content in simple, everyday language.">
-          <span>💡 Explain this content in simple words</span>
+        <button class="prompt-btn" data-prompt="Explain this content in simple, straightforward language.">
+          Explain in plain language
         </button>
-        <button class="prompt-btn" data-prompt="Is this message or email trying to scam or phish me?">
-          <span>🎣 Is this message trying to scam me?</span>
+        <button class="prompt-btn" data-prompt="Check this message or page for phishing or social engineering signs.">
+          Inspect for phishing or scam patterns
         </button>
-        <button class="prompt-btn" data-prompt="What evidence would be needed to prove what is said here?">
-          <span>⚔️ Challenge the claims and missing proof</span>
+        <button class="prompt-btn" data-prompt="Challenge the unproven assumptions in this statement.">
+          Challenge assumptions and identify missing proof
         </button>
       </div>
     </div>
@@ -133,40 +134,33 @@
 
     <!-- Typing Indicator -->
     <div id="typingIndicator" class="typing-indicator hidden">
-      <div class="assistant-avatar">V</div>
       <div class="dots-bubble">
         <span class="dot"></span>
         <span class="dot"></span>
         <span class="dot"></span>
       </div>
-      <span class="typing-text">Analyzing content...</span>
+      <span class="typing-text">Analyzing</span>
     </div>
   </main>
 
   <!-- Active Speech Playing Banner -->
   <div id="speechBanner" class="speech-banner hidden">
-    <div class="sound-wave">
-      <span class="bar"></span>
-      <span class="bar"></span>
-      <span class="bar"></span>
-    </div>
-    <span class="speech-label">Reading response aloud...</span>
-    <button id="stopSpeechBtn" class="stop-speech-btn" title="Stop speech">Stop</button>
+    <span class="speech-label">Reading response aloud</span>
+    <button id="stopSpeechBtn" class="stop-speech-btn">Stop</button>
   </div>
 
   <!-- Composer Area -->
   <footer class="composer-container">
     <div class="composer-box">
-      <!-- Context Preview Pill inside composer -->
+      <!-- Context Pill in composer -->
       <div id="composerContextTag" class="composer-context-tag hidden">
-        <span class="tag-icon">📎</span>
-        <span id="composerContextLabel">Using page text</span>
+        <span id="composerContextLabel">Page text attached</span>
         <button id="removeContextTagBtn" class="tag-remove-btn" title="Remove context">✕</button>
       </div>
 
       <div class="composer-input-row">
-        <button id="voiceBtn" class="voice-btn" title="Voice Dictation (Click to speak)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button id="voiceBtn" class="voice-btn" title="Voice dictation" aria-label="Voice input">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
             <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
             <line x1="12" y1="19" x2="12" y2="23"></line>
@@ -177,12 +171,12 @@
         <textarea 
           id="messageInput" 
           rows="1" 
-          placeholder="Ask a question or select an action..." 
+          placeholder="Ask a question or enter text to analyze..." 
           aria-label="Ask VERATIS Companion"
         ></textarea>
 
-        <button id="sendBtn" class="send-btn" title="Send message">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button id="sendBtn" class="send-btn" title="Send message" aria-label="Send">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="22" y1="2" x2="11" y2="13"></line>
             <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
           </svg>
@@ -195,20 +189,20 @@
   <div id="settingsModal" class="modal-overlay hidden">
     <div class="modal-card">
       <div class="modal-header">
-        <h4>Companion Settings & API</h4>
+        <h4>Settings & API</h4>
         <button id="closeSettingsBtn" class="modal-close-btn">✕</button>
       </div>
 
       <div class="modal-body">
         <div class="setting-group">
-          <label for="apiUrlInput">AI Backend URL</label>
+          <label for="apiUrlInput">API Endpoint URL</label>
           <input 
             type="text" 
             id="apiUrlInput" 
             placeholder="http://localhost:5173/api/companion"
             value="http://localhost:5173/api/companion"
           >
-          <span class="setting-hint">Defaults to your local VERATIS backend or Vercel URL.</span>
+          <span class="setting-hint">Defaults to your local dev server or deployed Vercel URL.</span>
         </div>
 
         <div class="setting-group">
@@ -223,17 +217,17 @@
           <div class="radio-row">
             <label class="radio-label">
               <input type="radio" name="opMode" value="auto" checked>
-              <span>Auto (Live AI if available, Demo fallback)</span>
+              <span>Auto (Live AI when available, Demo fallback)</span>
             </label>
             <label class="radio-label">
               <input type="radio" name="opMode" value="demo">
-              <span>Demo Mode Only (Offline safe)</span>
+              <span>Demo Mode Only</span>
             </label>
           </div>
         </div>
 
         <div class="setting-group">
-          <label for="ttsRateSlider">Text-to-Speech Speed</label>
+          <label for="ttsRateSlider">Reading Speed</label>
           <div class="slider-row">
             <input type="range" id="ttsRateSlider" min="0.8" max="1.4" step="0.1" value="1.0">
             <span id="ttsRateVal" class="slider-val">1.0x</span>

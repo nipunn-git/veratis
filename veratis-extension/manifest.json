@@ -1,15 +1,15 @@
 {
   "manifest_version": 3,
-  "name": "VERATIS Companion — AI Digital Trust Assistant",
+  "name": "VERATIS Companion",
   "version": "1.0.0",
-  "description": "Persistent AI assistant side panel for investigating claims, challenging assumptions, spotting phishing, and verifying information across the web.",
+  "description": "Minimal AI digital-trust assistant side panel for investigating claims, challenging assumptions, and verifying web content.",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
   "action": {
-    "default_title": "Open VERATIS Companion Side Panel"
+    "default_title": "Open VERATIS Companion"
   },
   "side_panel": {
     "default_path": "sidepanel.html"
@@ -25,9 +25,14 @@
     "contextMenus"
   ],
   "host_permissions": [
-    "http://localhost:5173/*",
-    "http://127.0.0.1:5173/*",
-    "https://*.vercel.app/*"
+    "<all_urls>"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
   ],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
