@@ -53,10 +53,10 @@ export default async function handler(req, res) {
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
     const { scenarioId, messages = [], userMessage = '' } = body;
 
-    const groqKey = process.env.GROQ_API_KEY;
-    const geminiKey = process.env.GEMINI_API_KEY;
-    const openaiKey = process.env.OPENAI_API_KEY;
-    const anthropicKey = process.env.ANTHROPIC_API_KEY;
+    const groqKey = (body.groqApiKey || process.env.GROQ_API_KEY || '').trim();
+    const geminiKey = (body.geminiApiKey || process.env.GEMINI_API_KEY || '').trim();
+    const openaiKey = (body.openaiApiKey || process.env.OPENAI_API_KEY || '').trim();
+    const anthropicKey = (body.anthropicApiKey || process.env.ANTHROPIC_API_KEY || '').trim();
 
     let reply = null;
 
@@ -212,6 +212,65 @@ User said: "${userMessage}"`;
   throw lastErr || new Error('All Gemini models failed for twin');
 }
 
+/**
+ * Groq Cloud Llama 3.3 70B Implementation
+ */
+async function callGroqTwin(apiKey, scenarioId, messages, userMessage) {
+  const prompt = `You are roleplaying a social engineering character for corporate security awareness training.
+Scenario ID: "${scenarioId}".
+User said: "${userMessage}".
+
+Stay fully in character. Apply realistic emotional, authority, or urgency pressure.
+Return ONLY valid JSON matching this exact structure:
+{
+  "text": "Your in-character dialogue reply (keep it punchy, 2-3 sentences)",
+  "intentDetected": "one of: safe, risky, challenge, verify",
+  "coachingTip": "Brief educational coaching tip for the user",
+  "suggestedFollowUps": [
+    { "text": "A safe, cautious response the user could choose", "type": "safe" },
+    { "text": "A compliant or risky response to test the boundary", "type": "risky" },
+    { "text": "A verification challenge or out-of-band question", "type": "challenge" }
+  ]
+}`;
+
+  const historyMessages = (messages || []).map((m) => ({
+    role: m.sender === 'user' ? 'user' : 'assistant',
+    content: m.text
+  }));
+
+  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      response_format: { type: 'json_object' },
+      messages: [
+        { role: 'system', content: prompt },
+        ...historyMessages.slice(-6),
+        { role: 'user', content: userMessage }
+      ],
+      temperature: 0.4,
+      max_tokens: 800
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error(`Groq Twin HTTP ${response.status}: ${await response.text()}`);
+  }
+
+  const data = await response.json();
+  const parsed = JSON.parse(data.choices[0].message.content);
+
+  return {
+    ...parsed,
+    isLiveAI: true,
+    provider: 'Groq Cloud (Llama 3.3 70B)'
+  };
+}
+
 async function callOpenAITwin(apiKey, scenarioId, messages, userMessage) {
   const prompt = `You are roleplaying a social engineering simulation character for training. Stay in character, apply scenario pressure.
 Return JSON: { "text": "response", "suggestedFollowUps": [{ "text": "safe reply", "type": "safe" }, { "text": "risky reply", "type": "risky" }] }`;
@@ -236,41 +295,4 @@ Return JSON: { "text": "response", "suggestedFollowUps": [{ "text": "safe reply"
   const data = await response.json();
   const parsed = JSON.parse(data.choices[0].message.content);
   return { ...parsed, isLiveAI: true };
-}
-
-async function callGroqTwin(apiKey, scenarioId, messages, userMessage) {
-  const prompt = `You are roleplaying a social engineering simulation character for training in a cybersecurity awareness tool.
-Stay in character strictly. Apply realistic scenario pressure, urgency, or authority.
-Return ONLY valid JSON:
-{
-  "text": "Your in-character reply to the user",
-  "suggestedFollowUps": [
-    { "text": "A cautious safe reply the user could send", "type": "safe" },
-    { "text": "A risky compliant reply the user could send", "type": "risky" }
-  ]
-}
-Scenario: ${scenarioId}
-User said: "${userMessage}"`;
-
-  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
-      response_format: { type: 'json_object' },
-      messages: [
-        { role: 'system', content: prompt },
-        { role: 'user', content: userMessage }
-      ],
-      temperature: 0.3
-    })
-  });
-
-  if (!response.ok) throw new Error(`Groq error: ${response.status}`);
-  const data = await response.json();
-  const parsed = JSON.parse(data.choices[0].message.content);
-  return { ...parsed, isLiveAI: true, provider: 'GroqCloud (Llama 3.3 70B)' };
 }

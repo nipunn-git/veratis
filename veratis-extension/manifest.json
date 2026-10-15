@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "VERATIS Companion",
+  "name": "VERATIS",
   "version": "1.0.0",
   "description": "Minimal AI digital-trust assistant side panel for investigating claims, challenging assumptions, and verifying web content.",
   "icons": {
@@ -9,7 +9,7 @@
     "128": "icons/icon128.png"
   },
   "action": {
-    "default_title": "Open VERATIS Companion"
+    "default_title": "Open VERATIS"
   },
   "side_panel": {
     "default_path": "sidepanel.html"

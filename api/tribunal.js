@@ -61,11 +61,11 @@ export default async function handler(req, res) {
     const evidenceText = (evidence || '').trim();
     const contextText = (context || '').trim();
 
-    // Check for configured AI keys in environment variables
-    const groqKey = process.env.GROQ_API_KEY;
-    const geminiKey = process.env.GEMINI_API_KEY;
-    const openaiKey = process.env.OPENAI_API_KEY;
-    const anthropicKey = process.env.ANTHROPIC_API_KEY;
+    // Check for configured AI keys in environment variables or request body
+    const groqKey = (body.groqApiKey || process.env.GROQ_API_KEY || '').trim();
+    const geminiKey = (body.geminiApiKey || process.env.GEMINI_API_KEY || '').trim();
+    const openaiKey = (body.openaiApiKey || process.env.OPENAI_API_KEY || '').trim();
+    const anthropicKey = (body.anthropicApiKey || process.env.ANTHROPIC_API_KEY || '').trim();
 
     let analysisResult = null;
 
@@ -307,6 +307,53 @@ Return ONLY valid JSON matching this structure:
 }
 
 /**
+ * Groq Cloud Llama 3.3 70B Implementation
+ */
+async function callGroqTribunal(apiKey, claim, evidence, context) {
+  const systemPrompt = `You are the VERATIS Truth Tribunal backend.
+Analyze the claim using three distinct analytical personalities: The Skeptic, The Forensic Analyst, and The Adjudicator.
+Use simple, clear everyday English. Keep bullet points short.
+Return ONLY valid JSON with keys: title, category, skepticAnalysis, forensicAnalysis, challengeRound, agreementDisagreement, finalAssessment.`;
+
+  const userContent = `Claim: ${claim}\nEvidence: ${evidence || 'None provided'}\nContext: ${context || 'None provided'}`;
+
+  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      response_format: { type: 'json_object' },
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userContent }
+      ],
+      temperature: 0.2,
+      max_tokens: 2500
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error(`Groq Tribunal HTTP ${response.status}: ${await response.text()}`);
+  }
+
+  const data = await response.json();
+  const parsed = JSON.parse(data.choices[0].message.content);
+
+  return {
+    ...parsed,
+    id: `tribunal-${Date.now()}`,
+    claim,
+    evidenceProvided: evidence,
+    knownContext: context,
+    isLiveAI: true,
+    provider: 'Groq Cloud (Llama 3.3 70B)'
+  };
+}
+
+/**
  * OpenAI GPT-4o-mini Implementation
  */
 async function callOpenAITribunal(apiKey, claim, evidence, context) {
@@ -389,86 +436,5 @@ Claim: ${claim}\nEvidence: ${evidence}\nContext: ${context}`;
     evidenceProvided: evidence,
     knownContext: context,
     isLiveAI: true
-  };
-}
-
-/**
- * GroqCloud Llama 3.3 70B Implementation
- */
-async function callGroqTribunal(apiKey, claim, evidence, context) {
-  const systemPrompt = `You are the VERATIS Truth Tribunal backend.
-Analyze the claim using three distinct analytical personalities: The Skeptic, The Forensic Analyst, and The Adjudicator.
-IMPORTANT: Use simple, plain English that anyone can easily understand. Keep bullet points short, punchy, and clear.
-Return ONLY valid JSON matching this schema:
-{
-  "title": "Short title",
-  "category": "Category",
-  "skepticAnalysis": {
-    "unsupportedAssumptions": ["point 1", "point 2"],
-    "missingEvidence": ["point 1", "point 2"],
-    "alternativeExplanations": ["point 1", "point 2"],
-    "contradictions": ["point 1"],
-    "substantiationRequirements": ["point 1"]
-  },
-  "forensicAnalysis": {
-    "textCharacteristics": "Short plain summary",
-    "sourceObservations": "Short plain summary",
-    "visualClues": "Short plain summary",
-    "audioClues": "Short plain summary",
-    "groundedObservations": ["point 1", "point 2"]
-  },
-  "challengeRound": {
-    "skepticAssertion": "Plain English doubt",
-    "forensicResponse": "Plain English answer",
-    "adjudicatorNote": "Plain English note"
-  },
-  "agreementDisagreement": {
-    "agreements": ["point 1", "point 2"],
-    "disagreements": ["point 1"],
-    "unresolvedQuestions": ["point 1"]
-  },
-  "finalAssessment": {
-    "outcome": "One of: Supported by supplied evidence | Misleading context suspected | Potential manipulation indicators | Insufficient evidence | Unverified claim",
-    "verdictSummary": "Plain English verdict explanation",
-    "groundedEvidence": ["fact 1", "fact 2"],
-    "limitations": ["limitation 1"],
-    "recommendedNextSteps": ["step 1", "step 2"]
-  }
-}`;
-
-  const userContent = `Claim: ${claim}\nEvidence: ${evidence || 'None provided'}\nContext: ${context || 'None provided'}`;
-
-  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
-      response_format: { type: 'json_object' },
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userContent }
-      ],
-      temperature: 0.2
-    })
-  });
-
-  if (!response.ok) {
-    throw new Error(`Groq API error ${response.status}: ${await response.text()}`);
-  }
-
-  const data = await response.json();
-  const parsed = JSON.parse(data.choices[0].message.content);
-
-  return {
-    ...parsed,
-    id: `tribunal-${Date.now()}`,
-    claim,
-    evidenceProvided: evidence,
-    knownContext: context,
-    isLiveAI: true,
-    provider: 'GroqCloud (Llama 3.3 70B)'
   };
 }

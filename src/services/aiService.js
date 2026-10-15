@@ -12,14 +12,41 @@
 import { TRIBUNAL_SAMPLES } from '../data/tribunalSamples';
 import { DIGITAL_TWIN_SCENARIOS } from '../data/digitalTwinScenarios';
 
-const API_BASE_URL = import.meta.env.VITE_VERATIS_AI_URL || '';
+const API_BASE_URL = typeof window !== 'undefined' ? (window.__VERATIS_API_BASE__ || '') : '';
+let isBackendLive = true;
+
+// Proactively check local and deployed backend health
+if (typeof window !== 'undefined') {
+  fetch('/api/health')
+    .then((r) => {
+      isBackendLive = r.ok;
+    })
+    .catch(() => {
+      isBackendLive = false;
+    });
+}
 
 export const aiService = {
   /**
    * Check whether live backend AI is active
    */
   isLiveMode() {
-    return Boolean(API_BASE_URL && API_BASE_URL.trim() !== '');
+    return isBackendLive;
+  },
+
+  /**
+   * Asynchronously verify health of the live AI backend
+   */
+  async checkHealth() {
+    if (typeof window === 'undefined') return false;
+    try {
+      const res = await fetch('/api/health');
+      isBackendLive = res.ok;
+      return res.ok;
+    } catch {
+      isBackendLive = false;
+      return false;
+    }
   },
 
   /**

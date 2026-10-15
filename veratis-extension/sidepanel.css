@@ -85,20 +85,13 @@ body {
   gap: 10px;
 }
 
-.logo-mark {
+.brand-logo-img {
   width: 26px;
   height: 26px;
-  background: #09090b;
   border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-}
-
-.logo-mark svg {
-  width: 14px;
-  height: 14px;
+  object-fit: cover;
+  border: 1px solid var(--border-color);
+  background: #000000;
 }
 
 .brand-text {
@@ -377,22 +370,23 @@ body {
 }
 
 .welcome-icon {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   margin: 0 auto 16px;
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: 10px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-primary);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
-.welcome-icon svg {
-  width: 20px;
-  height: 20px;
+.welcome-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .welcome-state h3 {

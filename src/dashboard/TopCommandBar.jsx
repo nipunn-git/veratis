@@ -23,6 +23,11 @@ export default function TopCommandBar({
           title="Return to home"
         >
           <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5 text-zinc-400 group-hover:text-zinc-800" />
+          <img 
+            src="/veratis-logo.png" 
+            alt="VERATIS" 
+            className="w-4 h-4 rounded-full object-cover border border-zinc-200"
+          />
           <span className="font-semibold text-xs tracking-wider uppercase text-zinc-950">VERATIS</span>
         </button>
 

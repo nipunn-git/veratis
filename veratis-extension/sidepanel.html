@@ -3,24 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VERATIS Companion</title>
+  <title>VERATIS</title>
   <link rel="stylesheet" href="sidepanel.css">
 </head>
 <body>
   <!-- Header Bar -->
   <header class="header">
     <div class="brand">
-      <div class="logo-mark">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-          <polyline points="2 17 12 22 22 17"></polyline>
-          <polyline points="2 12 12 17 22 12"></polyline>
-        </svg>
-      </div>
+      <img src="icons/icon48.png" alt="VERATIS" class="brand-logo-img">
       <div class="brand-text">
         <span class="brand-title">VERATIS</span>
-        <span class="brand-divider">/</span>
-        <span class="brand-subtitle">COMPANION</span>
       </div>
     </div>
 
@@ -105,11 +97,9 @@
     <!-- Welcome Empty State -->
     <div id="welcomeState" class="welcome-state">
       <div class="welcome-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-        </svg>
+        <img src="icons/icon128.png" alt="VERATIS" class="welcome-logo-img">
       </div>
-      <h3>VERATIS Companion</h3>
+      <h3>VERATIS</h3>
       <p>Analyze web content for misleading claims, verify facts, and spot potential deception directly from your browser.</p>
 
       <div class="suggested-prompts">
@@ -172,7 +162,7 @@
           id="messageInput" 
           rows="1" 
           placeholder="Ask a question or enter text to analyze..." 
-          aria-label="Ask VERATIS Companion"
+          aria-label="Ask VERATIS"
         ></textarea>
 
         <button id="sendBtn" class="send-btn" title="Send message" aria-label="Send">
@@ -213,13 +203,23 @@
         </div>
 
         <div class="setting-group">
-          <label for="geminiKeyInput">Gemini API Key (Direct AI)</label>
+          <label for="groqKeyInput">GroqCloud API Key (Llama 3.3 70B)</label>
+          <input 
+            type="password" 
+            id="groqKeyInput" 
+            placeholder="gsk_..."
+          >
+          <span class="setting-hint">Powers ultra-fast answers, summaries, and safe replies (~250ms).</span>
+        </div>
+
+        <div class="setting-group">
+          <label for="geminiKeyInput">Gemini API Key (Gemini 2.5 Flash)</label>
           <input 
             type="password" 
             id="geminiKeyInput" 
             placeholder="AI Studio API Key"
           >
-          <span class="setting-hint">Provides direct Gemini AI analysis even when dev server is offline.</span>
+          <span class="setting-hint">Powers deep forensics, claim cross-examination, and full-page analysis.</span>
         </div>
 
         <div class="setting-group">

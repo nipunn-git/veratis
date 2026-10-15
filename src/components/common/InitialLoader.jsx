@@ -88,8 +88,15 @@ export default function InitialLoader({ onComplete }) {
       style={{ backgroundColor: "#000000" }}
     >
       {/* Editorial Eyebrow */}
-      <div className="text-[10px] sm:text-xs font-mono tracking-[0.35em] text-neutral-500 uppercase mb-5">
-        VERATIS — REALITY INVESTIGATION
+      <div className="flex items-center gap-2 mb-5">
+        <img 
+          src="/veratis-logo.png" 
+          alt="VERATIS" 
+          className="w-4 h-4 rounded-full object-cover border border-white/20 opacity-80" 
+        />
+        <span className="text-[10px] sm:text-xs font-mono tracking-[0.35em] text-neutral-400 uppercase">
+          VERATIS
+        </span>
       </div>
 
       {/* Large Crisp Monospace Percentage */}

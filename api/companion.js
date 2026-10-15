@@ -63,28 +63,48 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'No text or query provided for analysis.' });
     }
 
-    const groqKey = process.env.GROQ_API_KEY;
-    const geminiKey = process.env.GEMINI_API_KEY;
-    const openaiKey = process.env.OPENAI_API_KEY;
-    const anthropicKey = process.env.ANTHROPIC_API_KEY;
+    const groqKey = (body.groqApiKey || process.env.GROQ_API_KEY || '').trim();
+    const isGroqValid = groqKey && groqKey.startsWith('gsk_');
+    const geminiKey = (body.geminiApiKey || process.env.GEMINI_API_KEY || '').trim();
+    const openaiKey = (body.openaiApiKey || process.env.OPENAI_API_KEY || '').trim();
+    const anthropicKey = (body.anthropicApiKey || process.env.ANTHROPIC_API_KEY || '').trim();
 
     let aiResult = null;
 
-    // 1. Try GroqCloud (Ultra fast Llama 3.3 70B - requires gsk_ key)
-    if (groqKey && groqKey.startsWith('gsk_') && !aiResult) {
+    // Smart Routing Strategy:
+    // Groq Llama 3.3 70B is ultra-fast (~200 t/s) -> ideal for conversational ask, explain, safe-reply, summarize
+    // Gemini 2.5 Flash has a massive 1M token context & deep reasoning -> ideal for deep investigate, challenge, claims, phishing
+    const preferGroq = isGroqValid && (action === 'explain' || action === 'safe-reply' || action === 'ask' || action === 'summarize') && contextContent.length < 8000;
+
+    // 1. Try Preferred Model First
+    if (preferGroq) {
       try {
-        aiResult = await callGroqCompanion(groqKey, action, query, contextContent, pageTitle, pageUrl, history);
+        aiResult = await callGroqCompanion(groqKey, action, query, contextContent, pageTitle, pageUrl, history, pageContext);
       } catch (err) {
-        console.warn('Groq Companion failed, trying next provider:', err.message);
+        console.warn('Groq companion failed, trying Gemini:', err.message);
+      }
+    } else if (geminiKey) {
+      try {
+        aiResult = await callGeminiCompanion(geminiKey, action, query, contextContent, pageTitle, pageUrl, history, pageContext);
+      } catch (err) {
+        console.warn('Gemini companion failed, trying Groq:', err.message);
       }
     }
 
-    // 2. Try Gemini (Google AI Studio)
-    if (geminiKey && !aiResult) {
+    // 2. Cross-Provider Fallback
+    if (!aiResult && geminiKey) {
       try {
-        aiResult = await callGeminiCompanion(geminiKey, action, query, contextContent, pageTitle, pageUrl, history);
+        aiResult = await callGeminiCompanion(geminiKey, action, query, contextContent, pageTitle, pageUrl, history, pageContext);
       } catch (err) {
-        console.warn('Gemini Companion failed, trying next provider:', err.message);
+        console.warn('Gemini secondary fallback failed:', err.message);
+      }
+    }
+
+    if (!aiResult && isGroqValid) {
+      try {
+        aiResult = await callGroqCompanion(groqKey, action, query, contextContent, pageTitle, pageUrl, history, pageContext);
+      } catch (err) {
+        console.warn('Groq secondary fallback failed:', err.message);
       }
     }
 
@@ -202,16 +222,21 @@ function generateSmartCompanionFallback(action, query, text, pageTitle, pageUrl)
 }
 
 /**
- * Gemini Live AI Integration
+ * Gemini Live AI Integration (Google AI Studio)
  */
-async function callGeminiCompanion(apiKey, action, query, text, title, url, history) {
-  const prompt = `You are VERATIS Companion, an intelligent AI digital-trust and verification assistant running as a browser extension side panel.
-The user is viewing a webpage titled "${title}" at "${url}".
-The active content or selection is:
-"${text.slice(0, 3000)}"
+async function callGeminiCompanion(apiKey, action, query, text, title, url, history, pageContext = {}) {
+  const metaDesc = pageContext.metadata?.description ? `Meta Description: ${pageContext.metadata.description}\n` : '';
+  const headings = pageContext.headings?.length ? `Key Page Headings:\n${pageContext.headings.slice(0, 10).map(h => `- ${h}`).join('\n')}\n` : '';
+  const forms = pageContext.forms?.length ? `Forms On Page: ${pageContext.forms.map(f => f.hasPasswordField ? 'Password Login Form Detected' : 'Form').join(', ')}\n` : '';
 
-The user requested action: "${action}".
-The user question or instruction: "${query || action}".
+  const prompt = `You are VERATIS, an advanced AI digital-trust and verification assistant.
+The user is viewing a webpage titled "${title}" at "${url}".
+${metaDesc}${headings}${forms}
+Active Webpage Content:
+"${text.slice(0, 25000)}"
+
+Action Requested: "${action}".
+User Question / Instruction: "${query || action}".
 
 GUIDELINES:
 - Use simple, plain, conversational English with short bullet points.
@@ -231,7 +256,7 @@ GUIDELINES:
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{ role: 'user', parts: [{ text: prompt }] }],
-            generationConfig: { maxOutputTokens: 1000 }
+            generationConfig: { maxOutputTokens: 1200 }
           })
         }
       );
@@ -249,7 +274,7 @@ GUIDELINES:
           response: textOutput,
           isLiveAI: true,
           provider: `Gemini Live AI (${model})`,
-          suggestedNext: ['Investigate', 'Challenge This', 'Explain in simple terms']
+          suggestedNext: ['Investigate deeper', 'Challenge evidence', 'Explain in simple terms']
         };
       }
     } catch (err) {
@@ -259,6 +284,66 @@ GUIDELINES:
   }
 
   throw lastErr || new Error('All Gemini models failed');
+}
+
+/**
+ * Groq Cloud Live AI Integration (Llama 3.3 70B Versatile)
+ */
+async function callGroqCompanion(apiKey, action, query, text, title, url, history, pageContext = {}) {
+  const metaDesc = pageContext.metadata?.description ? `Meta Description: ${pageContext.metadata.description}\n` : '';
+  const headings = pageContext.headings?.length ? `Key Page Headings:\n${pageContext.headings.slice(0, 8).map(h => `- ${h}`).join('\n')}\n` : '';
+  const forms = pageContext.forms?.length ? `Forms On Page: ${pageContext.forms.map(f => f.hasPasswordField ? 'Password Login Form Detected' : 'Form').join(', ')}\n` : '';
+
+  const prompt = `You are VERATIS, an advanced AI digital-trust and verification assistant.
+The user is viewing a webpage titled "${title}" at "${url}".
+${metaDesc}${headings}${forms}
+Active Webpage Content:
+"${text.slice(0, 15000)}"
+
+Action Requested: "${action}".
+User Question / Instruction: "${query || action}".
+
+GUIDELINES:
+- Use simple, plain, conversational English with short bullet points.
+- Distinguish warning signs from proven fraud.
+- Highlight specific claims that require independent verification.
+- Be direct, polite, helpful, and concise.`;
+
+  const messages = [
+    { role: 'system', content: 'You are VERATIS, a trusted, plain-English digital-trust and media verification AI.' },
+    ...(history || []).slice(-4).map(h => ({ role: h.sender === 'user' ? 'user' : 'assistant', content: h.text })),
+    { role: 'user', content: prompt }
+  ];
+
+  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages,
+      temperature: 0.2,
+      max_tokens: 1200
+    })
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Groq HTTP ${response.status}: ${errText}`);
+  }
+
+  const data = await response.json();
+  const textOutput = data.choices?.[0]?.message?.content || 'No response generated.';
+
+  return {
+    action,
+    response: textOutput,
+    isLiveAI: true,
+    provider: 'Groq Cloud (Llama 3.3 70B)',
+    suggestedNext: ['Investigate deeper', 'Challenge evidence', 'Explain in simple terms']
+  };
 }
 
 /**
@@ -294,55 +379,6 @@ Provide a concise, plain-English, helpful analysis in Markdown with bullet point
     action,
     response: textOutput,
     isLiveAI: true,
-    suggestedNext: ['Investigate', 'Challenge This', 'Explain in simple terms']
-  };
-}
-
-/**
- * GroqCloud Live AI Integration (Ultra-fast Llama 3.3 70B)
- */
-async function callGroqCompanion(apiKey, action, query, text, title, url, history) {
-  const prompt = `You are VERATIS Companion, an intelligent AI digital-trust and verification assistant running as a browser extension side panel.
-Webpage Title: "${title}"
-URL: "${url}"
-Content/Excerpt:
-"${text.slice(0, 3000)}"
-
-Action Requested: "${action}".
-User query: "${query || action}".
-
-GUIDELINES:
-- Use simple, plain, conversational English with short bullet points.
-- Distinguish warning signs from proven facts.
-- Never claim an item is verified unless real proof exists.
-- Be direct, polite, helpful, and concise.`;
-
-  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
-      messages: [
-        { role: 'system', content: 'You are VERATIS Companion. Plain-English digital-trust assistant.' },
-        { role: 'user', content: prompt }
-      ],
-      temperature: 0.3,
-      max_tokens: 1000
-    })
-  });
-
-  if (!response.ok) throw new Error(`Groq status ${response.status}: ${await response.text()}`);
-  const data = await response.json();
-  const textOutput = data.choices?.[0]?.message?.content || 'No response generated.';
-
-  return {
-    action,
-    response: textOutput,
-    isLiveAI: true,
-    provider: 'GroqCloud (Llama 3.3 70B)',
     suggestedNext: ['Investigate', 'Challenge This', 'Explain in simple terms']
   };
 }

@@ -11,7 +11,13 @@ let currentContext = {
   selectedText: '',
   pageText: '',
   title: '',
-  url: ''
+  url: '',
+  domain: '',
+  wordCount: 0,
+  metadata: {},
+  headings: [],
+  links: [],
+  forms: []
 };
 let conversationHistory = [];
 let speechRecognition = null;
@@ -23,6 +29,7 @@ let settings = {
   apiUrl: 'http://localhost:5173/api/companion',
   opMode: 'auto', // 'auto' | 'demo'
   geminiApiKey: '',
+  groqApiKey: '',
   ttsRate: 1.0
 };
 
@@ -59,6 +66,7 @@ const sendBtn = document.getElementById('sendBtn');
 const settingsModal = document.getElementById('settingsModal');
 const closeSettingsBtn = document.getElementById('closeSettingsBtn');
 const apiUrlInput = document.getElementById('apiUrlInput');
+const groqKeyInput = document.getElementById('groqKeyInput');
 const geminiKeyInput = document.getElementById('geminiKeyInput');
 const testApiBtn = document.getElementById('testApiBtn');
 const apiStatusMessage = document.getElementById('apiStatusMessage');
@@ -112,6 +120,9 @@ async function loadSettings() {
   }
 
   apiUrlInput.value = settings.apiUrl;
+  if (groqKeyInput) {
+    groqKeyInput.value = settings.groqApiKey || '';
+  }
   if (geminiKeyInput) {
     geminiKeyInput.value = settings.geminiApiKey || '';
   }
@@ -270,14 +281,20 @@ function extractFromTab(actionType) {
 }
 
 function handleExtractionResponse(response, actionType) {
-  currentContext.title = response.title || currentTab.title || 'Page';
-  currentContext.url = response.url || currentTab.url || '';
+  currentContext.title = response.title || currentTab?.title || 'Page';
+  currentContext.url = response.url || currentTab?.url || '';
+  currentContext.domain = response.domain || '';
+  currentContext.wordCount = response.wordCount || 0;
+  currentContext.metadata = response.metadata || {};
+  currentContext.headings = response.headings || [];
+  currentContext.links = response.links || [];
+  currentContext.forms = response.forms || [];
 
   if (actionType === 'GET_SELECTION') {
     if (response.selectedText && response.selectedText.trim()) {
       setCapturedContext(response.selectedText, 'selection');
     } else {
-      addMessage('assistant', 'No text is currently highlighted on the webpage. Highlight text with your mouse and click Get Selection, or click Read Page.');
+      addMessage('assistant', 'No text is currently highlighted on the webpage. Highlight text with your mouse and click Get Selection, or click Read Page to inspect the whole page.');
     }
   } else {
     if (response.pageText && response.pageText.trim()) {
@@ -296,6 +313,7 @@ function setCapturedContext(text, type) {
   }
 
   const wordCount = text.trim().split(/\s+/).length;
+  currentContext.wordCount = wordCount;
   snippetText.textContent = text;
   if (wordCountLabel) {
     wordCountLabel.textContent = `${wordCount} words`;
@@ -309,6 +327,11 @@ function setCapturedContext(text, type) {
 function clearCapturedContext() {
   currentContext.selectedText = '';
   currentContext.pageText = '';
+  currentContext.wordCount = 0;
+  currentContext.metadata = {};
+  currentContext.headings = [];
+  currentContext.links = [];
+  currentContext.forms = [];
   contextSnippet.classList.add('hidden');
   composerContextTag.classList.add('hidden');
 }
@@ -387,20 +410,22 @@ function setupEventListeners() {
       const url = apiUrlInput.value.trim().replace('/companion', '/health');
       const res = await fetch(url);
       if (res.ok) {
-        apiStatusMessage.textContent = 'Backend connected successfully';
+        apiStatusMessage.textContent = 'Backend connected successfully (Live AI ready)';
         apiStatusMessage.className = 'api-status-msg success';
         updateModeBadge(true);
       } else {
         throw new Error(`HTTP ${res.status}`);
       }
     } catch (e) {
-      const directKey = geminiKeyInput?.value.trim() || settings.geminiApiKey;
-      if (directKey) {
-        apiStatusMessage.textContent = 'Local server offline. Direct Gemini AI active.';
+      const directGroq = groqKeyInput?.value.trim() || settings.groqApiKey;
+      const directGemini = geminiKeyInput?.value.trim() || settings.geminiApiKey;
+      if (directGroq || directGemini) {
+        const providers = [directGroq ? 'Groq' : '', directGemini ? 'Gemini' : ''].filter(Boolean).join(' + ');
+        apiStatusMessage.textContent = `Backend offline. Direct AI active (${providers}).`;
         apiStatusMessage.className = 'api-status-msg success';
         updateModeBadge(true);
       } else {
-        apiStatusMessage.textContent = 'Server offline. Enter Gemini Key for Direct AI.';
+        apiStatusMessage.textContent = 'Server offline. Enter Groq or Gemini Key for Direct AI.';
         apiStatusMessage.className = 'api-status-msg error';
         updateModeBadge(false);
       }
@@ -412,6 +437,7 @@ function setupEventListeners() {
   saveSettingsBtn.addEventListener('click', async () => {
     const selectedMode = document.querySelector('input[name="opMode"]:checked')?.value || 'auto';
     settings.apiUrl = apiUrlInput.value.trim() || 'http://localhost:5173/api/companion';
+    settings.groqApiKey = groqKeyInput ? groqKeyInput.value.trim() : '';
     settings.geminiApiKey = geminiKeyInput ? geminiKeyInput.value.trim() : '';
     settings.opMode = selectedMode;
     settings.ttsRate = parseFloat(ttsRateSlider.value) || 1.0;
@@ -424,6 +450,7 @@ function setupEventListeners() {
 
 function openSettingsModal() {
   apiUrlInput.value = settings.apiUrl;
+  if (groqKeyInput) groqKeyInput.value = settings.groqApiKey || '';
   if (geminiKeyInput) geminiKeyInput.value = settings.geminiApiKey || '';
   ttsRateSlider.value = settings.ttsRate;
   ttsRateVal.textContent = `${settings.ttsRate}x`;
@@ -490,11 +517,19 @@ async function executeAIRequest(action, query) {
   const payload = {
     action,
     query,
+    groqApiKey: settings.groqApiKey,
+    geminiApiKey: settings.geminiApiKey,
     pageContext: {
       selectedText: currentContext.selectedText,
       pageText: currentContext.pageText,
       title: currentContext.title,
-      url: currentContext.url
+      url: currentContext.url,
+      domain: currentContext.domain,
+      wordCount: currentContext.wordCount,
+      metadata: currentContext.metadata,
+      headings: currentContext.headings,
+      links: currentContext.links,
+      forms: currentContext.forms
     },
     history: conversationHistory.slice(-4)
   };
@@ -516,23 +551,45 @@ async function executeAIRequest(action, query) {
           updateModeBadge(result.isLiveAI);
         }
       } catch (networkErr) {
-        console.warn('Backend call failed, trying direct Gemini fallback:', networkErr);
+        console.warn('Backend call failed, trying direct Groq/Gemini fallback:', networkErr);
       }
 
-      // 2. Direct Gemini fallback if backend is offline
-      if (!result && settings.geminiApiKey) {
-        try {
-          result = await callDirectGemini(settings.geminiApiKey, action, query, currentContext);
-          if (result) {
-            updateModeBadge(true);
+      // 2. Direct client-side API fallback if backend is offline
+      if (!result) {
+        const isGroqKeyValid = settings.groqApiKey && settings.groqApiKey.startsWith('gsk_');
+        const preferGroq = isGroqKeyValid && (action === 'explain' || action === 'safe-reply' || action === 'summarize' || action === 'ask');
+
+        if (preferGroq) {
+          try {
+            result = await callDirectGroq(settings.groqApiKey, action, query, currentContext);
+          } catch (e) {
+            console.warn('Direct Groq call failed:', e);
           }
-        } catch (geminiErr) {
-          console.warn('Direct Gemini call failed:', geminiErr);
+        }
+
+        if (!result && settings.geminiApiKey) {
+          try {
+            result = await callDirectGemini(settings.geminiApiKey, action, query, currentContext);
+          } catch (geminiErr) {
+            console.warn('Direct Gemini call failed:', geminiErr);
+          }
+        }
+
+        if (!result && isGroqKeyValid) {
+          try {
+            result = await callDirectGroq(settings.groqApiKey, action, query, currentContext);
+          } catch (e) {
+            console.warn('Direct Groq secondary fallback failed:', e);
+          }
+        }
+
+        if (result) {
+          updateModeBadge(true);
         }
       }
     }
 
-    // 3. Client-side fallback if all live AI options are unavailable
+    // 3. Client-side deterministic fallback if all live AI options are unavailable
     if (!result) {
       result = clientFallbackAnalysis(action, query, currentContext);
       updateModeBadge(false);
@@ -559,7 +616,7 @@ function addMessage(sender, text) {
 
   const senderTag = document.createElement('span');
   senderTag.className = 'message-sender';
-  senderTag.textContent = sender === 'user' ? 'YOU' : 'VERATIS COMPANION';
+  senderTag.textContent = sender === 'user' ? 'YOU' : 'VERATIS';
 
   const bubble = document.createElement('div');
   bubble.className = 'message-bubble';
@@ -732,17 +789,78 @@ function stopSpeech() {
 }
 
 /* ==========================================================================
-   Direct Gemini Live AI Integration (Client-Side Backup)
+   Direct Groq & Gemini Live AI Integration (Client-Side Backup)
    ========================================================================== */
+
+async function callDirectGroq(apiKey, action, query, ctx) {
+  const text = (ctx.selectedText || ctx.pageText || query || '').trim();
+  if (!text) return null;
+
+  const headingsText = ctx.headings?.length ? `Headings:\n${ctx.headings.slice(0, 8).map(h => `- ${h}`).join('\n')}\n` : '';
+  const metaDesc = ctx.metadata?.description ? `Meta Description: ${ctx.metadata.description}\n` : '';
+  const formsText = ctx.forms?.length ? `Forms Detected: ${ctx.forms.map(f => f.hasPasswordField ? 'Login Password Form' : 'Input Form').join(', ')}\n` : '';
+
+  const prompt = `You are VERATIS Companion, an intelligent AI digital-trust and verification assistant running as a browser extension side panel.
+The user is viewing a webpage titled "${ctx.title || 'Webpage'}" at "${ctx.url || ''}".
+${metaDesc}${headingsText}${formsText}
+Active excerpt:
+"${text.slice(0, 15000)}"
+
+Action requested: "${action}". User query: "${query || action}".
+
+GUIDELINES:
+- Use simple, plain, conversational English with short bullet points.
+- Distinguish warning signs from proven fraud.
+- Never claim an item is verified unless real proof exists.
+- Be direct, polite, helpful, and concise.`;
+
+  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages: [
+        { role: 'system', content: 'You are VERATIS, a trusted, plain-English digital-trust and media verification AI.' },
+        { role: 'user', content: prompt }
+      ],
+      temperature: 0.2,
+      max_tokens: 1200
+    })
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Groq HTTP ${response.status}: ${errText}`);
+  }
+
+  const data = await response.json();
+  const textOut = data.choices?.[0]?.message?.content;
+  if (textOut) {
+    return {
+      response: textOut,
+      isLiveAI: true,
+      provider: 'Groq Direct (Llama 3.3 70B)'
+    };
+  }
+  return null;
+}
 
 async function callDirectGemini(apiKey, action, query, ctx) {
   const text = (ctx.selectedText || ctx.pageText || query || '').trim();
   if (!text) return null;
 
+  const headingsText = ctx.headings?.length ? `Headings:\n${ctx.headings.slice(0, 10).map(h => `- ${h}`).join('\n')}\n` : '';
+  const metaDesc = ctx.metadata?.description ? `Meta Description: ${ctx.metadata.description}\n` : '';
+  const formsText = ctx.forms?.length ? `Forms Detected: ${ctx.forms.map(f => f.hasPasswordField ? 'Login Password Form' : 'Input Form').join(', ')}\n` : '';
+
   const prompt = `You are VERATIS Companion, an intelligent AI digital-trust and verification assistant running as a browser extension side panel.
 The user is viewing a webpage titled "${ctx.title || 'Webpage'}" at "${ctx.url || ''}".
+${metaDesc}${headingsText}${formsText}
 Active excerpt:
-"${text.slice(0, 3000)}"
+"${text.slice(0, 25000)}"
 
 Action requested: "${action}". User query: "${query || action}".
 
@@ -760,7 +878,7 @@ GUIDELINES:
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ role: 'user', parts: [{ text: prompt }] }],
-          generationConfig: { maxOutputTokens: 1000 }
+          generationConfig: { maxOutputTokens: 1200 }
         })
       });
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Sparkles, 
   Search, 
@@ -26,6 +26,11 @@ export default function TruthTribunal({ currentCase }) {
   const [currentStage, setCurrentStage] = useState('idle');
   const [stageDescription, setStageDescription] = useState('');
   const [tribunalResult, setTribunalResult] = useState(TRIBUNAL_SAMPLES[0]);
+  const [isLive, setIsLive] = useState(aiService.isLiveMode());
+
+  useEffect(() => {
+    aiService.checkHealth().then(setIsLive);
+  }, []);
 
   // Handle switching sample case
   const handleSelectSample = (idx) => {
@@ -64,8 +69,6 @@ export default function TruthTribunal({ currentCase }) {
       setIsInvestigating(false);
     }
   };
-
-  const isLive = aiService.isLiveMode();
 
   return (
     <div className="space-y-10 font-sans max-w-[1800px] mx-auto">

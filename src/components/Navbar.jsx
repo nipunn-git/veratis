@@ -37,10 +37,14 @@ export default function Navbar({ onOpenDashboard }) {
             e.preventDefault();
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
-          className="flex items-center text-lg md:text-xl font-bold tracking-tight text-[#f5f4ef] hover:opacity-90 transition-opacity"
+          className="flex items-center gap-2.5 text-lg md:text-xl font-bold tracking-tight text-[#f5f4ef] hover:opacity-90 transition-opacity"
         >
-          <span>Veratis</span>
-          <span className="text-[#d5ed9a] ml-0.5">*</span>
+          <img 
+            src="/veratis-logo.png" 
+            alt="VERATIS Logo" 
+            className="w-6 h-6 rounded-full object-cover border border-white/20 shadow-xs" 
+          />
+          <span className="tracking-tight uppercase">VERATIS</span>
         </a>
 
         {/* Desktop Nav Items (Exact Souma Style) */}
