@@ -207,30 +207,30 @@ export default function Dashboard({ onBackToLanding, initialCaseIndex = 0 }) {
   };
 
   return (
-    <div className="h-screen max-h-screen w-screen overflow-hidden text-zinc-900 font-sans selection:bg-zinc-900 selection:text-white relative bg-[#f8fafd] flex flex-col justify-between">
-      {/* 0. Live Ambient Halftone Nebula Canvas Background (Fast-moving & Shiny White) */}
+    <div className="h-screen max-h-screen w-screen overflow-hidden text-zinc-900 font-sans selection:bg-zinc-900 selection:text-white relative bg-[#f4f4f6] flex flex-col justify-between">
+      {/* 0. Live Ambient Halftone Nebula Canvas Background (Calm Matte Gray & Serene Drift) */}
       <div className="fixed inset-0 z-0 pointer-events-auto">
         <HalftoneNebula
           height="100vh"
-          preset="shinyWhite"
+          preset="matteGrayLight"
           params={{
             planet: false,
-            density: 0.42,
-            pixel: 6,
-            speed: 3.8,
-            drift: 0.13,
-            starDrift: 3.6,
-            twinkle: 5.2,
-            sparkles: 24,
-            spikeWidth: 2.2,
-            rippleSpeed: 750,
-            grain: 0.015,
+            density: 0.28,
+            pixel: 5,
+            speed: 0.45,
+            drift: 0.02,
+            starDrift: 0.35,
+            twinkle: 0.7,
+            sparkles: 3,
+            spikeWidth: 0.8,
+            rippleSpeed: 180,
+            grain: 0.012,
           }}
           interactive={true}
           className="w-full h-full"
         />
-        {/* Subtle luminous light tint that preserves all sparkles and movement */}
-        <div className="absolute inset-0 bg-white/10 pointer-events-none" />
+        {/* Soft matte diffusion overlay to reduce brightness and distraction */}
+        <div className="absolute inset-0 bg-white/35 pointer-events-none" />
       </div>
 
       <div className="relative z-10 h-full w-full flex flex-col justify-between overflow-hidden">

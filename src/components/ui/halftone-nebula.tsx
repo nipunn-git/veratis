@@ -130,22 +130,40 @@ export const NEBULA_DEFAULTS: NebulaParams = {
 /** Overlays on the defaults. Named for the sky, not the numbers. */
 export const NEBULA_PRESETS: Record<string, Partial<NebulaParams>> = {
   shinyWhite: {
-    voidColor: "#f8fafd",
-    hazeColor: "#edf2fa",
-    duskColor: "#dbe5f6",
-    wineColor: "#bed0ee",
-    crimsonColor: "#7693c6", // Shimmering silver-slate
-    hotColor: "#2d4b85",    // Deep crystalline highlight
-    starColor: "#090d16",   // Sharp glittering dark stars
-    speed: 3.8,             // Fast and dynamic movement
-    drift: 0.13,            // Noticeable cloud drift
-    starDrift: 3.6,         // Fast star stream
-    twinkle: 5.2,           // Rapid glittering twinkle
-    sparkles: 24,           // Abundant sparkling starbursts
-    spikeWidth: 2.2,        // Prominent diffraction spikes
-    rippleSpeed: 750,       // Fast shockwave ripples
-    vignette: 0.04,
-    grain: 0.015,
+    voidColor: "#f5f5f7",
+    hazeColor: "#eeeeef",
+    duskColor: "#e4e4e7",
+    wineColor: "#d4d4d8",
+    crimsonColor: "#a1a1aa", // Soft matte gray
+    hotColor: "#71717a",    // Subdued matte charcoal
+    starColor: "#52525b",   // Calm matte zinc dots (no blue)
+    speed: 0.45,            // Slow, calm, serene motion
+    drift: 0.02,            // Very gentle drift
+    starDrift: 0.35,        // Relaxed star movement
+    twinkle: 0.7,           // Soft subtle twinkle
+    sparkles: 3,            // Minimal non-distracting sparkles
+    spikeWidth: 0.8,        // Delicate diffraction
+    rippleSpeed: 180,       // Slow smooth ripple waves
+    vignette: 0.02,
+    grain: 0.012,
+  },
+  matteGrayLight: {
+    voidColor: "#f5f5f7",
+    hazeColor: "#eeeeef",
+    duskColor: "#e4e4e7",
+    wineColor: "#d4d4d8",
+    crimsonColor: "#a1a1aa",
+    hotColor: "#71717a",
+    starColor: "#52525b",
+    speed: 0.45,
+    drift: 0.02,
+    starDrift: 0.35,
+    twinkle: 0.7,
+    sparkles: 3,
+    spikeWidth: 0.8,
+    rippleSpeed: 180,
+    vignette: 0.02,
+    grain: 0.012,
   },
   shinySilver: {
     voidColor: "#ffffff",
