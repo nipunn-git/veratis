@@ -1,81 +1,112 @@
 import React from 'react';
-import { HelpCircle, CheckCircle2, AlertTriangle, ShieldAlert } from 'lucide-react';
+import { 
+  Check, 
+  HelpCircle, 
+  Minus
+} from 'lucide-react';
 
-export default function UncertaintyEngine({ uncertainty }) {
+export default function UncertaintyEngine({ uncertainty = { known: [], unknown: [], untestable: [] } }) {
   return (
-    <div className="p-6 md:p-8 rounded-3xl bg-[#0c130f] border border-[#1f2d26] shadow-xl">
-      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-[#1f2d26] mb-6">
-        <div className="flex items-center gap-2 text-xs font-mono text-[#c8f344] uppercase tracking-wider">
-          <HelpCircle className="w-4 h-4" />
-          <span>UNCERTAINTY ENGINE // EPISTEMIC BOUNDARY MATRIX</span>
+    <div className="space-y-10 font-sans">
+      {/* Editorial Header (Scaled Up) */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-8 border-b border-zinc-100">
+        <div>
+          <span className="text-sm font-medium text-zinc-400 tracking-wide block">
+            Epistemic boundaries
+          </span>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-zinc-900 mt-1.5">
+            Uncertainty Engine
+          </h2>
+          <p className="text-base sm:text-lg text-zinc-500 mt-2 max-w-2xl">
+            Explicit demarcation between verified facts, open variables, and untestable factors.
+          </p>
         </div>
-        <span className="text-xs font-mono text-emerald-400">
-          PROBABILISTIC HUMILITY ACTIVE
-        </span>
+
+        {/* Humility Badge (Scaled Up) */}
+        <div className="flex items-center gap-2.5 text-sm text-zinc-500">
+          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+          <span className="font-medium">Epistemic humility active</span>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Known Pillar */}
-        <div className="p-6 rounded-2xl bg-[#080d0a] border border-emerald-500/30 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-mono text-emerald-400 font-bold mb-4">
-              <CheckCircle2 className="w-4 h-4" />
-              <span>WHAT IS KNOWN</span>
+      {/* 3 Open Columns (Scaled Up & Breathable) */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-14 items-start divide-y md:divide-y-0 md:divide-x divide-zinc-100">
+        {/* Pillar 1: Verified Facts */}
+        <div className="space-y-5 pt-4 md:pt-0">
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <span className="text-lg sm:text-2xl font-semibold text-zinc-900 tracking-tight">
+                Verified facts
+              </span>
+              <span className="text-xs sm:text-sm font-medium px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-600">
+                Empirical
+              </span>
             </div>
-            <ul className="space-y-3 text-xs font-mono text-[#a4b3a6]">
-              {uncertainty.known.map((k, i) => (
-                <li key={i} className="flex items-start gap-2">
-                  <span className="text-emerald-400">✓</span>
-                  <span>{k}</span>
-                </li>
-              ))}
-            </ul>
+            <p className="text-sm text-zinc-400">
+              Corroborated across multiple independent sensors.
+            </p>
           </div>
-          <div className="mt-6 pt-3 border-t border-[#18241e] text-[10px] font-mono text-[#526356]">
-            Falsifiable & mathematically verified
-          </div>
+
+          <ul className="space-y-3.5 pt-2 text-sm sm:text-base text-zinc-600">
+            {uncertainty.known.map((k, i) => (
+              <li key={i} className="flex items-start gap-3">
+                <Check className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 mt-0.5 shrink-0" />
+                <span className="leading-relaxed">{k}</span>
+              </li>
+            ))}
+          </ul>
         </div>
 
-        {/* Unknown Pillar */}
-        <div className="p-6 rounded-2xl bg-[#080d0a] border border-amber-500/30 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-mono text-amber-400 font-bold mb-4">
-              <AlertTriangle className="w-4 h-4" />
-              <span>WHAT IS UNKNOWN</span>
+        {/* Pillar 2: Unresolved Variables */}
+        <div className="space-y-5 pt-8 md:pt-0 md:pl-10 lg:pl-14">
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <span className="text-lg sm:text-2xl font-semibold text-zinc-900 tracking-tight">
+                Unresolved variables
+              </span>
+              <span className="text-xs sm:text-sm font-medium px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-600">
+                Pending
+              </span>
             </div>
-            <ul className="space-y-3 text-xs font-mono text-[#a4b3a6]">
-              {uncertainty.unknown.map((u, i) => (
-                <li key={i} className="flex items-start gap-2">
-                  <span className="text-amber-400">?</span>
-                  <span>{u}</span>
-                </li>
-              ))}
-            </ul>
+            <p className="text-sm text-zinc-400">
+              Requires upstream telemetry or registry confirmation.
+            </p>
           </div>
-          <div className="mt-6 pt-3 border-t border-[#18241e] text-[10px] font-mono text-[#526356]">
-            Requires additional telemetry or sensor access
-          </div>
+
+          <ul className="space-y-3.5 pt-2 text-sm sm:text-base text-zinc-600">
+            {uncertainty.unknown.map((u, i) => (
+              <li key={i} className="flex items-start gap-3">
+                <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 mt-0.5 shrink-0" />
+                <span className="leading-relaxed">{u}</span>
+              </li>
+            ))}
+          </ul>
         </div>
 
-        {/* Untestable Pillar */}
-        <div className="p-6 rounded-2xl bg-[#080d0a] border border-purple-500/30 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-mono text-purple-400 font-bold mb-4">
-              <HelpCircle className="w-4 h-4" />
-              <span>WHAT IS UNTESTABLE</span>
+        {/* Pillar 3: Untestable Factors */}
+        <div className="space-y-5 pt-8 md:pt-0 md:pl-10 lg:pl-14">
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <span className="text-lg sm:text-2xl font-semibold text-zinc-900 tracking-tight">
+                Untestable factors
+              </span>
+              <span className="text-xs sm:text-sm font-medium px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-600">
+                Assumption
+              </span>
             </div>
-            <ul className="space-y-3 text-xs font-mono text-[#a4b3a6]">
-              {uncertainty.untestable.map((t, i) => (
-                <li key={i} className="flex items-start gap-2">
-                  <span className="text-purple-400">∅</span>
-                  <span>{t}</span>
-                </li>
-              ))}
-            </ul>
+            <p className="text-sm text-zinc-400">
+              Qualitative context outside cryptographic bounds.
+            </p>
           </div>
-          <div className="mt-6 pt-3 border-t border-[#18241e] text-[10px] font-mono text-[#526356]">
-            Beyond the scope of optical / acoustic physics
-          </div>
+
+          <ul className="space-y-3.5 pt-2 text-sm sm:text-base text-zinc-600">
+            {uncertainty.untestable.map((ut, i) => (
+              <li key={i} className="flex items-start gap-3">
+                <Minus className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-400 mt-0.5 shrink-0" />
+                <span className="leading-relaxed">{ut}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </div>

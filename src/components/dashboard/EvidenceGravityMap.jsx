@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Share2, CircleDot, Info, AlertTriangle, CheckCircle2 } from 'lucide-react';
 
-export default function EvidenceGravityMap({ gravityMap }) {
+export default function EvidenceGravityMap({ gravityMap = { nodes: [], connections: [] } }) {
   const [selectedNodeId, setSelectedNodeId] = useState(gravityMap.nodes[0]?.id);
+  const [showRings, setShowRings] = useState(true);
 
   const selectedNode = gravityMap.nodes.find(n => n.id === selectedNodeId) || gravityMap.nodes[0];
   const relatedConnections = gravityMap.connections.filter(
@@ -10,112 +10,160 @@ export default function EvidenceGravityMap({ gravityMap }) {
   );
 
   return (
-    <div className="p-6 md:p-8 rounded-3xl bg-[#0c130f] border border-[#1f2d26] shadow-xl">
-      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-[#1f2d26] mb-6">
-        <div className="flex items-center gap-2 text-xs font-mono text-[#c8f344] uppercase tracking-wider">
-          <Share2 className="w-4 h-4" />
-          <span>EVIDENCE GRAVITY MAP // BAYESIAN ATTRACTION NETWORK</span>
+    <div className="space-y-10 font-sans">
+      {/* Editorial Header (Scaled Up) */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-8 border-b border-zinc-100">
+        <div>
+          <span className="text-sm font-medium text-zinc-400 tracking-wide block">
+            Network topology
+          </span>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-zinc-900 mt-1.5">
+            Evidence Gravity Map
+          </h2>
+          <p className="text-base sm:text-lg text-zinc-500 mt-2 max-w-2xl">
+            Probabilistic attraction network linking forensic anomalies and verified facts.
+          </p>
         </div>
-        <span className="text-xs font-mono text-[#788279]">
-          TOTAL NODES: {gravityMap.nodes.length} // CONNECTIONS: {gravityMap.connections.length}
-        </span>
+
+        {/* Orbit Rings Toggle (Scaled Up) */}
+        <div className="flex items-center gap-4 text-sm">
+          <span className="text-zinc-400 hidden sm:inline">
+            {gravityMap.nodes.length} nodes · {gravityMap.connections.length} connections
+          </span>
+          <button
+            onClick={() => setShowRings(!showRings)}
+            className="px-4 py-2 rounded-xl bg-zinc-100/80 hover:bg-zinc-200/70 text-zinc-700 font-medium transition-colors cursor-pointer border border-zinc-200/50"
+          >
+            {showRings ? 'Guides: Visible' : 'Guides: Hidden'}
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-        {/* Interactive Node Graph (Left) */}
-        <div className="lg:col-span-8 p-6 rounded-2xl bg-[#080d0a] border border-[#1f2d26] relative min-h-[420px] flex items-center justify-center overflow-hidden">
-          {/* Force Lines (SVG) */}
-          <svg className="absolute inset-0 w-full h-full pointer-events-none">
+      {/* Main Content Layout: Scaled Up & Expansive */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
+        {/* LEFT COLUMN: Clean Minimal Graph Canvas (Expansive) */}
+        <div className="lg:col-span-7 min-h-[500px] sm:min-h-[560px] lg:min-h-[620px] rounded-3xl bg-zinc-50/60 border border-zinc-100 relative flex items-center justify-center overflow-hidden p-8">
+          {/* Concentric Guide Rings */}
+          {showRings && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="w-64 h-64 sm:w-72 sm:h-72 rounded-full border border-zinc-200/80" />
+              <div className="w-96 h-96 sm:w-[480px] sm:h-[480px] rounded-full border border-dashed border-zinc-200/60" />
+              <div className="w-[560px] h-[560px] sm:w-[640px] sm:h-[640px] rounded-full border border-zinc-200/40" />
+            </div>
+          )}
+
+          {/* Force Lines (SVG Canvas) */}
+          <svg className="absolute inset-0 w-full h-full pointer-events-none z-10">
             {gravityMap.connections.map((conn, idx) => {
               const isDirectContradiction = conn.relation.includes('contradicts') || conn.relation.includes('disproves');
+              const isSelected = conn.from === selectedNodeId || conn.to === selectedNodeId;
               return (
                 <line
                   key={idx}
                   x1="50%"
                   y1="50%"
-                  x2={idx % 2 === 0 ? "25%" : "75%"}
-                  y2={idx < 2 ? "25%" : "75%"}
-                  stroke={isDirectContradiction ? "#f43f5e" : "#c8f344"}
-                  strokeWidth={conn.strength * 2.5}
-                  strokeDasharray={isDirectContradiction ? "4 4" : "none"}
-                  opacity="0.6"
+                  x2={idx % 2 === 0 ? "24%" : "76%"}
+                  y2={idx < 2 ? "26%" : "74%"}
+                  stroke={isDirectContradiction ? "#f43f5e" : isSelected ? "#18181b" : "#d4d4d8"}
+                  strokeWidth={isSelected ? 2.5 : 1.5}
+                  strokeDasharray={isDirectContradiction ? "5 5" : "none"}
+                  className="transition-all duration-300"
+                  opacity={isSelected ? 1 : 0.6}
                 />
               );
             })}
           </svg>
 
-          {/* Render Interactive Nodes */}
-          <div className="flex flex-wrap items-center justify-center gap-6 relative z-10 p-4">
+          {/* Floating Pill Nodes (Scaled Up) */}
+          <div className="flex flex-wrap items-center justify-center gap-4 relative z-20 p-6 max-w-lg">
             {gravityMap.nodes.map((node) => {
               const isSelected = node.id === selectedNodeId;
               const isClaim = node.type === 'claim';
               const isFact = node.type === 'fact';
-              const isAnomaly = node.type === 'anomaly';
 
               return (
                 <button
                   key={node.id}
                   onClick={() => setSelectedNodeId(node.id)}
-                  className={`p-4 rounded-2xl border transition-all text-left cursor-pointer ${
+                  className={`px-4 sm:px-5 py-2.5 sm:py-3 rounded-full transition-all duration-200 text-left cursor-pointer flex items-center gap-3 select-none ${
                     isSelected
-                      ? 'bg-[#18241e] border-[#c8f344] scale-105 shadow-[0_0_24px_rgba(200,243,68,0.3)]'
-                      : 'bg-[#0f1612] border-[#223528] hover:border-[#334d3c]'
+                      ? 'bg-zinc-900 text-white shadow-lg scale-105'
+                      : 'bg-white text-zinc-800 border border-zinc-200/80 hover:border-zinc-400 shadow-2xs'
                   }`}
                 >
-                  <div className="flex items-center justify-between gap-3 text-[10px] font-mono mb-1">
-                    <span className={`uppercase font-bold ${
-                      isClaim ? 'text-rose-400' : isFact ? 'text-emerald-400' : 'text-[#c8f344]'
-                    }`}>
-                      {node.type}
-                    </span>
-                    <span className="text-[#788279]">MASS: {node.gravity}kg</span>
-                  </div>
-                  <div className="text-xs font-display font-bold text-[#f5f4ef]">
+                  <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${
+                    isSelected 
+                      ? 'bg-white' 
+                      : isFact 
+                      ? 'bg-emerald-500' 
+                      : isClaim 
+                      ? 'bg-indigo-500' 
+                      : 'bg-rose-500'
+                  }`} />
+                  <span className="text-sm sm:text-base font-medium tracking-tight">
                     {node.label}
-                  </div>
+                  </span>
+                  <span className={`text-xs sm:text-sm font-normal pl-1 ${isSelected ? 'text-zinc-300' : 'text-zinc-400'}`}>
+                    {node.gravity}%
+                  </span>
                 </button>
               );
             })}
           </div>
+
+          <span className="absolute bottom-4 left-6 text-xs sm:text-sm text-zinc-400">
+            Select a node to inspect relational attraction
+          </span>
         </div>
 
-        {/* Selected Node Details (Right) */}
-        <div className="lg:col-span-4 p-6 rounded-2xl bg-[#080d0a] border border-[#1f2d26] flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between pb-3 border-b border-[#1f2d26] mb-4">
-              <span className="text-xs font-mono text-[#788279]">SELECTED NODE</span>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#18241e] text-[#c8f344] uppercase">
-                {selectedNode?.type}
+        {/* RIGHT COLUMN: Node Inspector (Scaled Up) */}
+        <div className="lg:col-span-5 space-y-8">
+          {/* Active Node Header */}
+          <div className="space-y-3 pb-8 border-b border-zinc-100">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-zinc-400">
+                Selected evidence
+              </span>
+              <span className="text-xs sm:text-sm font-medium px-3.5 py-1 rounded-full bg-zinc-100 text-zinc-700 capitalize">
+                {selectedNode?.type} · {selectedNode?.gravity}% weight
               </span>
             </div>
 
-            <h4 className="text-xl font-display font-bold text-[#f5f4ef] mb-2">
+            <h3 className="text-2xl sm:text-3xl font-semibold text-zinc-900 tracking-tight">
               {selectedNode?.label}
-            </h4>
+            </h3>
+            <p className="text-base sm:text-lg text-zinc-500">
+              Assigned epistemic gravity based on cross-modal verification.
+            </p>
+          </div>
 
-            <div className="text-xs font-mono text-[#c8f344] mb-4">
-              GRAVITATIONAL MASS: {selectedNode?.gravity} KG
-            </div>
+          {/* Related Links: Scaled List */}
+          <div className="space-y-4 pb-8 border-b border-zinc-100">
+            <span className="text-sm sm:text-base font-medium text-zinc-400 block">
+              Connected evidence links ({relatedConnections.length})
+            </span>
 
-            <div className="space-y-3 pt-3 border-t border-[#1f2d26]">
-              <span className="text-[11px] font-mono text-[#788279] block">
-                ACTIVE VECTORS ({relatedConnections.length}):
-              </span>
-              {relatedConnections.map((conn, i) => (
-                <div key={i} className="p-2.5 rounded-lg bg-[#0d1410] border border-[#1b2720] text-xs font-mono">
-                  <div className="text-[#a4b3a6] text-[10px] uppercase mb-0.5">
-                    RELATION: <span className="text-[#c8f344] font-bold">{conn.relation.replace(/_/g, ' ')}</span>
+            <div className="divide-y divide-zinc-100">
+              {relatedConnections.map((conn, idx) => (
+                <div key={idx} className="py-3.5 flex items-center justify-between text-sm sm:text-base">
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-zinc-400">↳</span>
+                    <span className="font-medium text-zinc-800 capitalize">
+                      {conn.relation.replace('_', ' ')}
+                    </span>
                   </div>
-                  <div className="text-[#788279] text-[10px]">
-                    STRENGTH: {(conn.strength * 100).toFixed(0)}%
-                  </div>
+                  <span className="text-zinc-500 tabular-nums">
+                    {(conn.strength * 100).toFixed(0)}% correlation
+                  </span>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="p-3 rounded-lg bg-[#121c16] border border-[#23352a] text-[11px] font-mono text-[#a4b3a6] mt-6">
-            Higher mass nodes exert greater Bayesian pull on the ultimate verdict.
+          {/* Topology Finding Note */}
+          <div className="pt-2 text-sm sm:text-base text-zinc-600 leading-relaxed">
+            <span className="font-semibold text-zinc-900 block mb-1.5">Convergence summary</span>
+            Evidence clustering indicates strong structural alignment toward generative edge tampering over social media transmission artifacts.
           </div>
         </div>
       </div>

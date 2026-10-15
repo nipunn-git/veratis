@@ -1,111 +1,178 @@
 import React, { useState } from 'react';
-import { GitCompare, ChevronDown, ChevronUp, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import { 
+  ChevronDown, 
+  ChevronUp, 
+  Check, 
+  X, 
+  Sparkles 
+} from 'lucide-react';
 
-export default function CompetingHypotheses({ hypotheses }) {
+export default function CompetingHypotheses({ hypotheses = [] }) {
   const [expandedId, setExpandedId] = useState(hypotheses[0]?.id);
+  const [hypothesisList, setHypothesisList] = useState(hypotheses);
+  const [simulationActive, setSimulationActive] = useState(false);
 
   const toggleHypothesis = (id) => {
     setExpandedId(prev => (prev === id ? null : id));
   };
 
+  const handleSimulateEvidence = () => {
+    setSimulationActive(true);
+    setHypothesisList(prev => prev.map((h, i) => {
+      if (i === 0) return { ...h, probability: Math.min(96, h.probability + 8) };
+      return { ...h, probability: Math.max(4, h.probability - 8) };
+    }));
+  };
+
   return (
-    <div className="p-6 md:p-8 rounded-3xl bg-[#0c130f] border border-[#1f2d26] shadow-xl">
-      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-[#1f2d26] mb-6">
-        <div className="flex items-center gap-2 text-xs font-mono text-[#c8f344] uppercase tracking-wider">
-          <GitCompare className="w-4 h-4" />
-          <span>COMPETING HYPOTHESES // PROBABILITY ARBITRATION</span>
+    <div className="space-y-10 font-sans">
+      {/* Editorial Header (Scaled Up) */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-8 border-b border-zinc-100">
+        <div>
+          <span className="text-sm font-medium text-zinc-400 tracking-wide block">
+            Bayesian arbitration
+          </span>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-zinc-900 mt-1.5">
+            Competing Hypotheses
+          </h2>
+          <p className="text-base sm:text-lg text-zinc-500 mt-2 max-w-2xl">
+            Comparative evaluation of alternative scenarios against empirical findings.
+          </p>
         </div>
-        <span className="text-xs font-mono text-[#788279]">
-          ZERO CONFIRMATION BIAS FRAMEWORK
-        </span>
+
+        {/* Minimal Simulation Action (Scaled Up) */}
+        <button
+          onClick={handleSimulateEvidence}
+          className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-zinc-100/80 hover:bg-zinc-200/70 border border-zinc-200/50 text-zinc-800 text-sm font-medium transition-colors cursor-pointer flex items-center gap-2 self-start sm:self-auto"
+        >
+          <Sparkles className="w-4 h-4 text-zinc-500" />
+          <span>{simulationActive ? 'Evidence simulated' : 'Simulate evidence'}</span>
+        </button>
       </div>
 
-      <div className="space-y-4">
-        {hypotheses.map((hyp) => {
+      {/* Slim Probability Distribution Strip (Scaled Up) */}
+      <div className="space-y-3 pb-8 border-b border-zinc-100">
+        <div className="flex items-center justify-between text-sm text-zinc-500">
+          <span>Probability distribution</span>
+          <span className="font-semibold text-zinc-800">100% normalized</span>
+        </div>
+
+        {/* Progress bar scaled to h-2.5 */}
+        <div className="w-full h-2.5 rounded-full bg-zinc-100 flex overflow-hidden">
+          {hypothesisList.map((h, i) => (
+            <div
+              key={h.id}
+              style={{ width: `${h.probability}%` }}
+              className={`h-full transition-all duration-500 ${
+                i === 0 ? 'bg-zinc-900' : 'bg-zinc-300'
+              }`}
+            />
+          ))}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-6 text-sm sm:text-base text-zinc-600 pt-1.5">
+          {hypothesisList.map((h, i) => (
+            <span key={h.id} className="flex items-center gap-2">
+              <span className={`w-2.5 h-2.5 rounded-full ${i === 0 ? 'bg-zinc-900' : 'bg-zinc-300'}`} />
+              <span className="font-medium text-zinc-900">{h.title}</span>
+              <span className="text-zinc-400">({h.probability}%)</span>
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Hypotheses List (Scaled Up) */}
+      <div className="space-y-5">
+        {hypothesisList.map((hyp, i) => {
           const isExpanded = expandedId === hyp.id;
+          const isLeading = i === 0;
+
           return (
             <div
               key={hyp.id}
-              className={`rounded-2xl border transition-all overflow-hidden ${
-                isExpanded 
-                  ? 'bg-[#121c16] border-[#c8f344]/80 shadow-[0_0_20px_rgba(200,243,68,0.1)]' 
-                  : 'bg-[#080d0a] border-[#18241e] hover:border-[#25392e]'
+              className={`rounded-2xl transition-all duration-150 p-6 sm:p-8 ${
+                isLeading 
+                  ? 'bg-zinc-50/80 border border-zinc-200/70' 
+                  : 'bg-white border border-zinc-200/50 hover:border-zinc-300'
               }`}
             >
-              {/* Header Bar */}
-              <button
+              {/* Card Header */}
+              <div 
                 onClick={() => toggleHypothesis(hyp.id)}
-                className="w-full p-5 flex items-center justify-between text-left cursor-pointer"
+                className="flex items-center justify-between cursor-pointer select-none"
               >
-                <div className="flex items-center gap-4">
-                  <div className="font-mono text-xs px-2.5 py-1 rounded bg-[#18241e] text-[#c8f344] font-bold">
-                    {hyp.probability}%
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-sm text-zinc-400 font-medium">Scenario {i + 1}</span>
+                    {isLeading && (
+                      <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-zinc-900 text-white">
+                        Leading hypothesis
+                      </span>
+                    )}
                   </div>
-                  <div>
-                    <span className="text-[10px] font-mono text-[#788279] uppercase block">
-                      {hyp.status}
-                    </span>
-                    <h4 className="text-base font-display font-bold text-[#f5f4ef]">
-                      {hyp.title}
-                    </h4>
-                  </div>
+                  <h3 className="text-xl sm:text-2xl font-semibold text-zinc-900 tracking-tight">
+                    {hyp.title}
+                  </h3>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <span className="text-xs font-mono text-[#788279] hidden sm:inline-block">
-                    {hyp.supporting.length} SUPP / {hyp.contradicting.length} CONTRA
-                  </span>
-                  {isExpanded ? <ChevronUp className="w-4 h-4 text-[#c8f344]" /> : <ChevronDown className="w-4 h-4 text-[#788279]" />}
+                <div className="flex items-center gap-4 sm:gap-6">
+                  <div className="text-right">
+                    <div className="text-3xl sm:text-4xl font-semibold text-zinc-900 tabular-nums">
+                      {hyp.probability}%
+                    </div>
+                    <div className="text-xs sm:text-sm text-zinc-400 font-medium">Probability</div>
+                  </div>
+                  <button className="text-zinc-400 hover:text-zinc-700 p-1.5">
+                    {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                  </button>
                 </div>
-              </button>
+              </div>
 
-              {/* Expanded Details */}
+              {/* Scaled Indicator Bar */}
+              <div className="w-full h-2 bg-zinc-100 rounded-full mt-4 overflow-hidden">
+                <div 
+                  style={{ width: `${hyp.probability}%` }}
+                  className={`h-full rounded-full transition-all duration-500 ${
+                    isLeading ? 'bg-zinc-900' : 'bg-zinc-400'
+                  }`}
+                />
+              </div>
+
+              {/* Expanded Body: Scaled Unboxed Arguments */}
               {isExpanded && (
-                <div className="px-6 pb-6 pt-2 border-t border-[#1a2820] space-y-5">
-                  <p className="text-xs sm:text-sm text-[#a4b3a6] font-mono leading-relaxed">
-                    {hyp.description}
-                  </p>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Supporting Evidence */}
-                    <div className="p-4 rounded-xl bg-[#080d0a] border border-emerald-500/20">
-                      <div className="flex items-center gap-2 text-xs font-mono text-emerald-400 font-bold mb-3">
-                        <CheckCircle2 className="w-4 h-4" />
-                        <span>SUPPORTING EMPIRICAL POINTS ({hyp.supporting.length}):</span>
-                      </div>
-                      {hyp.supporting.length > 0 ? (
-                        <ul className="space-y-2 text-xs font-mono text-[#a4b3a6]">
-                          {hyp.supporting.map((s, idx) => (
-                            <li key={idx} className="flex items-start gap-2">
-                              <span className="text-emerald-400 font-bold">+</span>
-                              <span>{s}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <span className="text-xs font-mono text-[#526356]">No supporting empirical evidence found.</span>
+                <div className="mt-6 pt-6 border-t border-zinc-200/60 grid grid-cols-1 md:grid-cols-2 gap-8 text-sm sm:text-base">
+                  {/* Supporting Evidence */}
+                  <div>
+                    <span className="font-semibold text-zinc-900 block mb-3">
+                      Supporting evidence
+                    </span>
+                    <ul className="space-y-2.5 text-zinc-600">
+                      {hyp.supporting?.map((point, idx) => (
+                        <li key={idx} className="flex items-start gap-2.5">
+                          <Check className="w-4 h-4 text-emerald-600 mt-1 shrink-0" />
+                          <span className="leading-relaxed">{point}</span>
+                        </li>
+                      )) || (
+                        <li className="text-zinc-400">No supporting evidence logged.</li>
                       )}
-                    </div>
+                    </ul>
+                  </div>
 
-                    {/* Contradicting Evidence */}
-                    <div className="p-4 rounded-xl bg-[#080d0a] border border-rose-500/20">
-                      <div className="flex items-center gap-2 text-xs font-mono text-rose-400 font-bold mb-3">
-                        <XCircle className="w-4 h-4" />
-                        <span>CONTRADICTING PHYSICAL LAWS / FACTS ({hyp.contradicting.length}):</span>
-                      </div>
-                      {hyp.contradicting.length > 0 ? (
-                        <ul className="space-y-2 text-xs font-mono text-[#a4b3a6]">
-                          {hyp.contradicting.map((c, idx) => (
-                            <li key={idx} className="flex items-start gap-2">
-                              <span className="text-rose-400 font-bold">-</span>
-                              <span>{c}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <span className="text-xs font-mono text-[#526356]">No contradictions identified under current dataset.</span>
+                  {/* Contradicting Evidence */}
+                  <div>
+                    <span className="font-semibold text-zinc-900 block mb-3">
+                      Contradicting evidence
+                    </span>
+                    <ul className="space-y-2.5 text-zinc-600">
+                      {hyp.contradicting?.map((point, idx) => (
+                        <li key={idx} className="flex items-start gap-2.5">
+                          <X className="w-4 h-4 text-rose-500 mt-1 shrink-0" />
+                          <span className="leading-relaxed">{point}</span>
+                        </li>
+                      )) || (
+                        <li className="text-zinc-400">No contradicting evidence logged.</li>
                       )}
-                    </div>
+                    </ul>
                   </div>
                 </div>
               )}

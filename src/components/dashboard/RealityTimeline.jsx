@@ -1,83 +1,143 @@
 import React, { useState } from 'react';
-import { Clock, CheckCircle2, AlertTriangle, XCircle, Filter } from 'lucide-react';
+import { 
+  ChevronDown, 
+  ChevronUp 
+} from 'lucide-react';
 
-export default function RealityTimeline({ timeline }) {
+export default function RealityTimeline({ timeline = [] }) {
   const [filter, setFilter] = useState('all'); // 'all' | 'verified' | 'suspicious' | 'critical'
+  const [expandedIndex, setExpandedIndex] = useState(null);
 
   const filteredTimeline = timeline.filter(item => {
     if (filter === 'all') return true;
     return item.status === filter;
   });
 
+  const toggleExpand = (idx) => {
+    setExpandedIndex(prev => (prev === idx ? null : idx));
+  };
+
+  const filterTabs = [
+    { id: 'all', label: 'All events' },
+    { id: 'verified', label: 'Verified' },
+    { id: 'suspicious', label: 'Suspicious' },
+    { id: 'critical', label: 'Critical' },
+  ];
+
   return (
-    <div className="p-6 md:p-8 rounded-3xl bg-[#0c130f] border border-[#1f2d26] shadow-xl">
-      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-[#1f2d26] mb-6">
-        <div className="flex items-center gap-2 text-xs font-mono text-[#c8f344] uppercase tracking-wider">
-          <Clock className="w-4 h-4" />
-          <span>REALITY TIMELINE // CHRONOLOGICAL PROVENANCE RECONSTRUCTION</span>
+    <div className="space-y-10 font-sans">
+      {/* Editorial Header (Scaled Up) */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-8 border-b border-zinc-100">
+        <div>
+          <span className="text-sm font-medium text-zinc-400 tracking-wide block">
+            Temporal provenance
+          </span>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-zinc-900 mt-1.5">
+            Reality Timeline
+          </h2>
+          <p className="text-base sm:text-lg text-zinc-500 mt-2 max-w-2xl">
+            Verified chronological sequence of publication, distribution, and media alteration.
+          </p>
         </div>
 
-        {/* Filter Controls */}
-        <div className="flex items-center gap-2 bg-[#080d0a] p-1 rounded-xl border border-[#1f2d26] text-xs font-mono">
-          <span className="text-[#788279] text-[10px] px-2 hidden sm:inline-block">FILTER:</span>
-          {['all', 'verified', 'suspicious', 'critical'].map((f) => (
+        {/* Minimal Filter Tabs (Scaled Up) */}
+        <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-zinc-100/80 border border-zinc-200/50 text-sm">
+          {filterTabs.map((tab) => (
             <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-3 py-1 rounded-lg text-[10px] uppercase transition-colors cursor-pointer ${
-                filter === f ? 'bg-[#1e2e24] text-[#c8f344] font-bold' : 'text-[#788279] hover:text-[#f5f4ef]'
+              key={tab.id}
+              onClick={() => setFilter(tab.id)}
+              className={`px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl font-medium transition-all cursor-pointer ${
+                filter === tab.id
+                  ? 'bg-white text-zinc-900 shadow-xs'
+                  : 'text-zinc-600 hover:text-zinc-900'
               }`}
             >
-              {f}
+              {tab.label}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Timeline Events List */}
-      <div className="space-y-4">
+      {/* Main Continuous Timeline Rail (Scaled Up & Expansive) */}
+      <div className="relative pl-8 sm:pl-10 before:absolute before:left-3.5 sm:before:left-4 before:top-2 before:bottom-2 before:w-[1.5px] before:bg-zinc-200 space-y-4">
         {filteredTimeline.map((item, idx) => {
           const isVerified = item.status === 'verified';
           const isCritical = item.status === 'critical';
-          const isSuspicious = item.status === 'suspicious';
+          const isExpanded = expandedIndex === idx;
 
           return (
             <div
               key={idx}
-              className="p-5 rounded-2xl bg-[#080d0a] border border-[#1f2d26] flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-[#2b3e32] transition-colors"
+              className="relative p-6 sm:p-7 rounded-2xl hover:bg-zinc-50/70 transition-colors duration-150 group"
             >
-              <div className="flex items-start gap-4">
-                <div className={`p-2.5 rounded-xl border mt-0.5 shrink-0 ${
+              {/* Timeline Pin Node on Rail */}
+              <div 
+                className={`absolute -left-[23px] sm:-left-[27px] top-8 w-4 h-4 rounded-full border-2 bg-white transition-transform group-hover:scale-125 ${
                   isVerified 
-                    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' 
+                    ? 'border-emerald-500' 
                     : isCritical 
-                    ? 'bg-rose-500/10 border-rose-500/30 text-rose-400' 
-                    : 'bg-amber-500/10 border-amber-500/30 text-amber-400'
-                }`}>
-                  {isVerified ? <CheckCircle2 className="w-4 h-4" /> : 
-                   isCritical ? <XCircle className="w-4 h-4" /> : 
-                   <AlertTriangle className="w-4 h-4" />}
+                    ? 'border-rose-500' 
+                    : 'border-amber-500'
+                }`}
+              />
+
+              {/* Event Metadata Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2">
+                <div className="flex flex-wrap items-center gap-2.5 text-sm">
+                  <span className="font-semibold text-zinc-900">
+                    {item.time} · {item.date}
+                  </span>
+                  <span className="text-zinc-300">·</span>
+                  <span className="text-zinc-500 font-medium">
+                    {item.platform}
+                  </span>
+                  <span className={`text-xs font-medium px-3 py-0.5 rounded-full ${
+                    isVerified 
+                      ? 'bg-emerald-50 text-emerald-700' 
+                      : isCritical 
+                      ? 'bg-rose-50 text-rose-700' 
+                      : 'bg-amber-50 text-amber-700'
+                  }`}>
+                    {isVerified ? 'Verified' : isCritical ? 'Critical anomaly' : 'Suspicious'}
+                  </span>
                 </div>
 
-                <div>
-                  <div className="flex flex-wrap items-center gap-2 mb-1">
-                    <span className="text-xs font-mono font-bold text-[#f5f4ef]">
-                      {item.event}
-                    </span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#16221b] text-[#a4b3a6] border border-[#23352b]">
-                      {item.platform}
-                    </span>
+                <button
+                  onClick={() => toggleExpand(idx)}
+                  className="inline-flex items-center gap-1.5 text-sm text-zinc-400 hover:text-zinc-700 cursor-pointer self-start sm:self-auto transition-colors font-medium"
+                >
+                  <span>{isExpanded ? 'Hide details' : 'View details'}</span>
+                  {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </button>
+              </div>
+
+              {/* Event Body */}
+              <div className="mt-1.5">
+                <h4 className="text-xl sm:text-2xl font-semibold text-zinc-900 tracking-tight">
+                  {item.event}
+                </h4>
+                <p className="text-base sm:text-lg text-zinc-600 mt-2 leading-relaxed font-normal">
+                  {item.description}
+                </p>
+              </div>
+
+              {/* Expanded Technical Details */}
+              {isExpanded && (
+                <div className="mt-4 pt-4 border-t border-zinc-100 grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-zinc-500">
+                  <div>
+                    <span className="text-zinc-400 block text-xs">Hash signature</span>
+                    <span className="text-zinc-800 font-medium truncate block mt-0.5">sha256:4f991ac89...34a</span>
                   </div>
-                  <p className="text-xs text-[#788279] font-mono leading-relaxed">
-                    {item.description}
-                  </p>
+                  <div>
+                    <span className="text-zinc-400 block text-xs">Propagation latency</span>
+                    <span className="text-zinc-800 font-medium block mt-0.5">+0.038 seconds</span>
+                  </div>
+                  <div>
+                    <span className="text-zinc-400 block text-xs">Validation node</span>
+                    <span className="text-zinc-800 font-medium block mt-0.5">Consensus node verified</span>
+                  </div>
                 </div>
-              </div>
-
-              <div className="text-left md:text-right shrink-0 border-t md:border-t-0 border-[#18241e] pt-2 md:pt-0">
-                <div className="text-xs font-mono font-bold text-[#c8f344]">{item.time}</div>
-                <div className="text-[10px] font-mono text-[#788279]">{item.date}</div>
-              </div>
+              )}
             </div>
           );
         })}

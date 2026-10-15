@@ -8,7 +8,7 @@ import SignatureFeatures from './components/SignatureFeatures';
 import InteractiveShowcase from './components/InteractiveShowcase';
 import FinalCTA from './components/FinalCTA';
 import HalftoneFooter from './components/HalftoneFooter';
-import DashboardLayout from './components/dashboard/DashboardLayout';
+import Dashboard from './dashboard';
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -42,7 +42,7 @@ export default function App() {
 
       {/* 2. Main Investigation Workspace (Dashboard View) */}
       {currentView === 'dashboard' ? (
-        <DashboardLayout 
+        <Dashboard 
           onBackToLanding={handleReturnToLanding} 
           initialCaseIndex={initialCaseIndex} 
         />
