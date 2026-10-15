@@ -157,7 +157,10 @@ export default function HalftoneWordmark({
 
       offCtx.fillStyle = "#000";
       offCtx.textBaseline = "alphabetic";
-      offCtx.fillText(text, (width - metrics.width) / 2, heightPx + ascent * cropOffset);
+      const topPadding = 12;
+      const topY = Math.max(topPadding, heightPx - ascent * (1 - cropOffset));
+      const baselineY = topY + ascent;
+      offCtx.fillText(text, (width - metrics.width) / 2, baselineY);
 
       const imgData = offCtx.getImageData(0, 0, width, heightPx).data;
       const step = Math.max(3, cfg.dotGap);

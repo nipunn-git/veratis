@@ -255,7 +255,12 @@ export default function HalftoneWordmarkFooter({
       const c = Math.max(0, Math.min(0.6, o.crop))
       m.fillStyle = "#000"
       m.textBaseline = "alphabetic"
-      m.fillText(word, (w - box.width) / 2, h + cap * c)
+      // Ensure the top of the letters is never clipped by the top edge of the canvas.
+      // Top headroom (12px) guarantees every letterhead, crossbar, and apex is 100% intact.
+      const topPadding = 12
+      const topY = Math.max(topPadding, h - cap * (1 - c))
+      const baselineY = topY + cap
+      m.fillText(word, (w - box.width) / 2, baselineY)
       const img = m.getImageData(0, 0, w, h).data
 
       const gap = Math.max(3, o.dotGap)
