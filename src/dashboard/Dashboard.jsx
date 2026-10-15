@@ -206,7 +206,7 @@ export default function Dashboard({ onBackToLanding, initialCaseIndex = 0 }) {
   };
 
   return (
-    <div className="relative min-h-screen text-zinc-900 font-sans selection:bg-zinc-900 selection:text-white overflow-x-hidden bg-[#f8fafd]">
+    <div className="h-screen max-h-screen w-screen overflow-hidden text-zinc-900 font-sans selection:bg-zinc-900 selection:text-white relative bg-[#f8fafd] flex flex-col justify-between">
       {/* 0. Live Ambient Halftone Nebula Canvas Background (Fast-moving & Shiny White) */}
       <div className="fixed inset-0 z-0 pointer-events-auto">
         <HalftoneNebula
@@ -232,8 +232,8 @@ export default function Dashboard({ onBackToLanding, initialCaseIndex = 0 }) {
         <div className="absolute inset-0 bg-white/10 pointer-events-none" />
       </div>
 
-      <div className="relative z-10">
-        {/* 1. Sleek Top Command Bar */}
+      <div className="relative z-10 h-full w-full flex flex-col justify-between overflow-hidden">
+        {/* 1. Sleek Top Command Bar with Centered Floating Action Capsule */}
         <TopCommandBar
           currentCase={currentCase}
           onBackToLanding={onBackToLanding}
@@ -242,11 +242,11 @@ export default function Dashboard({ onBackToLanding, initialCaseIndex = 0 }) {
           onExportDossier={handleExportDossier}
         />
 
-        {/* 2. Main Dashboard Content Canvas */}
-        <main className="w-full">
+        {/* 2. Main Dashboard Content Canvas (Constant Ratio, Only Feature Area Scrollable) */}
+        <main className="flex-1 w-full min-h-0 flex flex-col justify-center my-auto overflow-hidden">
           {/* VIEW A: OVERVIEW - The 21st.dev Draggable Widget Grid (6 cards only) */}
           {activeTab === 'overview' && (
-            <div className="max-w-[1800px] w-full mx-auto px-4 sm:px-8 lg:px-12 pt-5 pb-28">
+            <div className="max-w-[1800px] w-full mx-auto px-4 sm:px-8 lg:px-12 my-auto max-h-[calc(100vh-170px)] overflow-y-auto pb-4">
               <DraggableGrid
                 widgets={widgets}
                 onReorderWidgets={handleReorderWidgets}
@@ -262,7 +262,7 @@ export default function Dashboard({ onBackToLanding, initialCaseIndex = 0 }) {
 
           {/* FOCUSED FEATURE VIEWS: Attached edge-to-edge to sides, open top/bottom revealing live moving background */}
           {activeTab !== 'overview' && (
-            <div className="w-full mt-4 sm:mt-5 mb-24 sm:mb-28 max-h-[calc(100vh-170px)] overflow-y-auto bg-white/70 backdrop-blur-md border-y border-zinc-200/60 border-x-0 py-6 sm:py-8 px-6 sm:px-12 lg:px-20 xl:px-28 2xl:px-36 shadow-xs">
+            <div className="w-full my-auto max-h-[calc(100vh-160px)] overflow-y-auto bg-white/70 backdrop-blur-md border-y border-zinc-200/60 border-x-0 py-6 sm:py-8 px-6 sm:px-12 lg:px-20 xl:px-28 2xl:px-36 shadow-xs">
               {/* VIEW B: DECEPTION RADAR */}
               {activeTab === 'radar' && (
                 <DeceptionRadar
@@ -303,6 +303,9 @@ export default function Dashboard({ onBackToLanding, initialCaseIndex = 0 }) {
             </div>
           )}
         </main>
+
+        {/* Bottom Spacer to guarantee moving nebula is always visible behind bottom dock */}
+        <div className="shrink-0 h-16 pointer-events-none" />
 
         {/* 3. Floating Bottom Navigation Dock (Differs completely from the white dashboard!) */}
         <BottomNavbar
