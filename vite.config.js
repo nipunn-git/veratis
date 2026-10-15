@@ -55,6 +55,10 @@ function localApiPlugin() {
             const { default: handler } = await import('./api/twin.js');
             return handler(req, res);
           }
+          if (urlPath === '/api/companion') {
+            const { default: handler } = await import('./api/companion.js');
+            return handler(req, res);
+          }
         } catch (err) {
           console.error('Local API error:', err);
           return res.status(500).json({ error: err.message });
