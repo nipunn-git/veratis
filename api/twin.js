@@ -1,12 +1,36 @@
-/**
- * VERATIS Intelligence API - Digital Twin Test Endpoint
- * Vercel Serverless Function & Chrome Extension Backend
- * 
- * Supports Live AI roleplay via Gemini, OpenAI, Claude or smart intent branching.
- * Fully CORS-enabled for web app & Chrome Extension.
- */
+import fs from 'fs';
+import path from 'path';
+
+// Helper to ensure .env keys are populated
+function ensureEnvLoaded() {
+  if (process.env.GEMINI_API_KEY && process.env.GROQ_API_KEY) return;
+  try {
+    const envPath = path.resolve(process.cwd(), '.env');
+    if (fs.existsSync(envPath)) {
+      const content = fs.readFileSync(envPath, 'utf8');
+      for (const line of content.split('\n')) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith('#')) continue;
+        const [k, ...v] = trimmed.split('=');
+        if (k && v.length) {
+          const key = k.trim();
+          let val = v.join('=').trim();
+          if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+            val = val.slice(1, -1);
+          }
+          if (!process.env[key]) {
+            process.env[key] = val;
+          }
+        }
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+}
 
 export default async function handler(req, res) {
+  ensureEnvLoaded();
   // CORS Headers
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -36,8 +60,8 @@ export default async function handler(req, res) {
 
     let reply = null;
 
-    // 1. Try GroqCloud (Ultra-fast Llama 3.3 70B)
-    if (groqKey && !reply) {
+    // 1. Try GroqCloud (Ultra-fast Llama 3.3 70B - requires gsk_ key)
+    if (groqKey && groqKey.startsWith('gsk_') && !reply) {
       try {
         reply = await callGroqTwin(groqKey, scenarioId, messages, userMessage);
       } catch (err) {
@@ -154,22 +178,38 @@ Return ONLY JSON:
 Scenario: ${scenarioId}
 User said: "${userMessage}"`;
 
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        generationConfig: { responseMimeType: 'application/json' }
-      })
-    }
-  );
+  const models = ['gemini-2.5-flash', 'gemini-3.5-flash-lite', 'gemini-flash-latest'];
+  let lastErr = null;
 
-  if (!response.ok) throw new Error(`Gemini error: ${response.status}`);
-  const data = await response.json();
-  const parsed = JSON.parse(data.candidates[0].content.parts[0].text);
-  return { ...parsed, isLiveAI: true };
+  for (const model of models) {
+    try {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            generationConfig: { responseMimeType: 'application/json' }
+          })
+        }
+      );
+
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`Gemini ${model} HTTP ${response.status}: ${errText}`);
+      }
+
+      const data = await response.json();
+      const parsed = JSON.parse(data.candidates[0].content.parts[0].text);
+      return { ...parsed, isLiveAI: true, provider: `Gemini Live AI (${model})` };
+    } catch (err) {
+      lastErr = err;
+      console.warn(`Gemini model ${model} twin failed:`, err.message);
+    }
+  }
+
+  throw lastErr || new Error('All Gemini models failed for twin');
 }
 
 async function callOpenAITwin(apiKey, scenarioId, messages, userMessage) {

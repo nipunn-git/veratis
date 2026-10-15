@@ -22,6 +22,7 @@ let currentUtterance = null;
 let settings = {
   apiUrl: 'http://localhost:5173/api/companion',
   opMode: 'auto', // 'auto' | 'demo'
+  geminiApiKey: '',
   ttsRate: 1.0
 };
 
@@ -58,6 +59,7 @@ const sendBtn = document.getElementById('sendBtn');
 const settingsModal = document.getElementById('settingsModal');
 const closeSettingsBtn = document.getElementById('closeSettingsBtn');
 const apiUrlInput = document.getElementById('apiUrlInput');
+const geminiKeyInput = document.getElementById('geminiKeyInput');
 const testApiBtn = document.getElementById('testApiBtn');
 const apiStatusMessage = document.getElementById('apiStatusMessage');
 const ttsRateSlider = document.getElementById('ttsRateSlider');
@@ -110,6 +112,9 @@ async function loadSettings() {
   }
 
   apiUrlInput.value = settings.apiUrl;
+  if (geminiKeyInput) {
+    geminiKeyInput.value = settings.geminiApiKey || '';
+  }
   ttsRateSlider.value = settings.ttsRate;
   ttsRateVal.textContent = `${settings.ttsRate}x`;
   
@@ -213,48 +218,54 @@ removeContextTagBtn.addEventListener('click', () => {
   clearCapturedContext();
 });
 
-async function extractFromTab(actionType) {
-  if (!currentTab || !currentTab.id) {
-    await refreshActiveTab();
-  }
-  if (!currentTab || !currentTab.id) {
-    addMessage('assistant', 'Could not access the active tab. Please make sure a normal webpage is open.');
-    return;
-  }
-
-  // Check if current tab is a restricted system page
-  if (isRestrictedUrl(currentTab.url)) {
-    addMessage(
-      'assistant',
-      'Chrome restricts extensions from accessing internal system pages (chrome://) for security reasons.\n\nTo analyze webpage text, switch to any normal website (such as Wikipedia, news, or your local web app), highlight text, and click Get Selection.\n\nYou can also type or paste content directly in the composer below.'
-    );
-    return;
-  }
-
-  // 1. Send direct message to the content script
-  chrome.tabs.sendMessage(currentTab.id, { action: actionType }, async (response) => {
-    if (chrome.runtime.lastError || !response) {
-      // 2. If content script was not already listening (e.g. page loaded before extension installation), inject it dynamically
-      try {
-        await chrome.scripting.executeScript({
-          target: { tabId: currentTab.id },
-          files: ['content.js']
-        });
-
-        chrome.tabs.sendMessage(currentTab.id, { action: actionType }, (retryResponse) => {
-          if (retryResponse) {
-            handleExtractionResponse(retryResponse, actionType);
-          } else {
-            addMessage('assistant', 'Could not read text from this tab. Please highlight text directly on the page or paste it in the composer below.');
-          }
-        });
-      } catch (err) {
-        console.warn('Script injection failed:', err);
-        addMessage('assistant', 'Unable to inspect this page. Please enter or paste text in the composer below.');
-      }
-    } else {
-      handleExtractionResponse(response, actionType);
+function extractFromTab(actionType) {
+  return new Promise(async (resolve) => {
+    if (!currentTab || !currentTab.id) {
+      await refreshActiveTab();
     }
+    if (!currentTab || !currentTab.id) {
+      addMessage('assistant', 'Could not access the active tab. Please make sure a normal webpage is open.');
+      return resolve(null);
+    }
+
+    // Check if current tab is a restricted system page
+    if (isRestrictedUrl(currentTab.url)) {
+      addMessage(
+        'assistant',
+        'Chrome restricts extensions from accessing internal system pages (chrome://) for security reasons.\n\nTo analyze webpage text, switch to any normal website (such as Wikipedia, news, or your local web app), highlight text, and click Get Selection.\n\nYou can also type or paste content directly in the composer below.'
+      );
+      return resolve(null);
+    }
+
+    // 1. Send direct message to the content script
+    chrome.tabs.sendMessage(currentTab.id, { action: actionType }, async (response) => {
+      if (chrome.runtime.lastError || !response) {
+        // 2. If content script was not already listening, inject it dynamically
+        try {
+          await chrome.scripting.executeScript({
+            target: { tabId: currentTab.id },
+            files: ['content.js']
+          });
+
+          chrome.tabs.sendMessage(currentTab.id, { action: actionType }, (retryResponse) => {
+            if (retryResponse) {
+              handleExtractionResponse(retryResponse, actionType);
+              resolve(retryResponse);
+            } else {
+              addMessage('assistant', 'Could not read text from this tab. Please highlight text directly on the page or paste it in the composer below.');
+              resolve(null);
+            }
+          });
+        } catch (err) {
+          console.warn('Script injection failed:', err);
+          addMessage('assistant', 'Unable to inspect this page. Please enter or paste text in the composer below.');
+          resolve(null);
+        }
+      } else {
+        handleExtractionResponse(response, actionType);
+        resolve(response);
+      }
+    });
   });
 }
 
@@ -376,15 +387,23 @@ function setupEventListeners() {
       const url = apiUrlInput.value.trim().replace('/companion', '/health');
       const res = await fetch(url);
       if (res.ok) {
-        apiStatusMessage.textContent = 'Connected successfully';
+        apiStatusMessage.textContent = 'Backend connected successfully';
         apiStatusMessage.className = 'api-status-msg success';
+        updateModeBadge(true);
       } else {
-        apiStatusMessage.textContent = `HTTP error ${res.status}`;
-        apiStatusMessage.className = 'api-status-msg error';
+        throw new Error(`HTTP ${res.status}`);
       }
     } catch (e) {
-      apiStatusMessage.textContent = 'Connection failed (server offline)';
-      apiStatusMessage.className = 'api-status-msg error';
+      const directKey = geminiKeyInput?.value.trim() || settings.geminiApiKey;
+      if (directKey) {
+        apiStatusMessage.textContent = 'Local server offline. Direct Gemini AI active.';
+        apiStatusMessage.className = 'api-status-msg success';
+        updateModeBadge(true);
+      } else {
+        apiStatusMessage.textContent = 'Server offline. Enter Gemini Key for Direct AI.';
+        apiStatusMessage.className = 'api-status-msg error';
+        updateModeBadge(false);
+      }
     } finally {
       testApiBtn.disabled = false;
     }
@@ -393,6 +412,7 @@ function setupEventListeners() {
   saveSettingsBtn.addEventListener('click', async () => {
     const selectedMode = document.querySelector('input[name="opMode"]:checked')?.value || 'auto';
     settings.apiUrl = apiUrlInput.value.trim() || 'http://localhost:5173/api/companion';
+    settings.geminiApiKey = geminiKeyInput ? geminiKeyInput.value.trim() : '';
     settings.opMode = selectedMode;
     settings.ttsRate = parseFloat(ttsRateSlider.value) || 1.0;
 
@@ -404,6 +424,7 @@ function setupEventListeners() {
 
 function openSettingsModal() {
   apiUrlInput.value = settings.apiUrl;
+  if (geminiKeyInput) geminiKeyInput.value = settings.geminiApiKey || '';
   ttsRateSlider.value = settings.ttsRate;
   ttsRateVal.textContent = `${settings.ttsRate}x`;
   apiStatusMessage.textContent = '';
@@ -482,6 +503,7 @@ async function executeAIRequest(action, query) {
     let result = null;
 
     if (settings.opMode !== 'demo') {
+      // 1. Try local dev server or deployed backend
       try {
         const response = await fetch(settings.apiUrl, {
           method: 'POST',
@@ -494,11 +516,23 @@ async function executeAIRequest(action, query) {
           updateModeBadge(result.isLiveAI);
         }
       } catch (networkErr) {
-        console.warn('Backend call failed, using client fallback:', networkErr);
+        console.warn('Backend call failed, trying direct Gemini fallback:', networkErr);
+      }
+
+      // 2. Direct Gemini fallback if backend is offline
+      if (!result && settings.geminiApiKey) {
+        try {
+          result = await callDirectGemini(settings.geminiApiKey, action, query, currentContext);
+          if (result) {
+            updateModeBadge(true);
+          }
+        } catch (geminiErr) {
+          console.warn('Direct Gemini call failed:', geminiErr);
+        }
       }
     }
 
-    // Client-side fallback if backend failed or in demo mode
+    // 3. Client-side fallback if all live AI options are unavailable
     if (!result) {
       result = clientFallbackAnalysis(action, query, currentContext);
       updateModeBadge(false);
@@ -695,6 +729,57 @@ function stopSpeech() {
     window.speechSynthesis.cancel();
   }
   speechBanner.classList.add('hidden');
+}
+
+/* ==========================================================================
+   Direct Gemini Live AI Integration (Client-Side Backup)
+   ========================================================================== */
+
+async function callDirectGemini(apiKey, action, query, ctx) {
+  const text = (ctx.selectedText || ctx.pageText || query || '').trim();
+  if (!text) return null;
+
+  const prompt = `You are VERATIS Companion, an intelligent AI digital-trust and verification assistant running as a browser extension side panel.
+The user is viewing a webpage titled "${ctx.title || 'Webpage'}" at "${ctx.url || ''}".
+Active excerpt:
+"${text.slice(0, 3000)}"
+
+Action requested: "${action}". User query: "${query || action}".
+
+GUIDELINES:
+- Use simple, plain, conversational English with short bullet points.
+- Distinguish warning signs from proven fraud.
+- Never claim an item is verified unless real proof exists.
+- Be direct, polite, helpful, and concise.`;
+
+  const models = ['gemini-2.5-flash', 'gemini-3.5-flash-lite', 'gemini-flash-latest'];
+  for (const model of models) {
+    try {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          generationConfig: { maxOutputTokens: 1000 }
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const textOut = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (textOut) {
+          return {
+            response: textOut,
+            isLiveAI: true,
+            provider: `Gemini Direct (${model})`
+          };
+        }
+      }
+    } catch (e) {
+      console.warn(`Direct Gemini model ${model} failed:`, e);
+    }
+  }
+  return null;
 }
 
 /* ==========================================================================

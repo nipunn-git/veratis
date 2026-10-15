@@ -1,13 +1,36 @@
-/**
- * VERATIS Companion - AI Analysis Endpoint
- * Vercel Serverless Function & Chrome Extension API
- * 
- * Supports Live AI (Gemini, OpenAI, Anthropic) via server-side environment keys,
- * or runs an intelligent fallback analyzer when keys are not configured.
- * Fully CORS-enabled for Chrome Extensions and Web Apps.
- */
+import fs from 'fs';
+import path from 'path';
+
+// Helper to ensure .env keys are populated
+function ensureEnvLoaded() {
+  if (process.env.GEMINI_API_KEY && process.env.GROQ_API_KEY) return;
+  try {
+    const envPath = path.resolve(process.cwd(), '.env');
+    if (fs.existsSync(envPath)) {
+      const content = fs.readFileSync(envPath, 'utf8');
+      for (const line of content.split('\n')) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith('#')) continue;
+        const [k, ...v] = trimmed.split('=');
+        if (k && v.length) {
+          const key = k.trim();
+          let val = v.join('=').trim();
+          if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+            val = val.slice(1, -1);
+          }
+          if (!process.env[key]) {
+            process.env[key] = val;
+          }
+        }
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+}
 
 export default async function handler(req, res) {
+  ensureEnvLoaded();
   // CORS Headers
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -47,8 +70,8 @@ export default async function handler(req, res) {
 
     let aiResult = null;
 
-    // 1. Try GroqCloud (Ultra fast Llama 3.3 70B)
-    if (groqKey && !aiResult) {
+    // 1. Try GroqCloud (Ultra fast Llama 3.3 70B - requires gsk_ key)
+    if (groqKey && groqKey.startsWith('gsk_') && !aiResult) {
       try {
         aiResult = await callGroqCompanion(groqKey, action, query, contextContent, pageTitle, pageUrl, history);
       } catch (err) {
@@ -56,7 +79,7 @@ export default async function handler(req, res) {
       }
     }
 
-    // 2. Try Gemini
+    // 2. Try Gemini (Google AI Studio)
     if (geminiKey && !aiResult) {
       try {
         aiResult = await callGeminiCompanion(geminiKey, action, query, contextContent, pageTitle, pageUrl, history);
@@ -191,33 +214,51 @@ The user requested action: "${action}".
 The user question or instruction: "${query || action}".
 
 GUIDELINES:
-- Use simple, plain, crisp English. Avoid heavy academic jargon.
+- Use simple, plain, conversational English with short bullet points.
 - Distinguish warning signs from proven fraud.
 - Never claim an item is verified unless real proof exists.
-- Be direct, polite, helpful, and concise with short bullet points.`;
+- Be direct, polite, helpful, and concise.`;
 
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        generationConfig: { maxOutputTokens: 1000 }
-      })
+  const models = ['gemini-2.5-flash', 'gemini-3.5-flash-lite', 'gemini-flash-latest'];
+  let lastErr = null;
+
+  for (const model of models) {
+    try {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            generationConfig: { maxOutputTokens: 1000 }
+          })
+        }
+      );
+
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`Gemini ${model} HTTP ${response.status}: ${errText}`);
+      }
+
+      const data = await response.json();
+      const textOutput = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (textOutput) {
+        return {
+          action,
+          response: textOutput,
+          isLiveAI: true,
+          provider: `Gemini Live AI (${model})`,
+          suggestedNext: ['Investigate', 'Challenge This', 'Explain in simple terms']
+        };
+      }
+    } catch (err) {
+      lastErr = err;
+      console.warn(`Gemini model ${model} attempt failed:`, err.message);
     }
-  );
+  }
 
-  if (!response.ok) throw new Error(`Gemini status ${response.status}`);
-  const data = await response.json();
-  const textOutput = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated.';
-
-  return {
-    action,
-    response: textOutput,
-    isLiveAI: true,
-    suggestedNext: ['Investigate', 'Challenge This', 'Explain in simple terms']
-  };
+  throw lastErr || new Error('All Gemini models failed');
 }
 
 /**
