@@ -441,6 +441,8 @@ export default function WebGLHero({ onExplore, onPhaseChange }) {
 
   const [phase, setPhase]     = useState("idle"); // 'idle' | 'animating' | 'done'
   const [glError, setGlError] = useState(false);
+  const [showWordmark, setShowWordmark] = useState(false);
+  const showWordmarkRef = useRef(false);
 
   const onPhaseChangeRef = useRef(onPhaseChange);
   useEffect(() => {
@@ -495,8 +497,14 @@ export default function WebGLHero({ onExplore, onPhaseChange }) {
       ],
       (v) => {
         progressRef.current = v;
+        if (v >= 0.35 && !showWordmarkRef.current) {
+          showWordmarkRef.current = true;
+          setShowWordmark(true);
+        }
       },
       () => {
+        showWordmarkRef.current = true;
+        setShowWordmark(true);
         transitionedRef.current = true;
         isPlayingRef.current    = false;
         updatePhase("done");
@@ -532,6 +540,8 @@ export default function WebGLHero({ onExplore, onPhaseChange }) {
     progressRef.current     = 0;
     transitionedRef.current = false;
     isPlayingRef.current    = false;
+    showWordmarkRef.current = false;
+    setShowWordmark(false);
     updatePhase("idle");
   }, [updatePhase]);
 
@@ -712,10 +722,10 @@ export default function WebGLHero({ onExplore, onPhaseChange }) {
         </div>
       )}
 
-      {/* ── Preloaded Interactive Halftone Dot 'VERATIS' Wordmark (Mounted on start, 0 delay) ── */}
+      {/* ── Preloaded Interactive Halftone Dot 'VERATIS' Wordmark (Appears Quicker) ── */}
       <div
-        className={`absolute inset-x-0 bottom-0 z-20 flex flex-col justify-end transition-opacity duration-500 ease-out ${
-          phase === "done" ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        className={`absolute inset-x-0 bottom-0 z-20 flex flex-col justify-end transition-opacity duration-300 ease-out ${
+          showWordmark ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
       >
         <HalftoneWordmarkFooter
