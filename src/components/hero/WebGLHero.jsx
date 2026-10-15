@@ -693,16 +693,16 @@ export default function WebGLHero({ onExplore, onPhaseChange }) {
         }}
       />
 
-      {/* ── Proper, Highly Readable, Sleek Thin "TOUCH" Text Touching the Bottom ── */}
+      {/* ── "REALITY HAS A BLIND SPOT" at the Bottom ── */}
       {phase === "idle" && (
-        <div className="absolute inset-x-0 bottom-0 z-30 flex flex-col items-center justify-end pb-2 sm:pb-3 pointer-events-none select-none overflow-visible">
+        <div className="absolute inset-x-0 bottom-0 z-30 flex flex-col items-center justify-end pb-3 sm:pb-4 pointer-events-none select-none overflow-visible px-4">
           <button
             type="button"
             onClick={handleInteraction}
             onPointerDown={handleInteraction}
-            className="text-white pointer-events-auto cursor-pointer select-none touch-manipulation transition-opacity duration-150 hover:opacity-80 active:opacity-60"
+            className="text-white pointer-events-auto cursor-pointer select-none touch-manipulation transition-opacity duration-150 hover:opacity-80 active:opacity-60 whitespace-nowrap"
             style={{
-              fontSize: "clamp(2.4rem, 6.8vw, 4.5rem)",
+              fontSize: "clamp(1.1rem, 3.4vw, 3.2rem)",
               fontFamily: "'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif",
               letterSpacing: "0.04em",
               fontWeight: 300,
@@ -717,7 +717,7 @@ export default function WebGLHero({ onExplore, onPhaseChange }) {
               display: "inline-block",
             }}
           >
-            TOUCH
+            REALITY HAS A BLIND SPOT
           </button>
         </div>
       )}
