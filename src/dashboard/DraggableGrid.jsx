@@ -28,6 +28,7 @@ export default function DraggableGrid({
   onSwitchCase,
   onExportDossier,
   onNewUpload,
+  onPredictOriginal,
 }) {
   const [draggedWidgetId, setDraggedWidgetId] = useState(null);
   const [dragOverWidgetId, setDragOverWidgetId] = useState(null);
@@ -97,6 +98,7 @@ export default function DraggableGrid({
             onSwitchCase={onSwitchCase}
             onExportDossier={onExportDossier}
             onNewUpload={onNewUpload}
+            onPredictOriginal={onPredictOriginal}
           />
         );
       case 'synthetic-coherence':

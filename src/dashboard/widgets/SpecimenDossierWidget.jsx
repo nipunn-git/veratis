@@ -5,7 +5,8 @@ export default function SpecimenDossierWidget({
   currentCase, 
   onSwitchCase, 
   onExportDossier, 
-  onNewUpload 
+  onNewUpload,
+  onPredictOriginal
 }) {
   if (!currentCase) return null;
 
@@ -52,6 +53,14 @@ export default function SpecimenDossierWidget({
 
           <div className="flex flex-wrap items-center gap-2 pt-2">
             <button
+              onClick={onPredictOriginal}
+              className="text-xs font-semibold px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-emerald-200" />
+              <span>Predict Original</span>
+            </button>
+
+            <button
               onClick={onSwitchCase}
               className="text-xs font-medium px-3 py-1.5 rounded-lg bg-zinc-100/80 hover:bg-zinc-200/70 text-zinc-700 transition-colors cursor-pointer flex items-center gap-1.5"
             >
@@ -65,14 +74,6 @@ export default function SpecimenDossierWidget({
             >
               <Upload className="w-3.5 h-3.5 text-zinc-500" />
               <span>Ingest media</span>
-            </button>
-
-            <button
-              onClick={onExportDossier}
-              className="text-xs font-medium px-3.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>Export dossier</span>
             </button>
           </div>
         </div>
@@ -95,11 +96,15 @@ export default function SpecimenDossierWidget({
       </div>
 
       {/* Footer Meta */}
-      <div className="flex items-center justify-between text-xs text-zinc-400 pt-3 border-t border-zinc-100">
-        <span>Lead: {currentCase.leadInvestigator}</span>
-        <span className="text-zinc-600 font-medium flex items-center gap-1.5">
-          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Enclave verified
-        </span>
+      <div className="flex items-center justify-between text-xs text-zinc-500 pt-3 border-t border-zinc-100">
+        <span>Authentic Ground Truth Recovery</span>
+        <button
+          onClick={onPredictOriginal}
+          className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 cursor-pointer transition-colors"
+        >
+          <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+          <span>Invert Latent Deepfake →</span>
+        </button>
       </div>
     </div>
   );

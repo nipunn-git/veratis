@@ -42,9 +42,9 @@ export default function ConsensusRegistryWidget({ currentCase }) {
       </div>
 
       {/* Footer */}
-      <div className="text-[11px] text-zinc-400 pt-3 border-t border-zinc-100 flex items-center justify-between">
-        <span>Hardware EXIF: Absent</span>
-        <span className="text-rose-600 font-medium">Non-authentic</span>
+      <div className="text-[11px] text-zinc-500 pt-3 border-t border-zinc-100 flex items-center justify-between">
+        <span>EXIF Signatures: Stripped</span>
+        <span className="text-rose-600 font-medium">Synthetic Provenance</span>
       </div>
     </div>
   );

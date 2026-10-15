@@ -38,13 +38,13 @@ export default function IngestModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="w-full max-w-3xl bg-white border border-zinc-200 rounded-3xl p-6 sm:p-8 shadow-2xl relative max-h-[92vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-zinc-200 mb-6">
+        <div className="flex items-center justify-between pb-4 border-b border-zinc-200 mb-6 font-sans">
           <div>
-            <span className="text-xs font-mono text-zinc-500 uppercase tracking-wider font-semibold">
-              [CLIENT-SIDE FORENSIC INGESTION]
+            <span className="text-xs text-zinc-500 font-medium">
+              Forensic Specimen Ingestion
             </span>
-            <h3 className="text-2xl font-bold text-zinc-900 uppercase mt-1">
-              Load Specimen Media
+            <h3 className="text-xl font-bold text-zinc-950 mt-0.5">
+              Upload Specimen Media
             </h3>
           </div>
           <button

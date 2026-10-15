@@ -27,6 +27,7 @@ import RealityTimeline from '../components/dashboard/RealityTimeline';
 import EvidenceGravityMap from '../components/dashboard/EvidenceGravityMap';
 import CompetingHypotheses from '../components/dashboard/CompetingHypotheses';
 import UncertaintyEngine from '../components/dashboard/UncertaintyEngine';
+import RealityInversion from '../components/dashboard/RealityInversion';
 
 const STORAGE_KEY = 'veratis_dashboard_white_v2';
 
@@ -256,6 +257,7 @@ export default function Dashboard({ onBackToLanding, initialCaseIndex = 0 }) {
                 onSwitchCase={() => setCaseModalOpen(true)}
                 onExportDossier={handleExportDossier}
                 onNewUpload={() => setUploadModalOpen(true)}
+                onPredictOriginal={() => setActiveTab('reconstruct')}
               />
             </div>
           )}
@@ -263,6 +265,14 @@ export default function Dashboard({ onBackToLanding, initialCaseIndex = 0 }) {
           {/* FOCUSED FEATURE VIEWS: Attached edge-to-edge to sides, open top/bottom revealing live moving background */}
           {activeTab !== 'overview' && (
             <div className="w-full my-auto max-h-[calc(100vh-160px)] overflow-y-auto bg-white/70 backdrop-blur-md border-y border-zinc-200/60 border-x-0 py-6 sm:py-8 px-6 sm:px-12 lg:px-20 xl:px-28 2xl:px-36 shadow-xs">
+              {/* VIEW: REALITY INVERSION (AI Original Prediction & Reconstruction) */}
+              {activeTab === 'reconstruct' && (
+                <RealityInversion
+                  currentCase={currentCase}
+                  onIngestNew={() => setUploadModalOpen(true)}
+                />
+              )}
+
               {/* VIEW B: DECEPTION RADAR */}
               {activeTab === 'radar' && (
                 <DeceptionRadar

@@ -10,7 +10,8 @@ import {
   Upload, 
   Download, 
   Home, 
-  Layers
+  Layers,
+  Sparkles
 } from 'lucide-react';
 
 export default function BottomNavbar({
@@ -23,12 +24,13 @@ export default function BottomNavbar({
 }) {
   const tabs = [
     { id: 'overview', label: 'Grid', icon: LayoutGrid, hotkey: '1' },
-    { id: 'radar', label: 'Radar', icon: Radar, hotkey: '2' },
-    { id: 'autopsy', label: 'Autopsy', icon: Search, hotkey: '3' },
-    { id: 'timeline', label: 'Timeline', icon: Clock, hotkey: '4' },
-    { id: 'gravity', label: 'Gravity', icon: GitFork, hotkey: '5' },
-    { id: 'hypotheses', label: 'Hypotheses', icon: Scale, hotkey: '6' },
-    { id: 'uncertainty', label: 'Uncertainty', icon: HelpCircle, hotkey: '7' },
+    { id: 'reconstruct', label: 'Reconstruct', icon: Sparkles, hotkey: '2' },
+    { id: 'radar', label: 'Radar', icon: Radar, hotkey: '3' },
+    { id: 'autopsy', label: 'Autopsy', icon: Search, hotkey: '4' },
+    { id: 'timeline', label: 'Timeline', icon: Clock, hotkey: '5' },
+    { id: 'gravity', label: 'Gravity', icon: GitFork, hotkey: '6' },
+    { id: 'hypotheses', label: 'Hypotheses', icon: Scale, hotkey: '7' },
+    { id: 'uncertainty', label: 'Uncertainty', icon: HelpCircle, hotkey: '8' },
   ];
 
   // Keyboard shortcuts

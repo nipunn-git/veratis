@@ -37,9 +37,9 @@ export default function SpectralArtifactsWidget({ currentCase }) {
       </div>
 
       {/* Footer */}
-      <div className="text-[11px] text-zinc-400 pt-3 border-t border-zinc-100 flex items-center justify-between">
-        <span>Sub-pixel resolution</span>
-        <span className="text-zinc-700 font-medium">32-bit calibrated</span>
+      <div className="text-[11px] text-zinc-500 pt-3 border-t border-zinc-100 flex items-center justify-between">
+        <span>Boundary Type: Inpainting Blend</span>
+        <span className="text-emerald-700 font-medium">Reconstructable</span>
       </div>
     </div>
   );
