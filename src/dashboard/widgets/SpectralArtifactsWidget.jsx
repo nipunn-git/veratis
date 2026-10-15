@@ -7,39 +7,39 @@ export default function SpectralArtifactsWidget({ currentCase }) {
       {/* Header */}
       <div>
         <div className="flex items-center justify-between pb-3 border-b border-zinc-100 pr-16">
-          <span className="text-xs font-medium text-zinc-400">
+          <span className="text-sm font-semibold text-zinc-950">
             Spectral artifacts
           </span>
-          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700">
+          <span className="text-sm font-semibold text-rose-600">
             Detected
           </span>
         </div>
 
         {/* Primary Metric */}
         <div className="mt-3">
-          <div className="text-3xl font-semibold text-zinc-900 tracking-tight">
+          <div className="text-4xl font-bold text-zinc-950 tracking-tight">
             64px
           </div>
-          <span className="text-xs text-zinc-500">Neural face-swap blend boundary</span>
+          <span className="text-sm text-zinc-500 font-medium">Neural face-swap blend boundary</span>
         </div>
 
         {/* Breakdown Items */}
-        <div className="space-y-2 mt-4 text-xs">
-          <div className="p-2 rounded-xl bg-zinc-50 border border-zinc-100">
-            <span className="text-[11px] text-zinc-400 block">Fourier high-freq drop</span>
-            <span className="font-semibold text-zinc-900">-37% pixel variance</span>
+        <div className="space-y-2 mt-4 text-sm">
+          <div className="p-2.5 rounded-xl bg-zinc-50 border border-zinc-100">
+            <span className="text-xs text-zinc-400 block font-medium">Fourier high-freq drop</span>
+            <span className="font-semibold text-zinc-950 text-sm">-37% pixel variance</span>
           </div>
-          <div className="p-2 rounded-xl bg-zinc-50 border border-zinc-100">
-            <span className="text-[11px] text-zinc-400 block">Specular reflection</span>
-            <span className="font-semibold text-zinc-900">41° source divergence</span>
+          <div className="p-2.5 rounded-xl bg-zinc-50 border border-zinc-100">
+            <span className="text-xs text-zinc-400 block font-medium">Specular reflection</span>
+            <span className="font-semibold text-zinc-950 text-sm">41° source divergence</span>
           </div>
         </div>
       </div>
 
       {/* Footer */}
-      <div className="text-[11px] text-zinc-500 pt-3 border-t border-zinc-100 flex items-center justify-between">
-        <span>Boundary Type: Inpainting Blend</span>
-        <span className="text-emerald-700 font-medium">Reconstructable</span>
+      <div className="text-xs text-zinc-500 pt-3 border-t border-zinc-100 flex items-center justify-between">
+        <span>Boundary: Inpainting Blend</span>
+        <span className="text-emerald-700 font-semibold">Reconstructable</span>
       </div>
     </div>
   );

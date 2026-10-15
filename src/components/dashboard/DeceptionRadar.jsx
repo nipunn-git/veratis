@@ -53,28 +53,31 @@ export default function DeceptionRadar({ scores, analysis }) {
   const activeAxisData = axes.find((a) => a.key === selectedAxis) || axes[0];
 
   return (
-    <div className="space-y-10 font-sans">
-      {/* Editorial Header (Scaled Up) */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-8 border-b border-zinc-100">
+    <div className="space-y-10 font-sans max-w-[1800px] mx-auto">
+      {/* Editorial Header - Matches Image 2 */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-8 border-b border-zinc-200/80">
         <div>
-          <span className="text-sm font-medium text-zinc-400 tracking-wide block">
-            Integrity radar
-          </span>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-zinc-900 mt-1.5">
-            Synthetic Coherence Analysis
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xs font-mono font-bold tracking-widest text-zinc-500 uppercase">
+              INTEGRITY RADAR // ORTHOGONAL DECOMPOSITION
+            </span>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-700 border border-zinc-200 font-semibold">
+              5-AXIS FORENSICS
+            </span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-zinc-950">
+            Deception Radar
           </h2>
-          <p className="text-base sm:text-lg text-zinc-500 mt-2 max-w-2xl">
-            Five-dimensional orthogonal decomposition of media authenticity.
+          <p className="text-base sm:text-lg text-zinc-600 mt-2 max-w-3xl leading-relaxed">
+            Five-dimensional orthogonal decomposition of media authenticity, isolating anomalies across spectrum, temporal cadence, and context.
           </p>
         </div>
 
         {/* Scaled Minimal Score Indicator */}
-        <div className="flex items-baseline gap-3 sm:text-right shrink-0">
-          <div>
-            <div className="text-sm text-zinc-400 font-medium">Composite deviation</div>
-            <div className="text-5xl sm:text-6xl font-semibold tracking-tight text-zinc-900 mt-0.5">
-              {compositeScore}<span className="text-2xl font-normal text-zinc-400"> / 100</span>
-            </div>
+        <div className="flex flex-col items-start sm:items-end gap-1 shrink-0">
+          <span className="text-xs font-mono text-zinc-400 uppercase">COMPOSITE DEVIATION</span>
+          <div className="text-5xl sm:text-6xl font-extrabold tracking-tight text-zinc-950 tabular-nums">
+            {compositeScore}<span className="text-2xl font-normal text-zinc-400"> / 100</span>
           </div>
         </div>
       </div>

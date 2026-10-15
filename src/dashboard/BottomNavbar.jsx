@@ -13,7 +13,9 @@ import {
   Layers,
   Sparkles,
   Gavel,
-  Bot
+  Bot,
+  FileText,
+  Activity
 } from 'lucide-react';
 
 export default function BottomNavbar({
@@ -25,16 +27,13 @@ export default function BottomNavbar({
   onBackToLanding,
 }) {
   const tabs = [
-    { id: 'overview', label: 'Grid', icon: LayoutGrid, hotkey: '1' },
+    { id: 'home', label: 'Home', icon: Home, hotkey: '1' },
     { id: 'tribunal', label: 'Tribunal', icon: Gavel, hotkey: '2' },
     { id: 'twin', label: 'Digital Twin', icon: Bot, hotkey: '3' },
     { id: 'reconstruct', label: 'Reconstruct', icon: Sparkles, hotkey: '4' },
-    { id: 'radar', label: 'Radar', icon: Radar, hotkey: '5' },
-    { id: 'autopsy', label: 'Autopsy', icon: Search, hotkey: '6' },
-    { id: 'timeline', label: 'Timeline', icon: Clock, hotkey: '7' },
-    { id: 'gravity', label: 'Gravity', icon: GitFork, hotkey: '8' },
-    { id: 'hypotheses', label: 'Hypotheses', icon: Scale, hotkey: '9' },
-    { id: 'uncertainty', label: 'Uncertainty', icon: HelpCircle, hotkey: '0' },
+    { id: 'reactor', label: 'Reactor', icon: Activity, hotkey: '5' },
+    { id: 'neutralizer', label: 'Neutralizer', icon: FileText, hotkey: '6' },
+    { id: 'radar', label: 'Radar', icon: Radar, hotkey: '7' },
   ];
 
   // Keyboard shortcuts
@@ -79,19 +78,6 @@ export default function BottomNavbar({
             );
           })}
         </div>
-
-        {/* Subtle Separator */}
-        <div className="w-px h-4 bg-zinc-800 mx-1" />
-
-        {/* Exit / Return to Landing Page */}
-        <button
-          onClick={onBackToLanding}
-          className="flex items-center gap-1 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-full text-zinc-400 hover:text-white hover:bg-zinc-800/60 transition-colors cursor-pointer text-xs font-normal"
-          title="Return to home landing page"
-        >
-          <Home className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline text-xs">Home</span>
-        </button>
       </div>
     </nav>
   );

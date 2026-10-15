@@ -183,60 +183,64 @@ export default function RealityInversion({ currentCase, onIngestNew }) {
   const activeOriginal = customOriginalUrl || selectedCase?.originalSrc || '/assets/original_diplomat.jpg';
 
   return (
-    <div className="space-y-6 font-sans">
-      {/* Header Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-zinc-200/70">
+    <div className="space-y-10 font-sans max-w-[1800px] mx-auto">
+      {/* Editorial Header - Matches Image 2 */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-zinc-200/80">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/60">
-              Neural Latent Inverter
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xs font-mono font-bold tracking-widest text-zinc-500 uppercase">
+              NEURAL LATENT INVERTER // GROUND TRUTH RECOVERY
             </span>
-            <span className="text-xs text-zinc-400">·</span>
-            <span className="text-xs text-zinc-500 font-medium">De-Morphing & Pre-Morph Ground Truth Reconstruction</span>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-700 border border-zinc-200 font-semibold">
+              LATENT RESTORATION
+            </span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950 mt-1">
-            Predict & Reconstruct Original
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-zinc-950">
+            Reality Inversion
           </h2>
-          <p className="text-xs sm:text-sm text-zinc-600 mt-0.5 max-w-2xl">
-            Attach any AI-morphed or face-swapped media. The inversion engine isolates synthetic latents, strips generative artifacts, and reconstructs the predicted authentic original photograph on the spot.
+          <p className="text-base sm:text-lg text-zinc-600 mt-2 max-w-3xl leading-relaxed">
+            Isolate synthetic generative latents and reconstruct predicted pre-morph ground truth from suspect media.
           </p>
         </div>
 
         {/* View Switcher Controls */}
-        <div className="flex items-center gap-2 shrink-0">
-          <div className="flex items-center p-1 rounded-xl bg-zinc-100 border border-zinc-200/80 text-xs">
+        <div className="flex flex-col items-start md:items-end gap-2 shrink-0">
+          <span className="text-xs font-mono text-zinc-400 uppercase">INSPECTION VIEW</span>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-zinc-100/90 border border-zinc-200/60 text-xs font-semibold">
+              <button
+                onClick={() => setViewMode('slider')}
+                className={`px-3.5 py-1.5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
+                  viewMode === 'slider' 
+                    ? 'bg-white text-zinc-950 shadow-xs' 
+                    : 'text-zinc-600 hover:text-zinc-950'
+                }`}
+              >
+                <Split className="w-3.5 h-3.5" />
+                <span>Split Slider</span>
+              </button>
+              <button
+                onClick={() => setViewMode('side-by-side')}
+                className={`px-3.5 py-1.5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
+                  viewMode === 'side-by-side' 
+                    ? 'bg-white text-zinc-950 shadow-xs' 
+                    : 'text-zinc-600 hover:text-zinc-950'
+                }`}
+              >
+                <Eye className="w-3.5 h-3.5" />
+                <span>Side-by-Side</span>
+              </button>
+            </div>
+
+            {/* Quick Attach Image Button */}
             <button
-              onClick={() => setViewMode('slider')}
-              className={`px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer flex items-center gap-1.5 ${
-                viewMode === 'slider' 
-                  ? 'bg-white text-zinc-950 shadow-xs' 
-                  : 'text-zinc-600 hover:text-zinc-900'
-              }`}
+              onClick={() => fileInputRef.current?.click()}
+              className="px-3.5 py-2 rounded-xl bg-zinc-950 hover:bg-black text-white text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
             >
-              <Split className="w-3.5 h-3.5" />
-              <span>Split Slider</span>
-            </button>
-            <button
-              onClick={() => setViewMode('side-by-side')}
-              className={`px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer flex items-center gap-1.5 ${
-                viewMode === 'side-by-side' 
-                  ? 'bg-white text-zinc-950 shadow-xs' 
-                  : 'text-zinc-600 hover:text-zinc-900'
-              }`}
-            >
-              <Eye className="w-3.5 h-3.5" />
-              <span>Side-by-Side</span>
+              <Upload className="w-3.5 h-3.5" />
+              <span>Attach Image</span>
             </button>
           </div>
-
-          {/* Quick Attach Image Button */}
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="px-3.5 py-1.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
-          >
-            <Upload className="w-3.5 h-3.5" />
-            <span>Attach Morphed Image</span>
-          </button>
           <input
             ref={fileInputRef}
             type="file"
@@ -285,8 +289,8 @@ export default function RealityInversion({ currentCase, onIngestNew }) {
                     alt="AI Predicted Original"
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute top-3 right-3 z-10 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-emerald-200/80 shadow-sm text-xs font-semibold text-emerald-800 flex items-center gap-1.5 font-sans">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                  <div className="absolute top-3 right-3 z-10 px-3.5 py-1.5 rounded-xl bg-white/95 backdrop-blur-md border border-emerald-200/80 shadow-xs text-sm font-semibold text-emerald-800 flex items-center gap-2 font-sans">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
                     <span>AI Predicted Original Ground Truth</span>
                   </div>
                 </div>
@@ -302,7 +306,7 @@ export default function RealityInversion({ currentCase, onIngestNew }) {
                     className="w-full h-full object-cover max-w-none"
                     style={{ width: sliderContainerRef.current ? sliderContainerRef.current.clientWidth : '100%' }}
                   />
-                  <div className="absolute top-3 left-3 z-10 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-rose-200/80 shadow-sm text-xs font-semibold text-rose-800 flex items-center gap-1.5 font-sans">
+                  <div className="absolute top-3 left-3 z-10 px-3.5 py-1.5 rounded-xl bg-white/95 backdrop-blur-md border border-rose-200/80 shadow-xs text-sm font-semibold text-rose-800 flex items-center gap-2 font-sans">
                     <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
                     <span>Morphed AI Specimen</span>
                   </div>

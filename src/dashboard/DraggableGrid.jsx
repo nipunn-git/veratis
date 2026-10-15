@@ -18,6 +18,8 @@ import ConsensusRegistryWidget from './widgets/ConsensusRegistryWidget';
 import SpectralArtifactsWidget from './widgets/SpectralArtifactsWidget';
 import PropagationTrailWidget from './widgets/PropagationTrailWidget';
 import BayesianArbitrationWidget from './widgets/BayesianArbitrationWidget';
+import NeutralizerWidget from './widgets/NeutralizerWidget';
+import RumorReactorWidget from './widgets/RumorReactorWidget';
 
 export default function DraggableGrid({
   widgets,
@@ -30,6 +32,8 @@ export default function DraggableGrid({
   onNewUpload,
   onPredictOriginal,
   onNavigateTab,
+  onOpenNeutralizer,
+  onOpenReactor,
 }) {
   const [draggedWidgetId, setDraggedWidgetId] = useState(null);
   const [dragOverWidgetId, setDragOverWidgetId] = useState(null);
@@ -101,8 +105,14 @@ export default function DraggableGrid({
             onNewUpload={onNewUpload}
             onPredictOriginal={onPredictOriginal}
             onNavigateTab={onNavigateTab}
+            onOpenNeutralizer={onOpenNeutralizer}
+            onOpenReactor={onOpenReactor}
           />
         );
+      case 'reactor-preview':
+        return <RumorReactorWidget onOpenReactor={onOpenReactor} />;
+      case 'neutralizer-preview':
+        return <NeutralizerWidget onOpenNeutralizer={onOpenNeutralizer} />;
       case 'synthetic-coherence':
       case 'system-status':
         return <SyntheticCoherenceWidget currentCase={currentCase} />;
@@ -125,6 +135,8 @@ export default function DraggableGrid({
             onSwitchCase={onSwitchCase}
             onExportDossier={onExportDossier}
             onNewUpload={onNewUpload}
+            onPredictOriginal={onPredictOriginal}
+            onOpenNeutralizer={onOpenNeutralizer}
           />
         );
     }
