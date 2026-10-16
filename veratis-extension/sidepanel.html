@@ -17,6 +17,18 @@
     </div>
 
     <div class="header-actions">
+      <!-- Circular Overlay Toggle Button -->
+      <button id="overlayToggleBtn" class="circular-toggle-btn active" title="Page Quick-Access Overlay: ON (Click to toggle)" aria-label="Toggle page quick-access overlay">
+        <span class="circular-toggle-logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"></circle>
+            <circle cx="12" cy="12" r="4.5"></circle>
+            <circle cx="12" cy="12" r="1.5" fill="currentColor"></circle>
+          </svg>
+        </span>
+        <span class="circular-toggle-dot" id="overlayToggleDot"></span>
+      </button>
+
       <button id="modeBadge" class="mode-badge demo" title="Click to configure backend API">
         <span class="mode-dot"></span>
         <span id="modeText">DEMO</span>
@@ -220,6 +232,18 @@
             placeholder="AI Studio API Key"
           >
           <span class="setting-hint">Powers deep forensics, claim cross-examination, and full-page analysis.</span>
+        </div>
+
+        <div class="setting-group">
+          <div class="setting-toggle-row">
+            <div class="setting-toggle-info">
+              <label class="setting-toggle-title">Page Quick-Access Overlay</label>
+              <span class="setting-hint">Shows a circular VERATIS logo button at the bottom-right of every webpage for 1-click Gemini security & phishing scanning.</span>
+            </div>
+            <button id="overlayModalToggle" class="circular-switch-btn active" type="button" aria-label="Toggle page overlay button">
+              <span class="circular-switch-thumb"></span>
+            </button>
+          </div>
         </div>
 
         <div class="setting-group">

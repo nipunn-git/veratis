@@ -34,6 +34,7 @@ let settings = {
 };
 
 // DOM Elements
+const overlayToggleBtn = document.getElementById('overlayToggleBtn');
 const modeBadge = document.getElementById('modeBadge');
 const modeText = document.getElementById('modeText');
 const clearChatBtn = document.getElementById('clearChatBtn');
@@ -72,6 +73,7 @@ const testApiBtn = document.getElementById('testApiBtn');
 const apiStatusMessage = document.getElementById('apiStatusMessage');
 const ttsRateSlider = document.getElementById('ttsRateSlider');
 const ttsRateVal = document.getElementById('ttsRateVal');
+const overlayModalToggle = document.getElementById('overlayModalToggle');
 const saveSettingsBtn = document.getElementById('saveSettingsBtn');
 
 /* ==========================================================================
@@ -111,10 +113,12 @@ function isRestrictedUrl(url) {
 // Load settings from storage
 async function loadSettings() {
   try {
-    const stored = await chrome.storage.local.get(['veratis_settings']);
+    const stored = await chrome.storage.local.get(['veratis_settings', 'overlayEnabled']);
     if (stored.veratis_settings) {
       settings = { ...settings, ...stored.veratis_settings };
     }
+    const isOverlayOn = stored.overlayEnabled !== false;
+    updateOverlayToggleUI(isOverlayOn);
   } catch (e) {
     console.warn('Failed to load settings:', e);
   }
@@ -133,7 +137,48 @@ async function loadSettings() {
   if (radio) radio.checked = true;
 }
 
-// Refresh active browser tab information
+// Update circular overlay toggle UI in header and settings
+function updateOverlayToggleUI(isOn) {
+  if (overlayToggleBtn) {
+    overlayToggleBtn.classList.toggle('active', isOn);
+    overlayToggleBtn.title = isOn 
+      ? 'Page Quick-Access Overlay: ON (Click to turn OFF)' 
+      : 'Page Quick-Access Overlay: OFF (Click to turn ON)';
+  }
+  if (overlayModalToggle) {
+    overlayModalToggle.classList.toggle('active', isOn);
+  }
+}
+
+// Toggle page overlay state and broadcast to all tabs
+async function toggleOverlaySetting(forcedState) {
+  try {
+    const current = await chrome.storage.local.get(['overlayEnabled']);
+    const isCurrentlyOn = current.overlayEnabled !== false;
+    const newState = forcedState !== undefined ? forcedState : !isCurrentlyOn;
+
+    await chrome.storage.local.set({ overlayEnabled: newState });
+    updateOverlayToggleUI(newState);
+
+    // Notify all active tabs immediately so the button appears/disappears live
+    if (chrome.tabs) {
+      chrome.tabs.query({}, (tabs) => {
+        for (const tab of tabs) {
+          if (tab.id) {
+            chrome.tabs.sendMessage(tab.id, {
+              action: 'SET_OVERLAY_VISIBILITY',
+              enabled: newState
+            }).catch(() => {});
+          }
+        }
+      });
+    }
+  } catch (err) {
+    console.warn('Failed to toggle overlay setting:', err);
+  }
+}
+
+// Refresh active browser tab information & auto-extract page data
 async function refreshActiveTab() {
   try {
     const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -142,17 +187,70 @@ async function refreshActiveTab() {
       const isRestricted = isRestrictedUrl(currentTab.url);
       if (isRestricted) {
         pageTitleLabel.textContent = 'Chrome system page (open any website to analyze)';
+        clearCapturedContext();
       } else {
         const domain = currentTab.url ? new URL(currentTab.url).hostname : 'Webpage';
         pageTitleLabel.textContent = `${domain} · ${currentTab.title || 'Active Tab'}`;
+        currentContext.title = currentTab.title || '';
+        currentContext.url = currentTab.url || '';
+        currentContext.domain = domain;
+
+        // Automatically give the extension access to the active page content!
+        autoExtractPageData();
       }
-      currentContext.title = currentTab.title || '';
-      currentContext.url = currentTab.url || '';
     } else {
       pageTitleLabel.textContent = 'No active tab detected';
     }
   } catch (e) {
     pageTitleLabel.textContent = 'Active tab protected or restricted';
+  }
+}
+
+// Automatically extract page content in the background without user intervention
+async function autoExtractPageData() {
+  if (!currentTab || !currentTab.id || isRestrictedUrl(currentTab.url)) return;
+  try {
+    chrome.tabs.sendMessage(currentTab.id, { action: 'GET_PAGE_DATA' }, async (response) => {
+      if (chrome.runtime.lastError || !response) {
+        try {
+          await chrome.scripting.executeScript({
+            target: { tabId: currentTab.id },
+            files: ['content.js']
+          });
+          chrome.tabs.sendMessage(currentTab.id, { action: 'GET_PAGE_DATA' }, (retryRes) => {
+            if (retryRes && (retryRes.pageText || retryRes.title)) {
+              applyAutoExtractedData(retryRes);
+            }
+          });
+        } catch (e) {
+          // Ignored for internal or protected tabs
+        }
+      } else if (response && (response.pageText || response.title)) {
+        applyAutoExtractedData(response);
+      }
+    });
+  } catch (err) {
+    console.debug('Auto page extraction skipped:', err);
+  }
+}
+
+function applyAutoExtractedData(response) {
+  currentContext.title = response.title || currentTab?.title || 'Page';
+  currentContext.url = response.url || currentTab?.url || '';
+  currentContext.domain = response.domain || (currentTab?.url ? new URL(currentTab.url).hostname : '');
+  currentContext.pageText = response.pageText || '';
+  currentContext.wordCount = response.wordCount || (response.pageText ? response.pageText.split(/\s+/).length : 0);
+  currentContext.metadata = response.metadata || {};
+  currentContext.headings = response.headings || [];
+  currentContext.links = response.links || [];
+  currentContext.forms = response.forms || [];
+
+  const wordCount = currentContext.wordCount;
+  if (wordCount > 0 && !currentContext.selectedText) {
+    const domain = currentContext.domain || 'Page';
+    pageTitleLabel.textContent = `${domain} · ${currentContext.title.slice(0, 35)} (${wordCount.toLocaleString()} words)`;
+    composerContextTag.classList.remove('hidden');
+    composerContextLabel.textContent = `Page attached: ${wordCount.toLocaleString()} words`;
   }
 }
 
@@ -370,6 +468,16 @@ function setupEventListeners() {
     handleSendMessage();
   });
 
+  // Circular Overlay Toggle in Header Bar
+  overlayToggleBtn?.addEventListener('click', () => {
+    toggleOverlaySetting();
+  });
+
+  // Circular Switch in Settings Modal
+  overlayModalToggle?.addEventListener('click', () => {
+    toggleOverlaySetting();
+  });
+
   // Clear Chat
   clearChatBtn.addEventListener('click', () => {
     conversationHistory = [];
@@ -455,6 +563,12 @@ function openSettingsModal() {
   ttsRateSlider.value = settings.ttsRate;
   ttsRateVal.textContent = `${settings.ttsRate}x`;
   apiStatusMessage.textContent = '';
+
+  chrome.storage.local.get(['overlayEnabled'], (res) => {
+    const isOverlayOn = res.overlayEnabled !== false;
+    updateOverlayToggleUI(isOverlayOn);
+  });
+
   settingsModal.classList.remove('hidden');
 }
 
@@ -557,29 +671,40 @@ async function executeAIRequest(action, query) {
       // 2. Direct client-side API fallback if backend is offline
       if (!result) {
         const isGroqKeyValid = settings.groqApiKey && settings.groqApiKey.startsWith('gsk_');
-        const preferGroq = isGroqKeyValid && (action === 'explain' || action === 'safe-reply' || action === 'summarize' || action === 'ask');
+        const hasGeminiKey = Boolean(settings.geminiApiKey);
+        const isGeminiFeature = action === 'summarize' || action === 'investigate' || action === 'phishing' || action === 'claims' || (currentContext.pageText && currentContext.pageText.length > 5000);
 
-        if (preferGroq) {
-          try {
-            result = await callDirectGroq(settings.groqApiKey, action, query, currentContext);
-          } catch (e) {
-            console.warn('Direct Groq call failed:', e);
+        if (isGeminiFeature) {
+          // Gemini: Full-page scanning, form & link inspection, deep forensics
+          if (hasGeminiKey) {
+            try {
+              result = await callDirectGemini(settings.geminiApiKey, action, query, currentContext);
+            } catch (geminiErr) {
+              console.warn('Direct Gemini call failed:', geminiErr);
+            }
           }
-        }
-
-        if (!result && settings.geminiApiKey) {
-          try {
-            result = await callDirectGemini(settings.geminiApiKey, action, query, currentContext);
-          } catch (geminiErr) {
-            console.warn('Direct Gemini call failed:', geminiErr);
+          if (!result && isGroqKeyValid) {
+            try {
+              result = await callDirectGroq(settings.groqApiKey, action, query, currentContext);
+            } catch (e) {
+              console.warn('Direct Groq fallback failed:', e);
+            }
           }
-        }
-
-        if (!result && isGroqKeyValid) {
-          try {
-            result = await callDirectGroq(settings.groqApiKey, action, query, currentContext);
-          } catch (e) {
-            console.warn('Direct Groq secondary fallback failed:', e);
+        } else {
+          // Groq: Instant text explanation, skeptic challenges, safe replies, fast Q&A
+          if (isGroqKeyValid) {
+            try {
+              result = await callDirectGroq(settings.groqApiKey, action, query, currentContext);
+            } catch (e) {
+              console.warn('Direct Groq call failed:', e);
+            }
+          }
+          if (!result && hasGeminiKey) {
+            try {
+              result = await callDirectGemini(settings.geminiApiKey, action, query, currentContext);
+            } catch (geminiErr) {
+              console.warn('Direct Gemini fallback failed:', geminiErr);
+            }
           }
         }
 
@@ -709,22 +834,38 @@ function initVoiceRecognition() {
   speechRecognition.interimResults = true;
   speechRecognition.lang = 'en-US';
 
+  let baseInput = '';
+
   speechRecognition.onstart = () => {
     isRecordingVoice = true;
+    baseInput = messageInput.value ? messageInput.value.trim() + ' ' : '';
     voiceBtn.classList.add('active');
-    messageInput.placeholder = 'Listening...';
+    voiceBtn.title = 'Listening... Click to stop';
+    messageInput.placeholder = 'Listening... Speak now';
   };
 
   speechRecognition.onresult = (event) => {
-    let transcript = '';
+    let interim = '';
+    let final = '';
     for (let i = event.resultIndex; i < event.results.length; ++i) {
-      transcript += event.results[i][0].transcript;
+      const res = event.results[i];
+      if (res.isFinal) {
+        final += res[0].transcript + ' ';
+      } else {
+        interim += res[0].transcript;
+      }
     }
-    messageInput.value = transcript;
+    if (final) {
+      baseInput += final;
+    }
+    messageInput.value = (baseInput + interim).trimStart();
   };
 
   speechRecognition.onerror = (event) => {
     console.warn('Speech recognition error:', event.error);
+    if (event.error === 'not-allowed') {
+      addMessage('assistant', 'Microphone access was denied. Please allow microphone permissions for the extension in your browser settings.');
+    }
     stopRecording();
   };
 
@@ -732,14 +873,27 @@ function initVoiceRecognition() {
     stopRecording();
   };
 
-  voiceBtn.addEventListener('click', () => {
+  voiceBtn.addEventListener('click', async () => {
     if (isRecordingVoice) {
-      speechRecognition.stop();
+      if (speechRecognition) speechRecognition.stop();
+      stopRecording();
     } else {
       try {
+        // Request microphone permission first if mediaDevices is supported
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            stream.getTracks().forEach((t) => t.stop());
+          } catch (micErr) {
+            console.warn('Microphone permission error:', micErr);
+            addMessage('assistant', 'Microphone access is required for voice dictation. Please allow microphone access in Chrome.');
+            return;
+          }
+        }
         speechRecognition.start();
       } catch (e) {
         console.warn('Speech start error:', e);
+        stopRecording();
       }
     }
   });
@@ -796,23 +950,22 @@ async function callDirectGroq(apiKey, action, query, ctx) {
   const text = (ctx.selectedText || ctx.pageText || query || '').trim();
   if (!text) return null;
 
-  const headingsText = ctx.headings?.length ? `Headings:\n${ctx.headings.slice(0, 8).map(h => `- ${h}`).join('\n')}\n` : '';
+  const headingsText = ctx.headings?.length ? `Headings:\n${ctx.headings.slice(0, 6).map(h => `- ${h}`).join('\n')}\n` : '';
   const metaDesc = ctx.metadata?.description ? `Meta Description: ${ctx.metadata.description}\n` : '';
-  const formsText = ctx.forms?.length ? `Forms Detected: ${ctx.forms.map(f => f.hasPasswordField ? 'Login Password Form' : 'Input Form').join(', ')}\n` : '';
 
-  const prompt = `You are VERATIS Companion, an intelligent AI digital-trust and verification assistant running as a browser extension side panel.
-The user is viewing a webpage titled "${ctx.title || 'Webpage'}" at "${ctx.url || ''}".
-${metaDesc}${headingsText}${formsText}
-Active excerpt:
-"${text.slice(0, 15000)}"
+  const prompt = `You are VERATIS, a lightning-fast, high-precision digital-trust and verification AI.
+Webpage: "${ctx.title || 'Webpage'}" (${ctx.url || ''})
+${metaDesc}${headingsText}
+Excerpt:
+"${text.slice(0, 10000)}"
 
-Action requested: "${action}". User query: "${query || action}".
+Action: "${action}". User query: "${query || action}".
 
-GUIDELINES:
-- Use simple, plain, conversational English with short bullet points.
-- Distinguish warning signs from proven fraud.
-- Never claim an item is verified unless real proof exists.
-- Be direct, polite, helpful, and concise.`;
+CRITICAL FORMATTING RULES:
+- Output MUST be extremely short, concise, and to the point.
+- Maximum 2 to 3 bullet points or short sentences. Never exceed 70 words total.
+- NO greetings, pleasantries, or introductory phrases.
+- State the direct answer, verdict, or counter-point immediately.`;
 
   const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
@@ -823,11 +976,11 @@ GUIDELINES:
     body: JSON.stringify({
       model: 'llama-3.3-70b-versatile',
       messages: [
-        { role: 'system', content: 'You are VERATIS, a trusted, plain-English digital-trust and media verification AI.' },
+        { role: 'system', content: 'You are VERATIS. Output concise, plain-English digital-trust analysis in max 2-3 short bullet points without pleasantries.' },
         { role: 'user', content: prompt }
       ],
       temperature: 0.2,
-      max_tokens: 1200
+      max_tokens: 250
     })
   });
 
@@ -840,7 +993,7 @@ GUIDELINES:
   const textOut = data.choices?.[0]?.message?.content;
   if (textOut) {
     return {
-      response: textOut,
+      response: textOut.trim(),
       isLiveAI: true,
       provider: 'Groq Direct (Llama 3.3 70B)'
     };
@@ -856,19 +1009,19 @@ async function callDirectGemini(apiKey, action, query, ctx) {
   const metaDesc = ctx.metadata?.description ? `Meta Description: ${ctx.metadata.description}\n` : '';
   const formsText = ctx.forms?.length ? `Forms Detected: ${ctx.forms.map(f => f.hasPasswordField ? 'Login Password Form' : 'Input Form').join(', ')}\n` : '';
 
-  const prompt = `You are VERATIS Companion, an intelligent AI digital-trust and verification assistant running as a browser extension side panel.
-The user is viewing a webpage titled "${ctx.title || 'Webpage'}" at "${ctx.url || ''}".
+  const prompt = `You are VERATIS, a concise, high-precision digital-trust and verification AI analyzing webpage content.
+Webpage: "${ctx.title || 'Webpage'}" (${ctx.url || ''})
 ${metaDesc}${headingsText}${formsText}
-Active excerpt:
+Content:
 "${text.slice(0, 25000)}"
 
-Action requested: "${action}". User query: "${query || action}".
+Action: "${action}". User query: "${query || action}".
 
-GUIDELINES:
-- Use simple, plain, conversational English with short bullet points.
-- Distinguish warning signs from proven fraud.
-- Never claim an item is verified unless real proof exists.
-- Be direct, polite, helpful, and concise.`;
+CRITICAL FORMATTING RULES:
+- Output MUST be extremely short, concise, and to the point.
+- Maximum 2 to 3 bullet points or short sentences. Never exceed 70 words total.
+- NO greetings, pleasantries, or introductory phrases.
+- State the direct answer, verdict, or verification step immediately.`;
 
   const models = ['gemini-2.5-flash', 'gemini-3.5-flash-lite', 'gemini-flash-latest'];
   for (const model of models) {
@@ -878,7 +1031,7 @@ GUIDELINES:
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ role: 'user', parts: [{ text: prompt }] }],
-          generationConfig: { maxOutputTokens: 1200 }
+          generationConfig: { maxOutputTokens: 250 }
         })
       });
 
@@ -887,7 +1040,7 @@ GUIDELINES:
         const textOut = data.candidates?.[0]?.content?.parts?.[0]?.text;
         if (textOut) {
           return {
-            response: textOut,
+            response: textOut.trim(),
             isLiveAI: true,
             provider: `Gemini Direct (${model})`
           };
@@ -901,7 +1054,7 @@ GUIDELINES:
 }
 
 /* ==========================================================================
-   Client-Side Fallback Analysis (Demo Mode) - Zero Emojis, Minimal
+   Client-Side Fallback Analysis (Demo Mode) - Zero Emojis, Minimal, Crisp
    ========================================================================== */
 
 function clientFallbackAnalysis(action, query, ctx) {
@@ -913,50 +1066,50 @@ function clientFallbackAnalysis(action, query, ctx) {
     case 'explain':
       return {
         isLiveAI: false,
-        response: `**Summary**\n\nThis content discusses: "${snippet}..."\n\n**Key Points**\n• It provides information regarding ${title}.\n• Written in standard descriptive language without specialized verification seals.\n• Recommendation: Cross-check claims against primary institutional records.`
+        response: `• **Core Idea:** Discusses ${title} ("${snippet.slice(0, 80)}...").\n• **Plain Meaning:** Descriptive overview without verified institutional accreditation.`
       };
 
     case 'investigate':
       return {
         isLiveAI: false,
-        response: `**Investigation Assessment**\n\n• **Content:** "${snippet}..."\n• **Source Page:** ${title}\n\n**Findings**\n1. **Verification Status:** Unverified third-party content.\n2. **Language Indicators:** Evaluated for urgency, unsupported claims, and missing corroboration.\n3. **Conclusion:** Exercise caution before relying on this information without secondary confirmation.`
+        response: `• **Status:** Unverified third-party content from ${title}.\n• **Verification:** Lacks primary source citations, official datasets, or certified public records.`
       };
 
     case 'challenge':
       return {
         isLiveAI: false,
-        response: `**Skeptic's Challenge**\n\n1. **Unproven Premises:** What primary evidence substantiates this claim?\n2. **Missing Proof:** No primary source links or certified public documents are cited.\n3. **Alternative Possibility:** This could be selective framing or unverified speculation.`
+        response: `• **Premise:** Assumes assertions are factual without independent verification.\n• **Missing Proof:** No primary records or verifiable audit trails provided.`
       };
 
     case 'phishing':
       return {
         isLiveAI: false,
-        response: `**Security & Phishing Assessment**\n\n• **Guideline:** Never share authentication codes, passwords, or initiate financial transfers over direct messaging.\n• **Domain Check:** Verify that the browser URL matches the official organization domain.\n• **Urgency:** Scammers often introduce artificial deadlines to bypass standard verification protocols.`
+        response: `• **Threat Level:** Evaluated for urgent deadlines and credential harvesting.\n• **Action:** Verify domain against official registrar. Never enter credentials via external links.`
       };
 
     case 'claims':
       return {
         isLiveAI: false,
-        response: `**Factual Claims Requiring Verification**\n\n1. "${snippet}..."\n   ↳ Check official press registers or accredited news wire coverage.\n2. Cross-reference any named individuals or figures against verified public registries.`
+        response: `• **Claim 1:** "${snippet.slice(0, 90)}..." (Requires independent validation).\n• **Claim 2:** Assertions regarding specific figures lack secondary corroboration.`
       };
 
     case 'safe-reply':
       return {
         isLiveAI: false,
-        response: `**Recommended Safe Reply**\n\n> "Thank you for contacting me. In accordance with security protocols, I cannot process requests or access external links without direct verification through official verified channels."`
+        response: `> "Thank you. Per security protocols, I cannot process requests or access external links without official verification through our company directory."`
       };
 
     case 'summarize':
       return {
         isLiveAI: false,
-        response: `**Page Summary for ${title}**\n\n• **Overview:** Covers ${snippet}...\n• **Source:** Captured from active tab.\n• **Note:** Confirm the publication date and author credentials before citation.`
+        response: `• **Page:** ${title}.\n• **Overview:** Covers "${snippet.slice(0, 100)}...". Confirm critical assertions via independent outlets.`
       };
 
     case 'ask':
     default:
       return {
         isLiveAI: false,
-        response: `Regarding: "${query || 'Analysis'}"\n\nBased on ${title} ("${snippet}..."): The content presents these details for consideration. Important assertions should be verified through independent primary sources.`
+        response: `• **Answer:** Regarding "${query || 'Analysis'}": Content discusses "${snippet.slice(0, 90)}...".\n• **Tip:** Verify key numbers and source identity independently before acting.`
       };
   }
 }

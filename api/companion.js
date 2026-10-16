@@ -74,41 +74,42 @@ export default async function handler(req, res) {
     // Smart Routing Strategy:
     // Groq Llama 3.3 70B is ultra-fast (~200 t/s) -> ideal for conversational ask, explain, safe-reply, summarize
     // Gemini 2.5 Flash has a massive 1M token context & deep reasoning -> ideal for deep investigate, challenge, claims, phishing
-    const preferGroq = isGroqValid && (action === 'explain' || action === 'safe-reply' || action === 'ask' || action === 'summarize') && contextContent.length < 8000;
+    const isGeminiFeature = action === 'summarize' || action === 'investigate' || action === 'phishing' || action === 'claims' || contextContent.length > 5000;
 
-    // 1. Try Preferred Model First
-    if (preferGroq) {
-      try {
-        aiResult = await callGroqCompanion(groqKey, action, query, contextContent, pageTitle, pageUrl, history, pageContext);
-      } catch (err) {
-        console.warn('Groq companion failed, trying Gemini:', err.message);
+    // 1. Feature-Based Primary Execution & Cross-Provider Fallback
+    if (isGeminiFeature) {
+      if (geminiKey) {
+        try {
+          aiResult = await callGeminiCompanion(geminiKey, action, query, contextContent, pageTitle, pageUrl, history, pageContext);
+        } catch (err) {
+          console.warn('Gemini companion failed, trying Groq:', err.message);
+        }
       }
-    } else if (geminiKey) {
-      try {
-        aiResult = await callGeminiCompanion(geminiKey, action, query, contextContent, pageTitle, pageUrl, history, pageContext);
-      } catch (err) {
-        console.warn('Gemini companion failed, trying Groq:', err.message);
+      if (!aiResult && isGroqValid) {
+        try {
+          aiResult = await callGroqCompanion(groqKey, action, query, contextContent, pageTitle, pageUrl, history, pageContext);
+        } catch (err) {
+          console.warn('Groq secondary fallback failed:', err.message);
+        }
+      }
+    } else {
+      if (isGroqValid) {
+        try {
+          aiResult = await callGroqCompanion(groqKey, action, query, contextContent, pageTitle, pageUrl, history, pageContext);
+        } catch (err) {
+          console.warn('Groq companion failed, trying Gemini:', err.message);
+        }
+      }
+      if (!aiResult && geminiKey) {
+        try {
+          aiResult = await callGeminiCompanion(geminiKey, action, query, contextContent, pageTitle, pageUrl, history, pageContext);
+        } catch (err) {
+          console.warn('Gemini fallback failed:', err.message);
+        }
       }
     }
 
-    // 2. Cross-Provider Fallback
-    if (!aiResult && geminiKey) {
-      try {
-        aiResult = await callGeminiCompanion(geminiKey, action, query, contextContent, pageTitle, pageUrl, history, pageContext);
-      } catch (err) {
-        console.warn('Gemini secondary fallback failed:', err.message);
-      }
-    }
-
-    if (!aiResult && isGroqValid) {
-      try {
-        aiResult = await callGroqCompanion(groqKey, action, query, contextContent, pageTitle, pageUrl, history, pageContext);
-      } catch (err) {
-        console.warn('Groq secondary fallback failed:', err.message);
-      }
-    }
-
-    // 3. Try OpenAI
+    // 2. Try OpenAI if keys provided and no result yet
     if (openaiKey && !aiResult) {
       try {
         aiResult = await callOpenAICompanion(openaiKey, action, query, contextContent, pageTitle, pageUrl, history);
@@ -137,34 +138,26 @@ export default async function handler(req, res) {
  * Produces grounded, helpful, plain-English analysis tailored to each action.
  */
 function generateSmartCompanionFallback(action, query, text, pageTitle, pageUrl) {
-  const snippet = text.slice(0, 300);
-  const words = text.split(/\s+/).length;
+  const snippet = text.slice(0, 160);
 
   switch (action) {
     case 'explain':
       return {
         action: 'explain',
         isLiveAI: false,
-        response: `**Simple Summary:**\n\nThis content is talking about: "${snippet.slice(0, 150)}..."\n\n**Key Takeaways in Plain English:**\n1. **Core Idea:** It discusses ${pageTitle || 'the topic'} in terms of why it matters to the reader.\n2. **Context:** The text spans about ${words} words from ${pageUrl ? new URL(pageUrl).hostname : 'this page'}.\n3. **Practical Meaning:** No complex jargon—essentially, it describes an update, announcement, or perspective that should be weighed with normal common sense.`,
-        suggestedNext: ['Investigate claims', 'Challenge assumptions', 'Ask a question']
+        response: `• **Core Idea:** Discusses ${pageTitle || 'this topic'} ("${snippet.slice(0, 90)}...").\n• **Plain Meaning:** Informational summary without verified institutional accreditation. Cross-check before citing.`,
+        suggestedNext: ['Investigate claims', 'Challenge assumptions']
       };
 
     case 'investigate': {
       const hasUrgency = /urgent|immediate|breaking|warning|alert|act now|hurry|freeze/i.test(text);
-      const hasMoney = /money|dollar|\$|wire|transfer|crypto|bitcoin|fee|payment|zelle/i.test(text);
-      const hasSensitive = /password|login|otp|code|ssn|credentials|pin/i.test(text);
-
-      const flags = [];
-      if (hasUrgency) flags.push("Uses high-urgency or panic-inducing words.");
-      if (hasMoney) flags.push("Mentions financial transfers, payments, or cryptocurrency.");
-      if (hasSensitive) flags.push("References sensitive credentials, codes, or login details.");
-      if (flags.length === 0) flags.push("No immediate high-risk scam triggers, but claims should still be verified.");
+      const hasSensitive = /password|login|otp|code|ssn|credentials|pin|wire|crypto/i.test(text);
 
       return {
         action: 'investigate',
         isLiveAI: false,
-        response: `**Investigation Assessment:**\n\n• **Content Reviewed:** "${snippet.slice(0, 120)}..."\n• **Source Page:** ${pageTitle} (${pageUrl || 'unknown'})\n\n**Findings:**\n${flags.map((f, i) => `${i + 1}. **${f}**`).join('\n')}\n\n**Verdict:** ${flags.length > 1 ? 'Exercise Caution — verify through independent official sources before acting.' : 'Informational — cross-reference key assertions before relying on them.'}`,
-        suggestedNext: ['Challenge This', 'Find Claims', 'Check Phishing']
+        response: `• **Status:** ${hasUrgency || hasSensitive ? 'Heightened Risk — urgency or credential triggers detected.' : 'Uncorroborated third-party claim.'}\n• **Verification:** No primary source links or certified public documents cited on this page.`,
+        suggestedNext: ['Challenge assumptions', 'Phishing check']
       };
     }
 
@@ -172,8 +165,8 @@ function generateSmartCompanionFallback(action, query, text, pageTitle, pageUrl)
       return {
         action: 'challenge',
         isLiveAI: false,
-        response: `**Skeptic's Challenge & Missing Evidence:**\n\n1. **Unproven Assumptions:** What proof is provided that the events described actually occurred on this date?\n2. **Missing Evidence:** Are there direct quotes from named, accredited sources or verified public documents?\n3. **Alternative Possibility:** Could this be sponsored marketing, selective framing, or an uncorroborated rumor?\n\n**To substantiate this:** Seek verification from primary government, regulatory, or accredited news archives.`,
-        suggestedNext: ['Find Claims', 'Explain in simple terms']
+        response: `• **Premise:** Assumes assertions are factual without independent verification.\n• **Missing Proof:** Lacks primary public records, data citations, or sworn statements.`,
+        suggestedNext: ['Find Claims', 'Explain']
       };
 
     case 'phishing': {
@@ -181,8 +174,8 @@ function generateSmartCompanionFallback(action, query, text, pageTitle, pageUrl)
       return {
         action: 'phishing',
         isLiveAI: false,
-        response: `**Phishing & Social Engineering Assessment:**\n\n• **Threat Level:** ${isSuspicious ? 'Potential Social Engineering Detected' : 'Low Risk Profile'}\n\n**Inspection Checklist:**\n1. **Sender / Domain:** Check if the URL (${pageUrl || 'current site'}) matches the official organization.\n2. **Urgency Tactics:** Does the message pressure you to act within minutes to avoid penalties?\n3. **Data Requests:** Never share 2FA codes, passwords, or wire money to unverified accounts.\n\n**Advice:** If this arrived as an unexpected message or email, do not click internal links or reply directly. Navigate to the verified official portal manually.`,
-        suggestedNext: ['Draft Safe Reply', 'Investigate Content']
+        response: `• **Threat Level:** ${isSuspicious ? 'Suspicious pattern detected — urgency and credential requests.' : 'Low immediate threat.'}\n• **Action:** Verify domain against official registrar. Never enter passwords from external links.`,
+        suggestedNext: ['Safe reply', 'Investigate']
       };
     }
 
@@ -190,24 +183,24 @@ function generateSmartCompanionFallback(action, query, text, pageTitle, pageUrl)
       return {
         action: 'claims',
         isLiveAI: false,
-        response: `**Factual Claims Requiring Verification:**\n\n1. Claim: "${snippet.slice(0, 100)}..."\n   ↳ *Verification Need: Check official press registry or primary corporate filing.*\n2. Claim: Specific dates, numbers, or actions attributed to people mentioned.\n   ↳ *Verification Need: Look for secondary coverage on Reuters, AP, or official portals.*`,
-        suggestedNext: ['Investigate these claims', 'Challenge assumptions']
+        response: `• **Claim 1:** "${snippet.slice(0, 90)}..." (Requires independent primary source confirmation).\n• **Claim 2:** Assertions regarding dates or authoritative figures lack citation.`,
+        suggestedNext: ['Investigate', 'Challenge']
       };
 
     case 'safe-reply':
       return {
         action: 'safe-reply',
         isLiveAI: false,
-        response: `**Recommended Safe Counter-Replies:**\n\n*Option 1 (Cautious & Professional):*\n> "Thank you for reaching out. Per our security guidelines, I cannot process requests or click external links without verbal verification through our official company directory."\n\n*Option 2 (Firm Verification):*\n> "I will review this request through the official customer support portal directly. Please provide a verified ticket reference number."\n\n*Option 3 (Refusal):*\n> "I do not share verification codes or execute transfers over direct messaging. I am closing this conversation."`,
-        suggestedNext: ['Check Phishing', 'Explain in simple terms']
+        response: `> "Thank you. Per security protocols, I do not process requests, share credentials, or follow links without official verification through our company directory."`,
+        suggestedNext: ['Phishing check', 'Explain']
       };
 
     case 'summarize':
       return {
         action: 'summarize',
         isLiveAI: false,
-        response: `**Page Summary: ${pageTitle}**\n\n• **Overview:** This page covers "${snippet.slice(0, 140)}..."\n• **Context:** Originates from ${pageUrl ? new URL(pageUrl).hostname : 'the active tab'}.\n• **Key Takeaway:** The core message focuses on providing information or instructions to the user. Always confirm sensitive or financial demands through an independent channel.`,
-        suggestedNext: ['Investigate claims', 'Challenge This']
+        response: `• **Page:** ${pageTitle} (${pageUrl ? new URL(pageUrl).hostname : 'active tab'}).\n• **Summary:** Focuses on "${snippet.slice(0, 110)}...". Confirm critical assertions through secondary outlets.`,
+        suggestedNext: ['Investigate claims', 'Challenge']
       };
 
     case 'ask':
@@ -215,8 +208,8 @@ function generateSmartCompanionFallback(action, query, text, pageTitle, pageUrl)
       return {
         action: 'ask',
         isLiveAI: false,
-        response: `Based on **${pageTitle}**:\n\nRegarding your question: *"${query || 'Analyze this content'}"*\n\nThe content states: "${snippet.slice(0, 180)}..."\n\n**Key Takeaway:** Remember to verify critical facts, double-check URLs, and never supply sensitive personal details without out-of-band confirmation.`,
-        suggestedNext: ['Investigate', 'Challenge This', 'Explain']
+        response: `• **Answer:** Regarding "${query || 'your query'}": Content outlines "${snippet.slice(0, 100)}...".\n• **Tip:** Verify key numbers and source identity independently before acting.`,
+        suggestedNext: ['Investigate', 'Explain']
       };
   }
 }
@@ -229,20 +222,19 @@ async function callGeminiCompanion(apiKey, action, query, text, title, url, hist
   const headings = pageContext.headings?.length ? `Key Page Headings:\n${pageContext.headings.slice(0, 10).map(h => `- ${h}`).join('\n')}\n` : '';
   const forms = pageContext.forms?.length ? `Forms On Page: ${pageContext.forms.map(f => f.hasPasswordField ? 'Password Login Form Detected' : 'Form').join(', ')}\n` : '';
 
-  const prompt = `You are VERATIS, an advanced AI digital-trust and verification assistant.
-The user is viewing a webpage titled "${title}" at "${url}".
+  const prompt = `You are VERATIS, a concise, high-precision digital-trust and verification AI analyzing webpage content.
+Webpage: "${title}" (${url})
 ${metaDesc}${headings}${forms}
-Active Webpage Content:
+Content:
 "${text.slice(0, 25000)}"
 
-Action Requested: "${action}".
-User Question / Instruction: "${query || action}".
+Action: "${action}". User Request: "${query || action}".
 
-GUIDELINES:
-- Use simple, plain, conversational English with short bullet points.
-- Distinguish warning signs from proven fraud.
-- Never claim an item is verified unless real proof exists.
-- Be direct, polite, helpful, and concise.`;
+CRITICAL FORMATTING RULES:
+- Output MUST be extremely short, concise, and to the point.
+- Maximum 2 to 3 bullet points or short sentences. Never exceed 70 words total.
+- NO greetings, pleasantries, or introductory phrases (do NOT say "Here is a summary", "Based on my analysis", etc.).
+- State the direct answer, verdict, or verification step immediately.`;
 
   const models = ['gemini-2.5-flash', 'gemini-3.5-flash-lite', 'gemini-flash-latest'];
   let lastErr = null;
@@ -256,7 +248,7 @@ GUIDELINES:
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{ role: 'user', parts: [{ text: prompt }] }],
-            generationConfig: { maxOutputTokens: 1200 }
+            generationConfig: { maxOutputTokens: 250 }
           })
         }
       );
@@ -271,7 +263,7 @@ GUIDELINES:
       if (textOutput) {
         return {
           action,
-          response: textOutput,
+          response: textOutput.trim(),
           isLiveAI: true,
           provider: `Gemini Live AI (${model})`,
           suggestedNext: ['Investigate deeper', 'Challenge evidence', 'Explain in simple terms']
@@ -294,8 +286,8 @@ async function callGroqCompanion(apiKey, action, query, text, title, url, histor
   const headings = pageContext.headings?.length ? `Key Page Headings:\n${pageContext.headings.slice(0, 8).map(h => `- ${h}`).join('\n')}\n` : '';
   const forms = pageContext.forms?.length ? `Forms On Page: ${pageContext.forms.map(f => f.hasPasswordField ? 'Password Login Form Detected' : 'Form').join(', ')}\n` : '';
 
-  const prompt = `You are VERATIS, an advanced AI digital-trust and verification assistant.
-The user is viewing a webpage titled "${title}" at "${url}".
+  const prompt = `You are VERATIS, a lightning-fast, high-precision digital-trust and verification AI.
+Webpage: "${title}" (${url})
 ${metaDesc}${headings}${forms}
 Active Webpage Content:
 "${text.slice(0, 15000)}"
@@ -303,14 +295,14 @@ Active Webpage Content:
 Action Requested: "${action}".
 User Question / Instruction: "${query || action}".
 
-GUIDELINES:
-- Use simple, plain, conversational English with short bullet points.
-- Distinguish warning signs from proven fraud.
-- Highlight specific claims that require independent verification.
-- Be direct, polite, helpful, and concise.`;
+CRITICAL FORMATTING RULES:
+- Output MUST be extremely short, concise, and to the point.
+- Maximum 2 to 3 bullet points or short sentences. Never exceed 70 words total.
+- NO greetings, pleasantries, or introductory phrases (do NOT say "Here is a summary", "Based on my analysis", etc.).
+- State the direct answer, verdict, or counter-point immediately.`;
 
   const messages = [
-    { role: 'system', content: 'You are VERATIS, a trusted, plain-English digital-trust and media verification AI.' },
+    { role: 'system', content: 'You are VERATIS. Output concise, plain-English digital-trust analysis in max 2-3 short bullet points without pleasantries.' },
     ...(history || []).slice(-4).map(h => ({ role: h.sender === 'user' ? 'user' : 'assistant', content: h.text })),
     { role: 'user', content: prompt }
   ];
@@ -325,7 +317,7 @@ GUIDELINES:
       model: 'llama-3.3-70b-versatile',
       messages,
       temperature: 0.2,
-      max_tokens: 1200
+      max_tokens: 250
     })
   });
 
@@ -339,7 +331,7 @@ GUIDELINES:
 
   return {
     action,
-    response: textOutput,
+    response: textOutput.trim(),
     isLiveAI: true,
     provider: 'Groq Cloud (Llama 3.3 70B)',
     suggestedNext: ['Investigate deeper', 'Challenge evidence', 'Explain in simple terms']

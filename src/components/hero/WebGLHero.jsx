@@ -695,29 +695,32 @@ export default function WebGLHero({ onExplore, onPhaseChange }) {
 
       {/* ── "REALITY HAS A BLIND SPOT" at the Bottom ── */}
       {phase === "idle" && (
-        <div className="absolute inset-x-0 bottom-0 z-30 flex flex-col items-center justify-end pb-0.5 sm:pb-1 pointer-events-none select-none overflow-visible px-4">
+        <div className="absolute inset-x-0 bottom-4 sm:bottom-6 md:bottom-8 z-30 flex flex-col items-center justify-end pointer-events-none select-none overflow-visible px-4">
           <button
             type="button"
             onClick={handleInteraction}
             onPointerDown={handleInteraction}
-            className="text-white pointer-events-auto cursor-pointer select-none touch-manipulation transition-opacity duration-150 hover:opacity-80 active:opacity-60 whitespace-nowrap"
+            className="group pointer-events-auto cursor-pointer select-none touch-manipulation transition-all duration-300 ease-out whitespace-nowrap active:scale-[0.985]"
             style={{
-              fontSize: "clamp(1.1rem, 3.4vw, 3.2rem)",
-              fontFamily: "'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif",
-              letterSpacing: "0.04em",
-              fontWeight: 300,
-              lineHeight: 1,
-              textShadow: "none",
-              color: "#FFFFFF",
-              background: "transparent",
+              fontSize: "clamp(0.85rem, 2.0vw, 1.7rem)",
+              fontFamily: "'Geist', 'Instrument Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+              letterSpacing: "0.22em",
+              marginRight: "-0.22em",
+              fontWeight: 450,
+              lineHeight: 1.2,
+              background: "linear-gradient(180deg, #FFFFFF 0%, #EFECE3 50%, #CCC8BB 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              filter: "drop-shadow(0 2px 10px rgba(0, 0, 0, 0.45)) drop-shadow(0 0 1px rgba(0, 0, 0, 0.8))",
               border: "none",
               outline: "none",
-              margin: 0,
-              padding: 0,
+              padding: "6px 14px",
               display: "inline-block",
             }}
           >
-            REALITY HAS A BLIND SPOT
+            <span className="transition-all duration-300 group-hover:drop-shadow-[0_0_18px_rgba(255,255,255,0.45)] group-hover:brightness-110">
+              REALITY HAS A BLIND SPOT
+            </span>
           </button>
         </div>
       )}

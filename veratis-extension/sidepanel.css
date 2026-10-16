@@ -183,6 +183,125 @@ body {
 }
 
 /* ==========================================================================
+   Circular Overlay Toggle Button
+   ========================================================================== */
+
+.circular-toggle-btn {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-surface);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 0;
+}
+
+.circular-toggle-btn:hover {
+  background-color: var(--bg-matte);
+  color: var(--text-primary);
+  border-color: #a1a1aa;
+  transform: scale(1.06);
+}
+
+.circular-toggle-btn.active {
+  background-color: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #059669;
+}
+
+.circular-toggle-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.circular-toggle-logo svg {
+  width: 15px;
+  height: 15px;
+}
+
+.circular-toggle-dot {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--emerald-accent);
+  border: 1.5px solid var(--bg-surface);
+  transition: background-color 0.2s, opacity 0.2s;
+}
+
+.circular-toggle-btn:not(.active) .circular-toggle-dot {
+  background-color: #a1a1aa;
+}
+
+.circular-toggle-btn:not(.active) {
+  opacity: 0.55;
+}
+
+/* Circular Switch in Settings Modal */
+.setting-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.setting-toggle-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.setting-toggle-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.circular-switch-btn {
+  width: 38px;
+  height: 22px;
+  border-radius: 12px;
+  background-color: #e4e4e7;
+  border: 1px solid #d4d4d8;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.2s, border-color 0.2s;
+  flex-shrink: 0;
+}
+
+.circular-switch-btn.active {
+  background-color: #10b981;
+  border-color: #059669;
+}
+
+.circular-switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.circular-switch-btn.active .circular-switch-thumb {
+  transform: translateX(16px);
+}
+
+/* ==========================================================================
    Page Context Card
    ========================================================================== */
 

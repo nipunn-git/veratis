@@ -20,6 +20,7 @@
   "permissions": [
     "sidePanel",
     "activeTab",
+    "tabs",
     "scripting",
     "storage",
     "contextMenus"
@@ -36,5 +37,16 @@
   ],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "icons/icon16.png",
+        "icons/icon48.png",
+        "icons/icon128.png",
+        "icons/logo.png"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }
