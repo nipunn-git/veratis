@@ -295,25 +295,12 @@ This platform was architected, designed, and developed by:
 
 <div align="center">
 
-| <a href="https://github.com/nipunn-git"><img src="https://github.com/nipunn-git.png" width="100px;" alt="Nipun Dhiman"/><br /><sub><b>Nipun Dhiman</b></sub></a><br />💻 System Architect & UI/UX Design | <a href="https://github.com/adityaa6060"><img src="https://github.com/adityaa6060.png" width="100px;" alt="Aditya Tanwar"/><br /><sub><b>Aditya Tanwar</b></sub></a><br />🧠 AI Systems & Extension Engineer |
+| <a href="https://github.com/nipunn-git"><img src="https://github.com/nipunn-git.png" width="100px;" alt="Nipun Dhiman"/><br /><sub><b>Nipun Dhiman</b></sub></a><br />| <a href="https://github.com/adityaa6060"><img src="https://github.com/adityaa6060.png" width="100px;" alt="Aditya Tanwar"/><br /><sub><b>Aditya Tanwar</b></sub></a><br />|
 | :---: | :---: |
 | [@nipunn-git](https://github.com/nipunn-git) | [@adityaa6060](https://github.com/adityaa6060) |
 
 </div>
 
-### Key Contributions
-- **[Nipun Dhiman](https://github.com/nipunn-git)**:
-  - Core platform architecture and minimal obsidian design system.
-  - Three.js WebGL Halftone Nebula kinetic particle shader canvas.
-  - Evidence Autopsy, Deception Radar, Rumor Reactor, and Neutralizer UI widgets.
-  - Top Command Bar, Draggable Grid, Tornado Vortex preloader, and typography hierarchy.
-- **[Aditya Tanwar](https://github.com/adityaa6060)**:
-  - Interactive WebGL tear transition hero and halftone wordmark reveal.
-  - Truth Tribunal adversarial multi-agent engine and Digital Twin test simulation.
-  - Standalone VERATIS Companion Manifest V3 Chrome Extension (Side Panel, DOM scraper, STT/TTS).
-  - Serverless Node.js backend API layer with dual Google Gemini 2.5 Flash and GroqCloud Llama 3.3 routing.
-
----
 
 ## 📄 License
 
