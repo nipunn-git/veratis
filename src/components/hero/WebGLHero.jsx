@@ -733,8 +733,8 @@ export default function WebGLHero({ onExplore, onPhaseChange }) {
       >
         <HalftoneWordmarkFooter
           wordmark="VERATIS"
-          height="clamp(160px, 25vh, 240px)"
-          crop={0.16}
+          height="clamp(200px, 30vh, 300px)"
+          crop={0.04}
           dotGap={5}
           radius={85}
           grain={0.2}
@@ -753,7 +753,7 @@ export default function WebGLHero({ onExplore, onPhaseChange }) {
 
       {/* ── Minimalist Scroll Prompt on Completed Halftone Page ── */}
       <div
-        className={`absolute bottom-[clamp(170px,27vh,255px)] inset-x-0 z-30 flex justify-center transition-opacity duration-500 ease-out ${
+        className={`absolute bottom-[clamp(210px,32vh,315px)] inset-x-0 z-30 flex justify-center transition-opacity duration-500 ease-out ${
           phase === "done" ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
       >
