@@ -4,7 +4,7 @@
 
 # VERATIS
 
-### *Reality Has a Blind Spot — Take One of Ours.*
+### *Your eyes aren't enough — Take One of Ours.*
 
 An advanced full-stack epistemic intelligence platform and media forensics suite that neutralizes synthetic manipulation, deepfakes, conversational social engineering, and viral disinformation through **adversarial multi-agent deliberation**, **neural latent inversion**, and **client-side browser intervention**.
 
