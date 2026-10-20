@@ -36,8 +36,8 @@ export default function HalftoneFooter({ onStartInvestigation }) {
       offCtx.font = `900 ${fontSize}px "Syne", "Space Grotesk", sans-serif`;
       offCtx.textAlign = 'center';
       offCtx.textBaseline = 'bottom';
-      // Wordmark cropped slightly by bottom edge as in reference
-      offCtx.fillText('VERATIS', width / 2, height + fontSize * 0.12);
+      // Draw wordmark flush to bottom with only a tiny crop so it's fully visible in normal viewport
+      offCtx.fillText('VERATIS', width / 2, height + fontSize * 0.04);
 
       const imgData = offCtx.getImageData(0, 0, width, height).data;
       const step = Math.max(7, Math.floor(width / 130)); // Halftone dot spacing
@@ -290,7 +290,7 @@ export default function HalftoneFooter({ onStartInvestigation }) {
       </div>
 
       {/* Halftone Wordmark Canvas Stage (Inspired by 21st.dev reference by Kedhareswer Naidu) */}
-      <div className="relative w-full h-[180px] sm:h-[240px] md:h-[280px] mt-6 overflow-hidden">
+      <div className="relative w-full h-[220px] sm:h-[280px] md:h-[320px] mt-4 -mb-2 overflow-hidden">
         <canvas
           ref={canvasRef}
           onMouseMove={handleMouseMove}
